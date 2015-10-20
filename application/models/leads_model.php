@@ -2927,7 +2927,7 @@ SELECT
     }
 
     function check_prodnameduplicates_lead($prodid, $customerid) {
-        $sql = "SELECT leaddetails.leadid FROM leaddetails,leadproducts WHERE leaddetails.leadid= leadproducts.leadid AND  leaddetails.company=" . $customerid . " AND leadproducts.productid::TEXT='" . $prodid . "'";
+         $sql = "SELECT leaddetails.leadid FROM leaddetails,leadproducts WHERE leaddetails.leadid= leadproducts.leadid AND  leaddetails.company=" . $customerid . " AND leadproducts.productid::TEXT='" . $prodid . "'";
 
         // echo $sql;	die;				
         $result = $this->db->query($sql);
@@ -2938,6 +2938,20 @@ SELECT
             return "false";
         }
     }
+    function check_prodgroup_dup_saleorder($prodgrp, $customerid) {
+          $sql = "select * from vw_lead_check_prod_duplicate WHERE  lead_customer_ref_id=".$customerid." AND product_group = '".$prodgrp."'";
+
+        // echo $sql;   die;                
+        $result = $this->db->query($sql);
+        $rowcount = $result->num_rows();
+        if ($rowcount == 0) {
+            return "true";
+        } {
+            return "false";
+        }
+    }
+
+    
 
     function get_lead_sample_rejectcnt($leadid,$substatus_id)
     {
