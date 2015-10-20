@@ -3437,19 +3437,22 @@ select  cast(customermasterhdr.id as varchar(50)), customermasterhdr.tempcustnam
 
     function checkduplicate_product($prodid, $customerid) {
         $prodid = $_POST['prodid'];
+        $prodgroup = $this->Leads_model->GetItemgroup($prodid);
+      //  print_r($prodgroup); die;
         $customerid = $_POST['customerid'];
         $user1 = $this->session->userdata['loginname'];
         //echo "prodid ".$prodid; 			echo "customerid ".$customerid; die;
-        $leaddata['response'] = $this->Leads_model->check_prodnameduplicates_lead($prodid, $customerid);
+          $leaddata['response'] = $this->Leads_model->check_prodnameduplicates_lead($prodid, $customerid);
+         $leaddata1['response'] = $this->Leads_model->check_prodgroup_dup_saleorder($prodgroup['itemgroup'], $customerid);
         //	echo $activitydata['response'];
-        if ($leaddata['response'] == 'false') {
-            $response = array(
-                'ok' => false,
-                'msg' => "<font color=red>This product group has been already added to this customer</font>");
-        } else {
+        if ($leaddata['response'] == 'true' && $leaddata1['response'] == 'true' ) {
             $response = array(
                 'ok' => true,
                 'msg' => "<font color=green>Yes..!You can use this product product</font>");
+        } else {
+            $response = array(
+               'ok' => false,
+                'msg' => "<font color=red>This product group has been already exists for this customer</font>");
         }
 
         echo json_encode($response);
