@@ -3450,9 +3450,19 @@ select  cast(customermasterhdr.id as varchar(50)), customermasterhdr.tempcustnam
                 'ok' => true,
                 'msg' => "<font color=green>Yes..!You can use this product product</font>");
         } else {
-            $response = array(
+            if($leaddata1['response']=='false')
+            {
+                $response = array(
                'ok' => false,
-                'msg' => "<font color=red>This product group has been already exists for this customer</font>");
+                'msg' => "<font color=red>This product group has been already billed for this customer</font>");
+            }
+            else
+            {
+               $response = array(
+               'ok' => false,
+                'msg' => "<font color=red>This product group has already a lead for this customer</font>");  
+            }
+            
         }
 
         echo json_encode($response);
