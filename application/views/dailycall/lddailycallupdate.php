@@ -135,7 +135,7 @@
                     pageable: true,
                     columnsresize: true,
                     sortable: true,
-                            showfilterrow: true,
+                    showfilterrow: true,
                     filterable: true,
                     columns:
                             [

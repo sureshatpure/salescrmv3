@@ -25,13 +25,13 @@ $(document).ready(function ()
                     var max_val = Math.max.apply(Math,array_1); 
                     if (($('#leadstatus').val() >= 2 && $('#leadstatus').val()!=8 &&  leadsubchange[0]!=15))
                     {
-                        if (max_val>0.01) 
+                        if (max_val>0.001) 
                            {
                             return 0;
                            }
                            else
                            {
-                            return 0.01
+                            return 0.001
                            }
                     }   
                     else

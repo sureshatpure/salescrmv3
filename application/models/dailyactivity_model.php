@@ -217,7 +217,7 @@ class dailyactivity_model extends CI_Model
 
 
 				$db_dc= $this->load->database('forms', TRUE);
-			//	$db2->query($sql);
+				//$db2->query($sql);
 				$result = $db_dc->query($sql);
 				$activitydetails = $result->result_array();
 				$all_record_count = count($activitydetails);
@@ -311,8 +311,22 @@ class dailyactivity_model extends CI_Model
 				 /*$sql="SELECT id,custgroup,exename,branch,itemgroup,potentialqty,subactivity,modeofcontact,hour_s,minit,quantity,division,date,remarks,l1status,complaints, user_id,leadid,'leads/viewleaddetails/'||leadid as link,
 				 				CASE WHEN COALESCE (leadid,0) ='0'  THEN 'Value'  ELSE 'Select' END result_type 
 				 				from vw_web_daily_activity d where id ='".$header_id."'";*/
-				 $sql="SELECT id,custgroup,exename,branch,itemgroup,potentialqty,subactivity,modeofcontact,hour_s,minit,quantity,division,date,remarks,l1status,complaints, user_id,leadid
-				 				from vw_web_daily_activity d where id ='".$header_id."'";
+				/* $sql="SELECT id,custgroup,exename,branch,itemgroup,potentialqty,subactivity,modeofcontact,hour_s,minit,quantity,division,date,remarks,l1status,complaints, user_id,leadid
+				 				from vw_web_daily_activity d where id ='".$header_id."'";*/
+
+				/* $sql="SELECT id,custgroup,exename,branch,itemgroup,potentialqty,subactivity,modeofcontact,hour_s,minit,quantity,division,date,remarks,l1status,complaints, user_id,d.leadid,ls.leadstatus as statusname,sub.lst_name as substatusname
+				 				from vw_web_daily_activity d, leaddetails ld, leadstatus ls, leadsubstatus sub  where id =".$header_id."
+              AND ld.leadid=d.leadid 
+             AND ld.leadstatus= ls.leadstatusid 
+             AND ld.ldsubstatus = sub.lst_sub_id";*/
+
+             $sql="SELECT id,custgroup,exename,branch,itemgroup,potentialqty,subactivity,modeofcontact,hour_s,minit,quantity,division,date,remarks,l1status,complaints, user_id,d.leadid,ls.leadstatus as statusname,sub.lst_name as substatusname
+				 				from 
+							 vw_web_daily_activity d 
+							LEFT JOIN leaddetails ld ON ld.leadid=d.leadid 
+						  LEFT JOIN leadstatus ls ON ls.leadstatusid=ld.leadstatus 
+						LEFT JOIN leadsubstatus sub ON sub.lst_sub_id=ld.ldsubstatus 
+             WHERE d.id=".$header_id;
 
 
 				$result = $this->db->query($sql);
@@ -346,11 +360,15 @@ class dailyactivity_model extends CI_Model
 					$row["l1status"] = $activitydetails[$i]["l1status"];
 					if($activitydetails[$i]["leadid"]==0)
 					{
-					$row["leadid"] = "No Leads";	
+					$row["leadid"] = "No Leads";
+					$row["leadstatusid"] = "No Status";	
+					$row["leadsubstatusid"] = "No Substatus";
 					}
 					else
 					{
 						$row["leadid"] = $activitydetails[$i]["leadid"];
+						$row["leadstatusid"] = $activitydetails[$i]["statusname"];	
+						$row["leadsubstatusid"] = $activitydetails[$i]["substatusname"];
 					}
 					
 				//	$row["result_type"] = $activitydetails[$i]["result_type"];
@@ -578,6 +596,8 @@ class dailyactivity_model extends CI_Model
 				$arr = "{\"leadid\":" .json_encode($result->result_array()). "}";
 				return $arr;
 			}
+
+			
 			
 
 			//function get_activity($custgrp,$prodgrp)
@@ -646,6 +666,10 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 				
 			}
 
+			
+       
+			
+
    		function getnull_leadids()
 		{
 
@@ -694,7 +718,271 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
         return $arr;
     }
 
-		
+/* functions added for merging start*/
+
+		function get_ldstatusbyid($lead_id)
+			{
+			$sql="SELECT d.leadstatus as leadstatusid , s.leadstatus as lead_status_name
+ FROM leaddetails d, leadstatus s  WHERE leadid=".$lead_id." and d.leadstatus = s.leadstatusid AND d.lead_close_status=0 and d.converted=0";
+
+				$result = $this->db->query($sql);
+				if($result->num_rows()==0)
+				{
+					$leadst_val['0']['id']=0;
+					$leadst_val['0']['status_name']=0;
+					
+				}
+				else
+				{
+					$leadst_val = $result->result_array();
+				}
+
+				//print_r($poten_val);
+				$arr =  json_encode($leadst_val);
+				$arr =	 '{ "statusid" :'.$arr.' }';
+				return $arr;
+			}
+
+			function get_ldstatusfor($lead_id)
+			{
+			$sql="SELECT  leadstatusid as statusid , leadstatus as statusname  FROM leadstatus WHERE order_by >= (SELECT  s.order_by as order_id
+ FROM  leadstatus s,leaddetails d  WHERE leadid=".$lead_id." and d.leadstatus = s.leadstatusid AND d.lead_close_status=0 and d.converted=0) ORDER BY order_by";
+
+				$result = $this->db->query($sql);
+				if($result->num_rows()==0)
+				{
+					$leadst_val['0']['id']=0;
+					$leadst_val['0']['status_name']=0;
+					
+				}
+				else
+				{
+					$leadst_val = $result->result_array();
+				}
+
+				//print_r($poten_val);
+				$arr =  json_encode($leadst_val);
+				$arr =	 '{ "statusid" :'.$arr.' }';
+				return $arr;
+			}
+
+			
+
+			function get_ldstatus()
+			{
+				$sql="SELECT leadstatusid as statusid, leadstatus as statusname FROM leadstatus WHERE leadstatusid<=6 ORDER BY 1";
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"statusid\":" .json_encode($result->result_array()). "}";
+				return $arr;
+			
+			}
+			function get_ldsubstatus()
+			{
+				$sql="SELECT lst_sub_id as substatusid, lst_name as substatusname   FROM leadsubstatus  WHERE lst_parentid=1 ORDER BY 1";
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"substatusid\":" .json_encode($result->result_array()). "}";
+				return $arr;
+			
+			}
+			function get_ldsubstatus_byid($stast_id)
+			{
+				$sql="SELECT lst_sub_id as substatusid, lst_name as substatusname   FROM leadsubstatus  WHERE lst_parentid=".$stast_id." ORDER BY 1";
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"substatusid\":" .json_encode($result->result_array()). "}";
+				return $arr;
+			
+			}
+			function get_ldsubstatus_byleadid($stast_id,$leadid)
+			{
+				$sub_orderid = $this->get_leadsubstatus_orderid($leadid);
+				$sql="SELECT lst_sub_id as substatusid, lst_name as substatusname   FROM leadsubstatus  WHERE lst_parentid=".$stast_id." AND lst_order_by >= ".$sub_orderid." ORDER BY lst_order_by";
+				
+				
+				//echo $sql;
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"substatusid\":" .json_encode($result->result_array()). "}";
+				return $arr;
+			}
+			function get_ldsubstatus_byleadid_update($stast_id,$leadid)
+			{
+				$lead_status_id = $this->get_leadstatus_id($leadid);
+				$sub_orderid = $this->get_leadsubstatus_orderid($leadid);
+				if($stast_id!=$lead_status_id)
+				{
+					$sql="SELECT lst_sub_id as substatusid, lst_name as substatusname   FROM leadsubstatus  WHERE lst_parentid= ".$stast_id."  AND lst_order_by >= ".$sub_orderid." ORDER BY lst_order_by";
+				}
+				else
+				{
+					$sql="SELECT lst_sub_id as substatusid, lst_name as substatusname   FROM leadsubstatus  WHERE lst_parentid= ".$stast_id."  AND lst_order_by >= ".$sub_orderid." ORDER BY lst_order_by";
+				}
+				//echo $sql;
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"substatusid\":" .json_encode($result->result_array()). "}";
+				return $arr;
+			}
+			function get_ldsubstatus_byidorder($stast_id,$orderid)
+			{
+				$sql="SELECT lst_sub_id as substatusid, lst_name as substatusname   FROM leadsubstatus  WHERE lst_parentid= ".$stast_id."  AND lst_order_by >= ".$orderid." ORDER BY lst_order_by";
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"substatusid\":" .json_encode($result->result_array()). "}";
+				return $arr;
+			
+			}
+			
+			function GetLeadStatusid($lst_name) 
+			{
+				$lst_name=urldecode($lst_name);
+				$this->db->select('leadstatusid');
+		        $this->db->from('leadstatus');
+		        $this->db->where('leadstatus', $lst_name);
+		        $result = $this->db->get();
+		        $ld_status = $result->result_array();
+		        return $ld_status[0]['leadstatusid'];
+			}
+			function GetLeadStatusid_update($lsubst_name) 
+			{
+				$lsubst_name=urldecode($lsubst_name);
+				$this->db->select('lst_parentid');
+		        $this->db->from('leadsubstatus');
+		        $this->db->where('lst_name', $lsubst_name);
+		        $result = $this->db->get();
+		        $ld_status = $result->result_array();
+		        return $ld_status[0]['lst_parentid'];
+			}
+			
+			function get_leadstatus_id($leadid) 
+			{
+				
+				$this->db->select('leadstatus');
+		        $this->db->from('leaddetails');
+		        $this->db->where('leadid', $leadid);
+		        $result = $this->db->get();
+		        $ld_status = $result->result_array();
+		        return $ld_status[0]['leadstatus'];
+			}
+			function GetLeadStatusid_order($lst_name) 
+			{
+				$lst_name=urldecode($lst_name);
+				$this->db->select('order_by');
+		        $this->db->from('leadstatus');
+		        $this->db->where('leadstsatus', $lst_name);
+		        $result = $this->db->get();
+		        $ld_status = $result->result_array();
+		        return $ld_status[0]['order_by'];
+		        //return $ld_status[0];
+			}
+
+			function get_leadsubstatus_orderid($leadid)
+			{
+				$sql="SELECT	lsub.lst_sub_id as substatusid, 
+							    lsub.lst_parentid as status_id,
+                  				lsub.lst_order_by as order_id
+                  		FROM 
+									leadsubstatus lsub, 
+									leadstatus ls, 
+									leaddetails ld  
+						WHERE 
+								lsub.lst_parentid=ld.leadstatus 
+							AND lsub.lst_sub_id=ld.ldsubstatus 
+      						AND ls.leadstatusid = lsub.lst_parentid
+      						AND ld.leadid=".$leadid." ORDER BY 1";
+
+      			$result = $this->db->query($sql);
+				if($result->num_rows()==0)
+				{
+					//$leadst_val['0']['status_id']=1;
+					$leadst_val['0']['order_id']=1;
+					//$leadst_val['0']['order_id']=1;
+					
+				}
+				else
+				{
+					$leadst_val = $result->result_array();
+				}
+
+
+				return $leadst_val['0']['order_id'];
+			}
+
+			function get_ldsubstatusforlead($leadid)
+			{
+				$sql="SELECT	lsub.lst_sub_id as substatusid, 
+							    lsub.lst_parentid as status_id,
+                  				lsub.lst_order_by as order_id
+                  		FROM 
+									leadsubstatus lsub, 
+									leadstatus ls, 
+									leaddetails ld  
+						WHERE 
+								lsub.lst_parentid=ld.leadstatus 
+							AND lsub.lst_sub_id=ld.ldsubstatus 
+      						AND ls.leadstatusid = lsub.lst_parentid
+      						AND ld.leadid=".$leadid." ORDER BY 1";
+
+      			$result = $this->db->query($sql);
+				if($result->num_rows()==0)
+				{
+					$leadst_val['0']['status_id']=1;
+					$leadst_val['0']['substatusid']=1;
+					$leadst_val['0']['order_id']=1;
+					
+				}
+				else
+				{
+					$leadst_val = $result->result_array();
+				}
+
+
+				return $leadst_val[0];
+
+		/*		$result1 = $this->db->query($sql1);
+				$result_sql=$result1->result_array();
+				
+				$substatusid =$result_sql[0]['substatusid'];
+				$status_id =$result_sql[0]['status_id'];
+				$order_id =$result_sql[0]['order_id'];
+
+				$sql="SELECT lst_sub_id as substatusid, lst_name as substatusname, lst_order_by FROM leadsubstatus WHERE lst_order_by >=".$substatusid." AND lst_parentid = ".$status_id." ORDER BY lst_order_by";
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"substatusid\":" .json_encode($result->result_array()). "}";
+				return $arr;*/
+
+
+
+			}
+
+			function get_ldsubstatus_for_lead($substs,$status,$order)
+			{
+				
+			$sql="SELECT lst_sub_id as substatusid, lst_name as substatusname, lst_order_by FROM leadsubstatus WHERE lst_order_by >=".$substs." AND lst_parentid = ".$status." ORDER BY lst_order_by";
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"substatusid\":" .json_encode($result->result_array()). "}";
+				return $arr;
+
+			}
+
+			function check_prodgroup_dup_saleorder($customergroup,$prodgroup)
+			{
+				$customergroup=urldecode($customergroup);
+				$sql = "select * from vw_lead_check_prod_duplicate WHERE  customergroup='".$customergroup."' AND product_group = '".$prodgroup."'";
+
+         //echo $sql;   die;                
+		        $result = $this->db->query($sql);
+		        $rowcount = $result->num_rows();
+		        if ($rowcount == 0) {
+		            return "true";
+		        } {
+		            return "false";
+		        }
+			}
 
 			
 

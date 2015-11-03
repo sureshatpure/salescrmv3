@@ -112,6 +112,14 @@
                         $("#jqxMenu").css('visibility', 'visible');
                         $('#customWindow').hide();
 
+                        $("#popupWindow").jqxWindow({ width: 360,height: 101, title:'Select the Appointment Date', resizable: false, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
+                            $("#appiontment_date").jqxDateTimeInput({ width: '107px',height: '41px',formatString: 'dd/MM/yyyy' });
+                            $("#appiontment_date").val(null);
+                        $("#popupWindowNot").jqxWindow({ width: 360,height: 101, title:'Enter the reason for not able to get the appiontment', resizable: false, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
+                        
+                            $("#not_able_to_get_appointment").jqxInput({ width: 107,height:41});
+                            var validateProductName = $('#validateProductName');
+                            
                         var dhdr_headerid;
                         var header_date;
                         var hide_update_button;
@@ -181,7 +189,7 @@
                             $("#customgroup").addClass('jqx-input-' + theme);
 
                         }
-$("#excelExport").jqxButton({
+                        $("#excelExport").jqxButton({
                                 theme: 'energyblue'
                             });
 
@@ -212,9 +220,9 @@ $("#excelExport").jqxButton({
       placeHolder: "Select Collector", displayMember: "collector",autoDropDownHeight:true, valueMember: "collector", width: 200, height: 25
                 });
                         /* change column type dynamic start*/
+                        
                         var  Results ={
 
-                                     
                                initResultsEditor: function(row){
 
                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
@@ -235,6 +243,7 @@ $("#excelExport").jqxButton({
                                     this.columntype = 'dropdownlist';
                                    }
                                },
+
                                initResultsEditorat: function(row){
                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                                   if(data.result_type === 'Value')
@@ -265,6 +274,39 @@ $("#excelExport").jqxButton({
 
                                    }
                                },
+                               initResultsEditorldst: function(row){
+                                  var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                  if(data.result_type === 'Value')
+                                    {
+                                          this.columntype ='dropdownlist';
+                                    } 
+
+                                   else if(data.result_type ==='Select') 
+                                   {
+                                      this.columntype ='dropdownlist';
+                                   // return false;
+
+                                   }
+                               },
+
+                               initResultsEditorldsubst: function(row){
+                                  var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                  if(data.result_type === 'Value')
+                                    {
+                                        
+                                          this.columntype ='dropdownlist';
+
+                                    } 
+
+                                   else if(data.result_type ==='Select') 
+                                   {
+                                    this.columntype='dropdownlist';
+                                  //  return false;
+
+                                   }
+                               },
+
+                               
                                initResultsEditorcon: function(row){
                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                                   if(data.result_type === 'Value')
@@ -281,15 +323,41 @@ $("#excelExport").jqxButton({
                                },
                                resultsEditor: function(row, cellvalue, editor){
                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                   var cust_grp = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "custgroup");
+                                   var prod_grp = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "itemgroup");
                                   switch(data.result_type){
                                      case 'Value':
                                        editor.jqxInput({ placeHolder: "No Leads" });
+                                       $.ajax({
+                                                type: "POST",
+                                                url: base_url + 'dailyactivity/checkduplicate_product/'+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp),
+                                                data: 'prodgroup=' + encodeURIComponent(prod_grp) + '&customergroup=' + encodeURIComponent(cust_grp),
+                                                dataType: 'json',
+                                                success: function (response)
+                                                {
+
+                                                    if (response.ok == false)
+                                                    {
+                                                        //  datevalidation=false;
+                                                        //validateProductName.html(response.msg);
+                                                             //alert("This product group has been already billed for this customer")
+                                                             validateProductName.html(response.msg);
+                                                            // editor.jqxCheckBox({ checked: false, hasThreeStates:false});
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "create_lead",0);
+                                                    }
+                                                    else
+                                                    {
+                                                        // datevalidation=true;
+                                                        validateProductName.html(response.msg);
+                                                        $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "create_lead",1);
+                                                    }
+
+                                                }
+                                            })
                                      break;
                                      case 'Select':
 
-                                            var cust_grp = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "custgroup");
-                                            var prod_grp = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "itemgroup");
-                                      
+                                     
                                             var list = {
                                                 datatype: "json",
                                                 datafields:
@@ -335,6 +403,8 @@ $("#excelExport").jqxButton({
                                                         
                                                     }
                                             });
+
+                                              
                                              
                                      break;
                                      case 'Cascaded':
@@ -361,7 +431,125 @@ $("#excelExport").jqxButton({
                                         } // end of switch
                                             
                                },
+                               resultsEditorldst: function(row, cellvalue, editor){
+                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                   var leadid =data.leadid;
+                                  // alert("leadid in resultsEditorldst "+leadid);
+                                   if (leadid!="")
+                                    {
+                                        geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
+                                    }
+                                    else
+                                    {
+                                        geturl=base_url + "dailyactivity/getldstatus";
+                                        
+                                    }
+                                   var stslist = {
+                                                datatype: "json",
+                                                datafields:
+                                                        [
+                                                            {name: 'statusid'},
+                                                            {name: 'statusname'}
+                                                        ],
+                                                id: 'statusid',
+                                                root: "statusid",
+                                                url: geturl,
+                                                cache: false,
+                                                async: false
+                                               
+                                            };
+
+                                            stslistdataAdapter = new $.jqx.dataAdapter(stslist, {
+                                                autoBind: true,
+                                                buildSelect: function (suboptions)
+                                                {
+                                                    
+                                                     console.log(suboptions);
+                                                    var data = new Array();
+                                                    $.each(suboptions, function (id, value)
+                                                    {
+                                                        var stslist = records[i];
+                                                        stslist.statusid = list.statusid;
+                                                        stslist.statusname = stslist.statusname;
+                                                        data.push(stslist);
+                                                    });
+                                                    return data;
+                                                }
+                                            });
+                                    
+                                    
+                                        editor.jqxDropDownList(
+                                            {
+                                                source: stslistdataAdapter.records, displayMember: "statusname",autoDropDownHeight: true, valueMember: "statusid",promptText:"Status",selectedIndex:0,placeHolder: 'Select status',renderer: function (index, label, value) 
+                                                    {
+                                                         var option = '<div value="' + value + '">' + label + '</div>';
+                                                           return option;
+                                                    }
+                                            });
+                               },
+                               resultsEditorldsubst: function(row, cellvalue, editor){
+                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                   var status_name = data.statusid;
+                                   var leadid =data.leadid;
+                                   alert("in initeditor addform substatus "+status_name);
+                                    if (leadid!="")
+                                    {
+                                      //  geturl=base_url + "dailyactivity/getldsubstatusforlead/"+leadid;
+                                      geturl=base_url + "dailyactivity/getldsubstatusbynameid/"+status_name+"/"+leadid;
+                                    }
+                                    else
+                                    {
+                                        geturl=base_url + "dailyactivity/getldsubstatusbyname/"+status_name;
+                                        
+                                    }
+                                   var substslist = {
+                                                datatype: "json",
+                                                datafields:
+                                                        [
+                                                            {name: 'substatusid'},
+                                                            {name: 'substatusname'}
+                                                        ],
+                                                id: 'substatusid',
+                                                root: "substatusid",
+                                                /*url: base_url + "dailyactivity/getldsubstatus",*/
+                                                /*url: base_url + "dailyactivity/getldsubstatusbyname/"+status_name,*/
+                                                 url: geturl,
+                                                cache: false,
+                                                async: false
+                                               
+                                            };
+
+                                            substslistdataAdapter = new $.jqx.dataAdapter(substslist, {
+                                                autoBind: true,
+                                                buildSelect: function (suboptions)
+                                                {
+                                                    
+                                                     console.log(suboptions);
+                                                    var data = new Array();
+                                                    $.each(suboptions, function (id, value)
+                                                    {
+                                                        var substslist = records[i];
+                                                        substslist.substatusid = list.substatusid;
+                                                        substslist.substatusname = substslist.substatusname;
+                                                        data.push(substslist);
+                                                    });
+                                                    return data;
+                                                }
+                                            });
+                                    
+                                    
+                                        editor.jqxDropDownList(
+                                            {
+                                                source: substslistdataAdapter.records, displayMember: "substatusname",autoDropDownHeight: true, valueMember: "substatusid",promptText:"SubStatus",selectedIndex:0,placeHolder: 'Select substatus',renderer: function (index, label, value) 
+                                                    {
+                                                         var option = '<div value="' + value + '">' + label + '</div>';
+                                                           return option;
+                                                    }
+                                            });
+                                            
+                               },
                                resultsEditorcon: function(row, cellvalue, editor){
+
                                    var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                                  //  var data.leadid = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                   
@@ -409,12 +597,7 @@ $("#excelExport").jqxButton({
                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                                   if(data.result_type === 'Select' && data.result !== '')
                                   {
-                                   /*  alert("data.result_type "+data.result_type);
-                                     alert("columnfield "+columnfield);
-                                     alert("value "+value);
-                                     alert("defaulthtml "+defaulthtml);
-                                     alert("columnproperties "+columnproperties);*/
-                                     //defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ data.result +' '+ data.units +'</div>');
+
                                      defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>LEADS</div>');
                     
 
@@ -423,6 +606,7 @@ $("#excelExport").jqxButton({
                                   return defaulthtml;
                                },
                                renderUnitsst: function(row, columnfield, value, defaulthtml, columnproperties){
+                                
                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                                   if(data.result_type === 'Select'){
                                      defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ value +'</div>');
@@ -430,10 +614,31 @@ $("#excelExport").jqxButton({
                                  }
                                 
                                   return defaulthtml;
+                               },
+                               renderUnitsldst: function(row, columnfield, value, defaulthtml, columnproperties){
+                                  var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                  /*if(data.result_type === 'Select'){
+                                     defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ value +'</div>');
+
+                                 }*/
+                                 defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ value +'</div>');
+                                
+                                  return defaulthtml;
+                               },
+                               renderUnitsldsubst: function(row, columnfield, value, defaulthtml, columnproperties){
+                                  var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                 /* if(data.result_type === 'Select'){
+                                     defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ value +'</div>');
+
+                                 }*/
+                                  defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ value +'</div>');
+                                  return defaulthtml;
                                }
+                               
+                              
                               };
 
-                        /* change column type dynameic end*/
+                        /* change column type dynamic end*/
                             var  Resultsupdate ={
                                initResultsEditor: function (row, datafield, columntype) {
                             var rowdata = $("#jqxgrid_n").jqxGrid('getrowdata', row);
@@ -529,6 +734,37 @@ $("#excelExport").jqxButton({
                                     this.columntype='textbox';
                                    }
                                },
+                                initResultsEditorldst: function(row){
+                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                  if(data.result_type === 'Value')
+                                    {
+                                          this.columntype ='dropdownlist';
+                                    } 
+
+                                   else if(data.result_type ==='Select') 
+                                   {
+                                      this.columntype ='dropdownlist';
+                                   // return false;
+
+                                   }
+                               },
+
+                               initResultsEditorldsubst: function(row){
+                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                  if(data.result_type === 'Value')
+                                    {
+                                        
+                                          this.columntype ='dropdownlist';
+
+                                    } 
+
+                                   else if(data.result_type ==='Select') 
+                                   {
+                                    this.columntype='dropdownlist';
+                                  //  return false;
+
+                                   }
+                               },
                                initResultsEditorcon: function(row){
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                   if(data.result_type === 'Value')
@@ -598,6 +834,10 @@ $("#excelExport").jqxButton({
                                                         
                                                     }
                                             });
+                            /* load status on loading start*/
+
+                            /* load status on loading end*/
+                                            
                                              
                                      break;
                                      case 'Cascaded':
@@ -622,6 +862,130 @@ $("#excelExport").jqxButton({
                                      case 'Select':
 
                                         } // end of switch
+                                            
+                               },
+                               resultsEditorldst: function(row, cellvalue, editor){
+                                 var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                   var leadid =data.leadid;
+                                  // alert("leadid in resultsEditorldst "+leadid);
+                                   if (leadid!="")
+                                    {
+                                        geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
+                                    }
+                                    else
+                                    {
+                                        geturl=base_url + "dailyactivity/getldstatus";
+                                        
+                                    }
+                                   var stslist = {
+                                                datatype: "json",
+                                                datafields:
+                                                        [
+                                                            {name: 'statusid'},
+                                                            {name: 'statusname'}
+                                                        ],
+                                                id: 'statusid',
+                                                root: "statusid",
+                                                url: geturl,
+                                                cache: false,
+                                                async: false
+                                               
+                                            };
+
+                                            stslistdataAdapter = new $.jqx.dataAdapter(stslist, {
+                                                autoBind: true,
+                                                buildSelect: function (suboptions)
+                                                {
+                                                    
+                                                     console.log(suboptions);
+                                                    var data = new Array();
+                                                    $.each(suboptions, function (id, value)
+                                                    {
+                                                        var stslist = records[i];
+                                                        stslist.statusid = list.statusid;
+                                                        stslist.statusname = stslist.statusname;
+                                                        data.push(stslist);
+                                                    });
+                                                    return data;
+                                                }
+                                            });
+                                    
+                                    
+                                        editor.jqxDropDownList(
+                                            {
+                                                source: stslistdataAdapter.records, displayMember: "statusname",autoDropDownHeight: true, valueMember: "statusid",promptText:"Status",selectedIndex:0,placeHolder: 'Select status',renderer: function (index, label, value) 
+                                                    {
+                                                         var option = '<div value="' + value + '">' + label + '</div>';
+                                                           return option;
+                                                    }
+                                            });
+
+                                       
+                                            
+                               },
+                               resultsEditorldsubst: function(row, cellvalue, editor){
+                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                //   var substatus_name = data.leadsubstatusid;
+                                   var status_name = data.leadstatusid;
+
+                                   var leadid =data.leadid;
+                                   alert("in initeditor for update substatus "+status_name);
+                                    if (leadid!="")
+                                    {
+                                      //  geturl=base_url + "dailyactivity/getldsubstatusforlead/"+leadid;
+                                      //geturl=base_url + "dailyactivity/getldsubstatusbynameid_update/"+status_name+"/"+leadid;
+                                      geturl=base_url + "dailyactivity/getldsubstatusbynameid/"+status_name+"/"+leadid;
+                                      
+                                    }
+                                    else
+                                    {
+                                        geturl=base_url + "dailyactivity/getldsubstatusbyname/"+status_name;
+                                        
+                                    }
+                                   var substslist = {
+                                                datatype: "json",
+                                                datafields:
+                                                        [
+                                                            {name: 'substatusid'},
+                                                            {name: 'substatusname'}
+                                                        ],
+                                                id: 'substatusid',
+                                                root: "substatusid",
+                                                /*url: base_url + "dailyactivity/getldsubstatus",*/
+                                                /*url: base_url + "dailyactivity/getldsubstatusbyname/"+status_name,*/
+                                                 url: geturl,
+                                                cache: false,
+                                                async: false
+                                               
+                                            };
+
+                                            substslistdataAdapter = new $.jqx.dataAdapter(substslist, {
+                                                autoBind: true,
+                                                buildSelect: function (suboptions)
+                                                {
+                                                    
+                                                     console.log(suboptions);
+                                                    var data = new Array();
+                                                    $.each(suboptions, function (id, value)
+                                                    {
+                                                        var substslist = records[i];
+                                                        substslist.substatusid = list.substatusid;
+                                                        substslist.substatusname = substslist.substatusname;
+                                                        data.push(substslist);
+                                                    });
+                                                    return data;
+                                                }
+                                            });
+                                    
+                                    
+                                        editor.jqxDropDownList(
+                                            {
+                                                source: substslistdataAdapter.records, displayMember: "substatusname",autoDropDownHeight: true, valueMember: "substatusid",promptText:"SubStatus",selectedIndex:0,placeHolder: 'Select substatus',renderer: function (index, label, value) 
+                                                    {
+                                                         var option = '<div value="' + value + '">' + label + '</div>';
+                                                           return option;
+                                                    }
+                                            });
                                             
                                },
                                resultsEditorcon: function(row, cellvalue, editor){
@@ -651,6 +1015,7 @@ $("#excelExport").jqxButton({
                                          editor.jqxDropDownList({source: ["LEADS"],autoDropDownHeight: true,selectedIndex:0});
                                  }           
                                },
+
                                renderUnits: function(row, columnfield, value, defaulthtml, columnproperties)
                                {
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
@@ -659,6 +1024,27 @@ $("#excelExport").jqxButton({
                                      defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>No Leads</div>');
                                 
                                  }
+                                  return defaulthtml;
+                               },
+
+                               renderUnitsldst:function(row, columnfield, value, defaulthtml, columnproperties)
+                               {
+                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                /*  if(data.result_type === 'Value' && data.result !== ''){
+                                    
+                                     defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>No Leads</div>');
+                                
+                                 }*/
+                                  defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ value +'</div>');
+                                  return defaulthtml;
+                               },
+                                renderUnitsldsubst: function(row, columnfield, value, defaulthtml, columnproperties){
+                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                 /* if(data.result_type === 'Select'){
+                                     defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ value +'</div>');
+
+                                 }*/
+                                  defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ value +'</div>');
                                   return defaulthtml;
                                },
                                renderUnitsUpdate: function(row, columnfield, value, defaulthtml, columnproperties,editor)
@@ -676,24 +1062,7 @@ $("#excelExport").jqxButton({
                                      alert("items "+editor.toSource());
                                  }
                                   return defaulthtml;
-                                  /*//alert("g_noofleads in renderUnitsUpdate "+g_noofleads)
-                                  this.columntype='textbox';
-                                  alert("columnproperties "+columnproperties.toSource());
-                                  if(g_noofleads == 0){
-                                     this.columntype='textbox';
-                                     //alert("in renderUnitsUpdate if conditon true");
-                                     defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>No Leads</div>');
-                                 }
-                                 else
-                                 {
-                                    this.columntype='dropdownlist';
-                                     var hrefUrl = base_url+'leads/viewleaddetails/' + value;
-                                    var defaulthtml = '<option value="'+value+'"><a href="'+hrefUrl+'" target="_blank">'+value+'</a></option>';
-                                                      
-                                    defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>No Leads</div>');
-                                 }
-                                 alert("returning "+defaulthtml);
-                                 return defaulthtml;*/
+                                 
                                },
 
                                renderUnitsat: function(row, columnfield, value, defaulthtml, columnproperties)
@@ -703,12 +1072,7 @@ $("#excelExport").jqxButton({
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                   if(data.result_type === 'Select' && data.result !== '')
                                   {
-                                   /*  alert("data.result_type "+data.result_type);
-                                     alert("columnfield "+columnfield);
-                                     alert("value "+value);
-                                     alert("defaulthtml "+defaulthtml);
-                                     alert("columnproperties "+columnproperties);*/
-                                     //defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>'+ data.result +' '+ data.units +'</div>');
+                                 
                                      defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>LEADS</div>');
                     
 
@@ -858,7 +1222,7 @@ $("#excelExport").jqxButton({
                                                                         }
                                                                 },
                                                                 {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
+                                                                {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
 
                                                                 {text: 'Activity Type', datafield: 'subactivity', width: 110, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorat, initeditor: Resultsupdate.resultsEditorat, cellsrenderer: Resultsupdate.renderUnitsat
                                                                 },
@@ -884,8 +1248,27 @@ $("#excelExport").jqxButton({
                                                                     {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Resultsupdate.initResultsEditorst, initeditor: Resultsupdate.resultsEditorst, cellsrenderer: Resultsupdate.renderUnitsst
 
                                                                     },
-                                                                
+                                                                    {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst, initeditor: Resultsupdate.resultsEditorldst, cellsrenderer: Resultsupdate.renderUnitsldst,promptText:'Select Status',
+                                                                                    cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
+                                                                                    {
+                                                                                       // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
+                                                                                          if (newvalue == 0)  {
+                                                                                           return oldvalue;
+                                                                                      } 
+                                                                                       else if (newvalue!=oldvalue)
+                                                                                       {
+                                                                                       $("#jqxgrid_n").jqxGrid('setcellvalue', row, "leadsubstatusid", "Select Substatus");
+                                                                                        return newvalue;
+                                                                                       }
+
+
+                                                                                    }
+
+                                                                      
+                                                                    },
+                                                                    {text: 'SubStatus', datafield: 'leadsubstatusid', width: 200, cellsalign: 'left',readonly:false,cellbeginedit:Resultsupdate.initResultsEditorldsubst, initeditor: Resultsupdate.resultsEditorldsubst, cellsrenderer: Resultsupdate.renderUnitsldsubst
                                                                    
+                                                                    },
 
                                                                 {text: 'Mode of Contact', datafield: 'modeofcontact', width: 100, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorcon, createeditor: Resultsupdate.resultsEditorcon, cellsrenderer: Resultsupdate.renderUnitsst
                                                                 },
@@ -951,57 +1334,7 @@ $("#excelExport").jqxButton({
                               $('#addWindow').jqxWindow({ width: 1024, height: 'auto' });
                             });
 
-                           /* view.on('click', function (event)
-                            {
-                                actionmode = "view";
-                                var rowindex = $("#jqxgrid").jqxGrid('getselectedrowindex');
-                                var cellindex = $("#jqxgrid").jqxGrid('getselectedrowindex');
-                                var headerid = $("#jqxgrid").jqxGrid('getcellvalue', rowindex, 'id');
-                                //  alert("Link button pressed");
-                                //         alert("action mode "+actionmode);
-                                // alert("headerid "+headerid);
-                                if (headerid == null)
-                                {
-                                    alert("Please Select a row");
-                                    //  $('#jqxButton').attr('href','http://google.com');
-                                    return false;
-
-                                }
-                                else
-                                {
-                                    // $('#jqxButton').attr('href',baseurl+'leads/viewleaddetails/'+leadid); 
-
-                                    jQuery.ajax({
-                                        dataType: "html",
-                                        url: 'dailyactivity/get_edit_data/' + headerid,
-                                        type: "POST",
-                                        async: false,
-                                        error: function (xhr, status) {
-                                            alert("check " + status + " test");
-                                        },
-                                        success: function (result) {
-                                            var obj = jQuery.parseJSON(result);
-                                            columns = obj[0].columns;
-                                            rows = obj[1].rows;
-
-                                            commonCols = obj[0].columns;
-                                        }
-
-                                    });
-                                    var source =
-                                            {
-                                                datatype: "json",
-                                                datafields: [],
-                                                id: 'id',
-                                                localdata: rows
-                                            };
-                                    header_date = $("#jqxgrid").jqxGrid('getcellvalue', rowindex, 'currentdate');
-                                    username = $("#jqxgrid").jqxGrid('getcellvalue', rowindex, 'exename');
-                                    branch = $("#jqxgrid").jqxGrid('getcellvalue', rowindex, 'branch');
-                                    header_date = convert(header_date);
-                                }
-
-                            });*/
+                           
                            
                         };
 
@@ -1038,10 +1371,11 @@ $("#excelExport").jqxButton({
                             row["potentialqty"] = '0';
                             row["customgroup"] = '';
                             row["balqnty"] = '';
-                            row["created_date"] = '';
                             row["leadid"] = parseInt(0);
                             row["noofleads"] = '0';
                             row["result_type"] = '';
+                            row["appiontmnt_dt"] = '';
+                            row["not_able_to_get_appointment"] = '';
                             return row;
 
                         }
@@ -1056,7 +1390,7 @@ $("#excelExport").jqxButton({
                                     datatype: "local",
                                     cache: false,
                                     datafields: [
-                                        {name: 'leadid',type:'number',datafield:'leadid'},
+                                        {name: 'leadid',type:'number',datafield:'leadid'}
                                         ],
                                     /*datafields: [
                                         {name: 'id'},
@@ -1118,8 +1452,9 @@ $("#excelExport").jqxButton({
                                         },
                                             
 
-                                        {text: 'noofleads', datafield: 'noofleads', hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                        {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
+                                        {text: 'noofleads', datafield: 'noofleads', hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                        {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
+                                        { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
                                         {text: 'Activity Type', datafield: 'Sub_Activity', width: 110, cellsalign: 'left', cellbeginedit:Results.initResultsEditorat, initeditor: Results.resultsEditorat, cellsrenderer: Results.renderUnitsat
                                         },
                                         {text: 'Potential', datafield: 'Potential_Quantity', width: 75, cellsalign: 'left', editable: false},
@@ -1140,25 +1475,93 @@ $("#excelExport").jqxButton({
                                                     }
                                         },
                                         {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Results.initResultsEditorst, initeditor: Results.resultsEditorst, cellsrenderer: Results.renderUnitsst
-                                        /*,cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
-                                                        {
-                                                           // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
-                                                              alert("row "+row);
-                                                              alert("datafield "+datafield);
-                                                              alert("columntype "+columntype);
-                                                              alert("oldvalue "+oldvalue);
-                                                              alert("newvalue "+newvalue);
-                                                       
-                                                        }
-                                        */
+                                       
                                         },
-                                        
-                                        
-                                        /*{text: 'Mode of Contact', datafield: 'Mode_Of_Contact', width: 100, cellsalign: 'left', columntype: 'dropdownlist',
-                                            createeditor: function (row, cellvalue, editor) {
-                                                editor.jqxDropDownList({source: ["E-mail", "Phone", "Visit"]});
-                                            }
-                                        },*/
+                                        {text: 'Status', datafield: 'statusid', width: 150, cellsalign: 'center', cellbeginedit:Results.initResultsEditorldst, initeditor: Results.resultsEditorldst, cellsrenderer: Results.renderUnitsldst,promptText:'Select Status',
+                                                        cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
+                                                        {
+                                                            alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
+                                                          //  alert("datafield "+datafield); 
+                                                              if (newvalue == 0) {
+                                                                    return oldvalue;
+                                                                }
+                                                                else if (newvalue!=oldvalue)
+                                                                {
+                                                                   $("#jqxgrid_add").jqxGrid('setcellvalue', row, "leadsubstatusid", "Select Substatus");
+                                                                    return newvalue;
+                                                                } 
+
+                                                        }
+
+                                          
+                                        },
+                                        {text: 'SubStatus', datafield: 'leadsubstatusid', width: 200, cellsalign: 'left',readonly:false,cellbeginedit:Results.initResultsEditorldsubst, initeditor: Results.resultsEditorldsubst, cellsrenderer: Results.renderUnitsldsubst,cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
+                                                    {
+                                                       // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
+                                                          if (newvalue == 0)  {
+                                                           return oldvalue;
+                                                      } 
+                                                       else if (newvalue!=oldvalue)
+                                                       {
+
+                                                         if(newvalue=='Appointment Fixed')
+                                                         {
+                                                            
+                                                            $("#appiontment_date").val(null);                                       
+                                                            $("#popupWindow").jqxWindow('show');
+                                                            $("#save_appdt").click(function (event){
+                                                                   
+                                                                    var date_text = $('#appiontment_date').jqxDateTimeInput('getText');
+                                                                    if(date_text=="")
+                                                                    {
+                                                                        alert("Please select the Appointment Date");
+                                                                        return false;
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "appiontmnt_dt",date_text);
+                                                                        $("#popupWindow").jqxWindow('close');
+                                                                    }
+                                                               
+                                                            });
+                                                            
+                                                         }
+                                                         /*Not able to get appointment start*/
+                                                          if(newvalue=='Not Able to get the Appointment')
+                                                         {
+                                                            
+                                                                                                  
+                                                            $("#popupWindowNot").jqxWindow('show');
+                                                            $("#save_na2gappdt").click(function (event){
+                                                            
+                                                                    var reason_text = $('#not_able_to_get_appointment').val();
+                                                                    if(reason_text=="")
+                                                                    {
+                                                                        alert("Please Enter the Reason");
+                                                                        return false;
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "not_able_to_get_appointment",reason_text);
+                                                                        $("#popupWindowNot").jqxWindow('close');
+                                                                    }
+                                                               
+                                                            });
+                                                            
+                                                         }
+                                                         /* Not able to get appointment end*/
+                                                         return newvalue;
+                                                       }
+
+                                                    }
+                                       
+                                        },
+                                        {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:false},
+
+                                        {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
+
                                         {text: 'Mode of Contact', datafield: 'Mode_Of_Contact', width: 100, cellsalign: 'left', cellbeginedit:Results.initResultsEditorcon, initeditor: Results.resultsEditorcon, cellsrenderer: Results.renderUnitsst
                                         },
                                         {text: 'Time Spent (Hrs)', datafield: 'hour', width: 75, cellsalign: 'left', columntype: 'dropdownlist',
@@ -1408,6 +1811,8 @@ $("#excelExport").jqxButton({
                             var valid_moc = 0;
                             var valid_subact = 0;
                             var valid_subgrp = 0;
+                            var valid_lead_status=0;
+                            var valid_lead_substatus=0;
                             var entrydate = $('#addcurrentdate').val();
                             entrydate = convertdmy_ymd(entrydate);
                             for (var k = 0; k < rowscount; k++)
@@ -1449,6 +1854,35 @@ $("#excelExport").jqxButton({
                                     valid_subgrp = 1;
                                 }
 
+                                 var lead_status = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "statusid");
+                               // alert("status in add "+lead_status);
+                                if (lead_status == null || lead_status == 'undefined')
+                                {
+                                    $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "statusid", "Please select the Lead status");
+                                    valid_lead_status = 0;
+                                    break;
+                                }
+                                else
+                                {
+                                    valid_lead_status = 1;
+                                }
+
+                                var lead_substatus = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "leadsubstatusid");
+                              //  alert("substatus in add "+lead_substatus);
+                                if (lead_substatus == null || lead_substatus == 'undefined' || lead_substatus == 'Select Substatus')
+                                {
+                                    $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead substatus");
+                                    valid_lead_substatus = 0;
+                                    break;
+                                }
+                                else
+                                {
+                                    valid_lead_substatus = 1;
+                                }
+
+                                
+                                
+                                
                                 var hr_moc = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "Mode_Of_Contact");
                                 if (hr_moc == null || hr_moc == 'undefined') {
                                     $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "Mode_Of_Contact", "Please Select Mode of Contact");
@@ -1545,8 +1979,21 @@ $("#excelExport").jqxButton({
                             var rows = $('#jqxgrid_add').jqxGrid('getrows');
                             for (var i = 0; i < rowscount; i++)
                             {
+                                var lead_appointmentdt=null;
                                 var rowval = {};
                                 griddata = $('#jqxgrid_add').jqxGrid('getrowdata', i);
+                               // alert("griddata "+griddata.toSource());
+             /*                   alert(" gird row  "+i+" appiontmnt_dt "+griddata.appiontmnt_dt);
+                                alert("type of object "+typeof(griddata.appiontmnt_dt));*/
+                                var objType= typeof(griddata.appiontmnt_dt);
+                                if(objType=='string')
+                                {   
+                             
+                                    lead_appointmentdt = convertdmy_ymd(griddata.appiontmnt_dt);
+                                   
+                                }
+                                
+                                //alert("lead_appointmentdt after if  "+lead_appointmentdt);
                                 rowval["currentdate"] = currentdate;
                                 rowval["custgroup"] = griddata.custgroup;
                                 rowval["itemgroup"] = griddata.itemgroup;
@@ -1559,7 +2006,19 @@ $("#excelExport").jqxButton({
                                 rowval["quantity"] = griddata.Quantity_Requirement;
                                 rowval["division"] = griddata.division;
                                 rowval["leadid"] = griddata.leadid;
-                               
+                                rowval["statusid"] = griddata.statusid;
+                                rowval["leadsubstatusid"] = griddata.leadsubstatusid;
+                                rowval["lead_appointmentdt"] = lead_appointmentdt;
+                                rowval["not_able_to_get_appointment"] = griddata.not_able_to_get_appointment;
+                                if (griddata.create_lead==undefined)
+                                {
+                                    rowval["create_lead"] = false;    
+                                }
+                                else
+                                {
+                                    rowval["create_lead"] = griddata.create_lead;
+                                }
+                                
                                 rowval["Remarks"] = griddata.Notes_Remarks;
                                 data[i] = rowval;
                             }
@@ -1601,6 +2060,8 @@ $("#excelExport").jqxButton({
                             var valid_moc = 0;
                             var valid_subact = 0;
                             var valid_subgrp = 0;
+                            var valid_lead_status=0;
+                            var valid_lead_substatus=0;
 
                             var hdr_id = $('#hdn_hdr_id').val();
 
@@ -1645,6 +2106,32 @@ $("#excelExport").jqxButton({
                                     valid_subgrp = 1;
                                 }
 
+                                var lead_status = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "leadstatusid");
+                               // alert("status "+lead_status);
+                                if (lead_status == null || lead_status == 'undefined')
+                                {
+                                    $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadstatusid", "Please select the Lead status");
+                                    valid_lead_status = 0;
+                                    break;
+                                }
+                                else
+                                {
+                                    valid_lead_status = 1;
+                                }
+
+                                var lead_substatus = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "leadsubstatusid");
+                               // alert("substatus "+lead_substatus);
+                                if (lead_substatus == null || lead_substatus == 'undefined' || lead_substatus == 'Select Substatus')
+                                {
+                                    $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead substatus");
+                                    valid_lead_substatus = 0;
+                                    break;
+                                }
+                                else
+                                {
+                                    valid_lead_substatus = 1;
+                                }
+
                                 var moc_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "modeofcontact");
                                 if (moc_value == null || moc_value == 'undefined') {
                                     $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "modeofcontact", "Please Select the Mode of contact");
@@ -1666,6 +2153,9 @@ $("#excelExport").jqxButton({
                                 {
                                     valid_hrs = 1;
                                 }
+
+                                
+
                                 var mins_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "minit");
                                 if (mins_value == null || mins_value == 'undefined') {
                                     $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "minit", "Please Select the Minutes");
@@ -1707,6 +2197,14 @@ $("#excelExport").jqxButton({
                                 return false;
                             }
                             if (valid_subgrp == 0)
+                            {
+                                return false;
+                            }
+                             if (valid_lead_status == 0)
+                            {
+                                return false;
+                            }
+                             if (valid_lead_substatus == 0)
                             {
                                 return false;
                             }
@@ -2031,52 +2529,7 @@ $("#excelExport").jqxButton({
                         });
                         //  return value from item master end
 
-                        // Source for Customer Master grid start
-                    /*    var url = "dailyactivity/get_data_customermaster";
-                        var rows = {};
-                        jQuery.ajax({
-                            dataType: "html",
-                            url: url,
-                            type: "POST",
-                            async: false,
-                            error: function (xhr, status) {
-                                //  alert("check "+status+" test");
-                            },
-                            success: function (result) {
-                                //  console.log(result);
-                                var obj = jQuery.parseJSON(result);
-                                rows = obj.rows;
-                                //   rows = obj[1].rows;
-                                //  commonCols=obj[0].columns;
-                            }
-                        });
-                        var customer_source =
-                                {
-                                    datatype: "json",
-                                    datafields: [{name: 'customergroup', type: 'string'}],
-                                    localdata: rows
-                                };
-
-                        //  alert("columns "+columns.toSource());    
-                        var dataAdapterCustomerMaster = new $.jqx.dataAdapter(customer_source);
-                        $("#jqxgrid_selectCustomMaster").jqxGrid(
-                                {
-                                    width: '100%',
-                                    source: dataAdapterCustomerMaster,
-                                    theme: theme,
-                                    selectionmode: 'singlecell',
-                                    sortable: true,
-                                    pageable: true,
-                                    columnsresize: true,
-                                    sortable: true,
-                                            showfilterrow: true,
-                                    filterable: true,
-                                    columns: [
-                                        {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600},
-                                    ]
-                                });*/
-
-                        // source for Customer Master grid end
+                        
 
                         //  return value from Customer Master start
                         $("#jqxgrid_selectCustomMaster").on('cellselect', function (event) {
@@ -2143,6 +2596,7 @@ $("#excelExport").jqxButton({
                                          $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "division", lead_salestype);
                                          $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "modeofcontact", lead_email_id);
                                          
+                               
                                          
 
                                 }
@@ -2187,6 +2641,7 @@ $("#excelExport").jqxButton({
                                          $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "division", lead_salestype);
                                          $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "Mode_Of_Contact", lead_email_id);
                                          $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "Sub_Activity", "LEADS");
+                                         $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "create_lead", 0);
                                          
 
     
@@ -2196,6 +2651,8 @@ $("#excelExport").jqxButton({
                                 {
                                     alert("in cellendedit add mode itemgroup");
                                 }
+
+                                
                             });
                         /* End for getting the selected leadid value from the grid*/
 
@@ -2318,6 +2775,7 @@ $("#excelExport").jqxButton({
                                 <div id="customWindow" style="float: left; width:100%; display:none;">
                                     <div id="customWindowContent" style="float: left; width:1013px;">
                                         <div style="float: left; width:95%; padding-left: 7px;" >
+                                         
                                             <label style="float: left;">Entry Date: </label><label style="float: left; padding-left: 40px;">Executive Name </label>&nbsp;<label style="float: left;  padding-left: 107px;">Branch </label>
                                         </div> 
 
@@ -2356,9 +2814,41 @@ $("#excelExport").jqxButton({
                                     </div>
                                 </div>
                                 <!-- Select customer master popup end -->
-
-                            </div>
-
+                                <!-- Select Appiontment Date popup Start -->
+                                    <div id="popupWindow">
+                                        <div style="overflow: hidden; margin-top: 0px;">
+                                            <table>
+                                                <tr>
+                                                    <td align="right">
+                                                        Appiontment Date:
+                                                    </td>
+                                                    <td align="left">
+                                                        <div id="appiontment_date" name="appiontment_date" style="margin-top: 0px;"> </div>
+                                                        <input style="margin-right: 5px;" type="button" name="save_appdt" id="save_appdt" value="Save" />
+                                                    </td>
+                                                </tr>
+                                            </table> 
+                                        </div>
+                                    </div>
+                                <!-- Select Appiontment Date popup End -->
+                                 <!-- Select Appiontment Date popup Start -->
+                                    <div id="popupWindowNot">
+                                        <div style="overflow: hidden; margin-top: 0px;">
+                                            <table>
+                                                <tr>
+                                                    <td align="right">
+                                                        Reason:
+                                                    </td>
+                                                    <td align="left">
+                                                    <input type="text" id="not_able_to_get_appointment" name="not_able_to_get_appointment" style="margin-top: 0px;" />
+                                                       
+                                                        <input style="margin-right: 5px;" type="button" name="save_na2gappdt" id="save_na2gappdt" value="Save" />
+                                                    </td>
+                                                </tr>
+                                            </table> 
+                                        </div>
+                                    </div>
+                                <!-- Select Appiontment Date popup End -->
 
                             <!--  This part of div contain windows End      -->
                         </div>

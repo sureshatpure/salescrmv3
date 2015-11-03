@@ -1,5 +1,6 @@
 	<div id="addWindow" style="width:100%; margin-left:200px; display:none;" >
 	    <div id="addWindowContent" style="float: left; width:100%;">
+	    	<span id="validateProductName"></span>
 	        <div style=" float: left; "><label>Entry Date: (you can add entries for the past one week only) </label>
 	        	<div id="addcurrentdate"></div>
 	        	<div id='collector'></div>

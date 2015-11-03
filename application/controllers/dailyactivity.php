@@ -120,7 +120,7 @@ class dailyactivity extends CI_Controller {
 
         //$sql='SELECT  distinct on (view_tempcustomermaster.tempcustname) view_tempcustomermaster.id,view_tempcustomermaster.tempcustname FROM     view_tempcustomermaster ORDER BY  tempcustname ASC';
         $collector = urldecode($collector);
-        $sql = "SELECT distinct  replace(customergroup,'''','')   as customergroup FROM customermasterhdr WHERE 
+        $sql = "SELECT distinct  replace(customergroup,'''','')   as customergroup,id  FROM customermasterhdr WHERE 
         collector ='".$collector."' or collector is NULL order by customergroup";
        //echo $sql; die;
         $activitydata['datacustomermaster'] = $this->dailyactivity_model->get_customers($sql);
@@ -198,6 +198,7 @@ class dailyactivity extends CI_Controller {
         //echo "current_date ".$_POST[0]['currentdate'];
         $hrd_currentdate = $_POST[0]['currentdate'];
         $grid_data = array_slice($_POST, 1, null, true);
+        echo"<pre>";print_r($grid_data);echo"</pre>"; die;
         $check_duplicates = $this->dailyactivity_model->check_dailyhdr_duplicates($hrd_currentdate, $user1);
         //  echo $check_duplicates; die;
         if ($check_duplicates == 0) {
@@ -377,6 +378,7 @@ class dailyactivity extends CI_Controller {
         $data = $this->dailyactivity_model->get_leadids($customergroup,$prodgroup);
         print_r($data);
     }
+    
     function getactivity($leaid)
     {
         $data = array();
@@ -429,6 +431,94 @@ class dailyactivity extends CI_Controller {
       {
          $this->load->view('dailyactivity/findyourleads');
       }
+/* functions added for merging start*/
+    function getldstatus()
+    {
+        $data = array();
+        $data = $this->dailyactivity_model->get_ldstatus();
+        print_r($data);
+    }
+
+    function getldsubstatus()
+    {
+
+        $data = array();
+        $data = $this->dailyactivity_model->get_ldsubstatus();
+        print_r($data);
+    }
+
+    function getldsubstatusbyname($statusname)
+    {
+        $lead_status_id = $this->dailyactivity_model->GetLeadStatusid($statusname); 
+        $data = array();
+        $data = $this->dailyactivity_model->get_ldsubstatus_byid($lead_status_id);
+        print_r($data);
+    }
+
+    function getldsubstatusbynameid($statusname,$leadid)
+    {
+        $lead_status_id = $this->dailyactivity_model->GetLeadStatusid($statusname);
+        $data = array();
+        $data = $this->dailyactivity_model->get_ldsubstatus_byleadid($lead_status_id,$leadid);
+        print_r($data);
+    }
+    function getldsubstatusbynameid_update($substatusname,$leadid)
+    {
+        $lead_status_id = $this->dailyactivity_model->GetLeadStatusid_update($substatusname);
+        $data = array();
+        $data = $this->dailyactivity_model->get_ldsubstatus_byleadid_update($lead_status_id,$leadid);
+        print_r($data);
+    }
+
+    function getldsubstatusforlead($leadid)
+    {
+
+        $lead_status_id = $this->dailyactivity_model->get_ldsubstatusforlead($leadid);
+        $subts_id=$lead_status_id['substatusid'];
+        $status_id=$lead_status_id['status_id'];
+        $order_id=$lead_status_id['order_id'];
+        $data = array();
+        $data = $this->dailyactivity_model->get_ldsubstatus_for_lead($subts_id,$status_id,$order_id);
+        print_r($data);
+    }
+   
+   
+
+    function getldstatusbyid($leadid) {
+
+        $activitydata['lead_status'] = $this->dailyactivity_model->get_ldstatusbyid($leadid);
+        $viewdata = $activitydata['lead_status'];
+        echo $viewdata;
+    }
+    function getldstatusfor($leadid) {
+
+        $activitydata['lead_status'] = $this->dailyactivity_model->get_ldstatusfor($leadid);
+        $viewdata = $activitydata['lead_status'];
+        echo $viewdata;
+    }
+
+    function checkduplicate_product($prodgrp, $customergroup) {
+
+            $leaddata1['response'] = $this->dailyactivity_model->check_prodgroup_dup_saleorder($prodgrp, $customergroup);
+        
+            if($leaddata1['response']=='false')
+            {
+                $response = array(
+               'ok' => false,
+                'msg' => "<font color=red>This product group has been already billed for this customer</font>");
+            }
+            else
+            {
+               $response = array(
+               'ok' => true,
+                'msg' => "<font color=green> A lead will be created </font>");  
+            }
+            
+        
+
+        echo json_encode($response);
+
+    }
 
    
 }

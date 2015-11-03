@@ -519,8 +519,10 @@ class Leads extends CI_Controller {
         $product_name = $this->Leads_model->get_productname($leaddata['leadproducts'][0]['productid']);
         $leaddata['optionsproedit'] = $this->Leads_model->get_products_edit();
         $leaddata['optionsprotypeedit'] = $this->Leads_model->get_products_dispatch();
+
         $leaddata['data'] = $this->Leads_model->get_synched_products($company_id, $product_name);
-      //  echo"<pre>";print_r($leaddata);echo"</pre>";
+        
+      //  echo"<pre>";print_r($leaddata);echo"</pre>"; die;
         $this->load->view('leads/editleadsnew', $leaddata);
     }
 
@@ -1829,7 +1831,7 @@ class Leads extends CI_Controller {
             $proddata[0]['quantity'] = $_POST['customFieldValue'][0];
             $proddata[0]['last_modified'] = date('Y-m-d:H:i:s');
             $proddata[0]['last_updated_user'] = $login_user_id;
-            //  echo"<pre>proddata ";print_r($proddata);echo"</pre>";
+              echo"<pre>_POST ";print_r($_POST);echo"</pre>";
             foreach ($_POST['customDispatch'] as $key => $val) 
             {
 
@@ -1868,6 +1870,7 @@ class Leads extends CI_Controller {
                  $this->Leads_model->update_custmastrhdr_addlead($customerhdr_email_contact,$this->input->post('company'));
 
             }
+           
            // echo"mailalert array <pre>";print_r($lead_status_mailalert); echo"</pre>";
             if ($id) {
                 //$addid = $this->Leads_model->update_lead_address($leadaddress, $leadid); //commented by suresh for skipping leadaddress table
