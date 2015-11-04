@@ -529,18 +529,18 @@ class dailyactivity_model extends CI_Model
 					INNER JOIN customermasterhdr ON leaddetails.company = customermasterhdr.id 
 					INNER JOIN view_tempitemmaster_grp ON view_tempitemmaster_grp.id=leadproducts.productid 
 					INNER JOIN lead_prod_potential_types ON lead_prod_potential_types.leadid=leaddetails.leadid 
-					WHERE trim(customermasterhdr.customergroup)='".$customer."' AND trim(view_tempitemmaster_grp.itemgroup)='".$item."' AND leaddetails.lead_close_status=0 and converted=0 
+					WHERE replace(trim(customermasterhdr.customergroup),'''','')='".$customer."' AND trim(view_tempitemmaster_grp.itemgroup)='".$item."' AND leaddetails.lead_close_status=0 and converted=0 
 					GROUP BY leaddetails.leadid";
-
+				
 				$sql1="SELECT   business_plan_customer_group_id.header_id as custgroup_id,  sum(business_yearly_gc_plan.potential_annual_qty)  as potential 
 				FROM  	business_yearly_gc_plan  
 				INNER JOIN business_plan_customer_group_id ON business_yearly_gc_plan.customer_group_id=business_plan_customer_group_id.header_id
 				INNER JOIN business_plan_item_group_id ON business_yearly_gc_plan.item_group_id=business_plan_item_group_id.header_id
 				WHERE 
-					business_plan_customer_group_id.customer_group ='".$customer."' 
+					replace(business_plan_customer_group_id.customer_group,'''','') ='".$customer."' 
 					AND business_plan_item_group_id.item_group='".$item."'
 					GROUP BY custgroup_id";
-
+				
 				$result = $this->db->query($sql);
 
 				
@@ -590,7 +590,8 @@ class dailyactivity_model extends CI_Model
 					INNER JOIN leadproducts ON leaddetails.leadid = leadproducts.leadid 
 					INNER JOIN customermasterhdr ON leaddetails.company = customermasterhdr.id 
 					INNER JOIN view_tempitemmaster_grp ON view_tempitemmaster_grp.id=leadproducts.productid 
-					WHERE trim(customermasterhdr.customergroup)='".$custgrp."' AND trim(view_tempitemmaster_grp.itemgroup)='".$prodgrp."' AND leaddetails.lead_close_status=0 and converted=0";
+					WHERE replace(trim(customermasterhdr.customergroup),'''','')='".$custgrp."' AND trim(view_tempitemmaster_grp.itemgroup)='".$prodgrp."' AND leaddetails.lead_close_status=0 and converted=0";
+				
 				$result = $this->db->query($sql);
 			//	$arr =  json_encode($result->result_array());
 				$arr = "{\"leadid\":" .json_encode($result->result_array()). "}";
