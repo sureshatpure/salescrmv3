@@ -122,11 +122,11 @@ class dailyactivity extends CI_Controller {
         $collector = urldecode($collector);
         /* $sql = "SELECT distinct  replace(customergroup,'''','')   as customergroup,id  FROM customermasterhdr WHERE 
         collector ='".$collector."' or collector is NULL order by customergroup";*/
-/*        $sql = "SELECT distinct  replace(customergroup,'''','')   as customergroup FROM customermasterhdr WHERE 
-        collector ='".$collector."' or collector is NULL order by customergroup";*/
+        $sql = "SELECT distinct  replace(customergroup,'''','')   as customergroup FROM customermasterhdr WHERE 
+        collector ='".$collector."' or collector is NULL order by customergroup";
 
-        $sql = "SELECT min(id) as id,replace(customergroup,'''','')   as customergroup FROM customermasterhdr WHERE    collector ='".$collector."' or collector is NULL    GROUP BY customergroup order by customergroup";
-
+      /*  $sql = "SELECT min(id) as id,replace(customergroup,'''','')   as customergroup FROM customermasterhdr WHERE    collector ='".$collector."' or collector is NULL    GROUP BY customergroup order by customergroup";
+*/
        //echo $sql; die;
         $activitydata['datacustomermaster'] = $this->dailyactivity_model->get_customers($sql);
         $viewdata = $activitydata['datacustomermaster'];
