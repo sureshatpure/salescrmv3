@@ -1688,7 +1688,8 @@
                                                                 showfilterrow: true,
                                                         filterable: true,
                                                         columns: [
-                                                            {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600},
+                                                                  {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600}
+                                                            
                                                         ]
                                                     });
 
@@ -2332,7 +2333,7 @@
                                             var customer_source1 =
                                                     {
                                                         datatype: "json",
-                                                        datafields: [{name: 'customergroup', type: 'string'}],
+                                                        datafields: [{name: 'customergroup', type: 'string'},{name: 'id', type:'number'}],
                                                         localdata: rows
                                                     };
 
@@ -2350,10 +2351,11 @@
                                                         pageable: true,
                                                         columnsresize: true,
                                                         sortable: true,
-                                                                showfilterrow: true,
+                                                        showfilterrow: true,
                                                         filterable: true,
                                                         columns: [
                                                             {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600},
+                                                            {text: 'id', dataField: 'id', width: 500, height: 600},
                                                         ]
                                                     });
 
