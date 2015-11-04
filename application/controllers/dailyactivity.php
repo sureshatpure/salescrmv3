@@ -98,7 +98,8 @@ class dailyactivity extends CI_Controller {
 
     function get_data_itemmaster() {
        
-        $sql = 'SELECT  DISTINCT  itemgroup FROM view_tempitemmaster_grp ORDER BY itemgroup asc';
+        /*$sql = 'SELECT  DISTINCT  itemgroup FROM view_tempitemmaster_grp ORDER BY itemgroup asc';*/
+        $sql = 'SELECT  min(id) as itemid, itemgroup FROM view_tempitemmaster_grp GROUP BY itemgroup ORDER BY itemgroup asc';
         $activitydata['dataitemmaster'] = $this->dailyactivity_model->get_products($sql);
         $viewdata = $activitydata['dataitemmaster'];
         header('Content-Type: application/x-json; charset=utf-8');
@@ -122,7 +123,7 @@ class dailyactivity extends CI_Controller {
         $collector = urldecode($collector);
         /* $sql = "SELECT distinct  replace(customergroup,'''','')   as customergroup,id  FROM customermasterhdr WHERE 
         collector ='".$collector."' or collector is NULL order by customergroup";*/
-/*        $sql = "SELECT distinct  replace(customergroup,'''','')   as customergroup FROM customermasterhdr WHERE 
+     /*   $sql = "SELECT distinct  replace(customergroup,'''','')   as customergroup FROM customermasterhdr WHERE 
         collector ='".$collector."' or collector is NULL order by customergroup";*/
 
         $sql = "SELECT min(id) as id,replace(customergroup,'''','')   as customergroup FROM customermasterhdr WHERE    collector ='".$collector."' or collector is NULL    GROUP BY customergroup order by customergroup";
@@ -196,19 +197,53 @@ class dailyactivity extends CI_Controller {
         $lastupdatedate = date('Y-m-d:H:i:s');
         $creationuser = $this->session->userdata['identity'];
         $lastupdateuser = "";
-        $execode = $this->session->userdata['empcode'];
-        $exename = $this->session->userdata['identity'];
-        $user1 = $this->session->userdata['loginname'];
+        
+        echo $execode = $this->session->userdata['empcode'];
+        echo $exename = $this->session->userdata['identity'];
+        echo $user1 = $this->session->userdata['loginname'];
+        echo $user_id = $this->session->userdata['user_id'];
+        $login_user_id = $this->session->userdata['user_id'];
        
         //echo "current_date ".$_POST[0]['currentdate'];
         $hrd_currentdate = $_POST[0]['currentdate'];
         $grid_data = array_slice($_POST, 1, null, true);
-        echo"<pre>";print_r($grid_data);echo"</pre>"; die;
+        echo"<pre>";print_r($grid_data);echo"</pre>"; 
         $check_duplicates = $this->dailyactivity_model->check_dailyhdr_duplicates($hrd_currentdate, $user1);
         //  echo $check_duplicates; die;
         if ($check_duplicates == 0) {
             if ($_POST['save'] == 'true') {
-
+                /* Start for inserting into leaddetails*/
+                  foreach ($grid_data as $key => $val) 
+                  {
+                      if ($val['create_lead']==1)
+                      {
+                        
+                         $lead_no = 'LEAD-DCV';
+                         $lead_status_id = $this->dailyactivity_model->get_leadstatusidbyname($val['statusid']);
+                         $lead_substatus_id = $this->dailyactivity_model->get_leadsub_statusidbyname($val['leadsubstatusid']);
+                         $customer_id=$val['hdn_cust_id'];
+                         $customer_address[] = $this->dailyactivity_model->get_customer_address($customer_id);
+                         print_r($$customer_address);
+                         $leaddetails = array('lead_no' => $lead_no,
+                            'leadstatus' => $lead_status_id,
+                            'company' => $customer_id,
+                            'customer_id' => $customer_id,
+                            'email_id' => trim($this->input->post('email_id')),
+                            'assignleadchk' => $user_id,
+                            'leadsource' => 13,
+                      
+                            'ldsubstatus' => $lead_substatus_id,
+                           
+                            'createddate' => date('Y-m-d:H:i:s'),
+                            'last_modified' => date('Y-m-d:H:i:s'),
+                            'created_user' => $login_user_id
+                        );
+                      }  
+                } // end of for loop $grid_data
+               
+                /* End for inserting into leaddetails*/
+                print_r($leaddetails);
+die;
                 $daily_hdr_id = $this->dailyactivity_model->GetMaxVal('dailyactivityhdr');
                 $daily_hdr_id = $daily_hdr_id + 1;
                 $daily_hdr = array('id' => $daily_hdr_id,
@@ -518,12 +553,10 @@ class dailyactivity extends CI_Controller {
                'ok' => true,
                 'msg' => "<font color=green> A lead will be created </font>");  
             }
-            
-        
-
         echo json_encode($response);
 
     }
+
 
    
 }

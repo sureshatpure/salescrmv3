@@ -489,6 +489,7 @@
                                },
                                resultsEditorldsubst: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                   alert(data.toSource());
                                    var status_name = data.statusid;
                                    var leadid =data.leadid;
                                    alert("in initeditor addform substatus "+status_name);
@@ -926,6 +927,7 @@
                                resultsEditorldsubst: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                 //   var substatus_name = data.leadsubstatusid;
+
                                    var status_name = data.leadstatusid;
 
                                    var leadid =data.leadid;
@@ -1437,7 +1439,9 @@
                                     columns: [
                                         {text: 'UID', datafield: 'uid', width: 150, cellsalign: 'left', hidden: true},
                                         {text: 'Customer Group', datafield: 'custgroup', width: 100, editable: false},
+                                        {text: 'Cust Id', datafield: 'id', width: 100, editable: false},
                                         {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},   
+                                        {text: 'Prod Id', datafield: 'itemid', width: 100, editable: false},
                                         {text: 'Lead id', datafield: 'leadid', displayfield: 'leadid', width: 127, cellsalign: 'center', cellbeginedit:Results.initResultsEditor, initeditor: Results.resultsEditor, cellsrenderer: Results.renderUnits,promptText:'Select Leadid',
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                         {
@@ -1480,7 +1484,9 @@
                                         {text: 'Status', datafield: 'statusid', width: 150, cellsalign: 'center', cellbeginedit:Results.initResultsEditorldst, initeditor: Results.resultsEditorldst, cellsrenderer: Results.renderUnitsldst,promptText:'Select Status',
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                         {
+                                                            alert("statusid "+datafield); 
                                                             alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
+
                                                           //  alert("datafield "+datafield); 
                                                               if (newvalue == 0) {
                                                                     return oldvalue;
@@ -1492,8 +1498,6 @@
                                                                 } 
 
                                                         }
-
-                                          
                                         },
                                         {text: 'SubStatus', datafield: 'leadsubstatusid', width: 200, cellsalign: 'left',readonly:false,cellbeginedit:Results.initResultsEditorldsubst, initeditor: Results.resultsEditorldsubst, cellsrenderer: Results.renderUnitsldsubst,cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                     {
@@ -1667,7 +1671,7 @@
                                             var customer_source1 =
                                                     {
                                                         datatype: "json",
-                                                        datafields: [{name: 'customergroup', type: 'string'}],
+                                                        datafields: [{name: 'id', type: 'number'},{name: 'customergroup', type: 'string'}],
                                                         localdata: rows
                                                     };
 
@@ -1688,6 +1692,7 @@
                                                                 showfilterrow: true,
                                                         filterable: true,
                                                         columns: [
+                                                                  {text: 'id', dataField: 'id', width: 100, height: 600},
                                                                   {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600}
                                                             
                                                         ]
@@ -1993,10 +1998,12 @@
                                     lead_appointmentdt = convertdmy_ymd(griddata.appiontmnt_dt);
                                    
                                 }
-                                
-                                //alert("lead_appointmentdt after if  "+lead_appointmentdt);
+                                alert("type of object itemid id"+typeof(griddata.itemid));
+                                alert("itemid  "+griddata.itemid);
                                 rowval["currentdate"] = currentdate;
                                 rowval["custgroup"] = griddata.custgroup;
+                                rowval["hdn_cust_id"] = griddata.id;
+                                rowval["hdn_prod_id"] = griddata.itemid;
                                 rowval["itemgroup"] = griddata.itemgroup;
                                 rowval["potentialqty"] = griddata.Potential_Quantity;
                                 rowval["subactivity"] = griddata.Sub_Activity;
@@ -2333,7 +2340,7 @@
                                             var customer_source1 =
                                                     {
                                                         datatype: "json",
-                                                        datafields: [{name: 'customergroup', type: 'string'},{name: 'id', type:'number'}],
+                                                        datafields: [{name: 'customergroup', type: 'string'}],
                                                         localdata: rows
                                                     };
 
@@ -2354,8 +2361,7 @@
                                                         showfilterrow: true,
                                                         filterable: true,
                                                         columns: [
-                                                            {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600},
-                                                            {text: 'id', dataField: 'id', width: 500, height: 600},
+                                                            {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600}
                                                         ]
                                                     });
 
@@ -2417,7 +2423,7 @@
                         var item_source =
                                 {
                                     datatype: "json",
-                                    datafields: [{name: 'itemgroup', type: 'string'}],
+                                    datafields: [{name: 'itemid', type: 'string'},{name: 'itemgroup', type: 'string'}],
                                     id: 'itemgroup',
                                     localdata: rows
                                 };
@@ -2437,6 +2443,7 @@
                                     showfilterrow: true,
                                     filterable: true,
                                     columns: [
+                                        {text: 'Prod Id', dataField: 'itemid', width: 100, height: 600},
                                         {text: 'Product Group', dataField: 'itemgroup', width: 500, height: 600},
                                     ]
                                 });
@@ -2449,6 +2456,7 @@
 
                             var rowindex = $("#jqxgrid_selectItemMaster").jqxGrid('getselectedrowindex', event.args.rowindex);
                             var prodName = $("#jqxgrid_selectItemMaster").jqxGrid('getcellvalue', event.args.rowindex, 'itemgroup');
+                            var prodId = $("#jqxgrid_selectItemMaster").jqxGrid('getcellvalue', event.args.rowindex, 'itemid');
 
                              //var leadid = $("#jqxgrid_selectItemMaster").jqxGrid('getcellvalue', event.args.rowindex, 'leaid');
                             if (actionmode == 'add')
@@ -2460,6 +2468,7 @@
                                 gl_productname = $("#jqxgrid_add").jqxGrid('getcellvalue', jqxgrid_add_row_index, 'itemgroup');
 
                                 $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "Potential_Quantity", potential_quantity);
+                                $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "itemid", prodId);
 
                             }
 
@@ -2537,6 +2546,7 @@
                         $("#jqxgrid_selectCustomMaster").on('cellselect', function (event) {
                             var rowindex = $("#jqxgrid_selectCustomMaster").jqxGrid('getselectedrowindex', event.args.rowindex);
 
+                            var gl_hdn_custid   = $("#jqxgrid_selectCustomMaster").jqxGrid('getcellvalue', event.args.rowindex, 'id'); 
                             var custid = $("#jqxgrid_selectCustomMaster").jqxGrid('getcellvalue', event.args.rowindex, 'customergroup');
                             var custName = $("#jqxgrid_selectCustomMaster").jqxGrid('getcellvalue', event.args.rowindex, 'customergroup');
 
@@ -2545,6 +2555,7 @@
                             {
                                 $('#addWindow').jqxWindow('show');
                                 $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "custgroup", custName);
+                                $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "id", gl_hdn_custid);
 
                             }
                             if (actionmode == 'update')

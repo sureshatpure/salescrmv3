@@ -752,8 +752,8 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 				$result = $this->db->query($sql);
 				if($result->num_rows()==0)
 				{
-					$leadst_val['0']['id']=0;
-					$leadst_val['0']['status_name']=0;
+					$leadst_val['0']['statusid']=0;
+					$leadst_val['0']['statusname']=0;
 					
 				}
 				else
@@ -985,6 +985,60 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 		        }
 			}
 
+			function get_leadstatusidbyname($statusname)
+			{
+				//SELECT  leadstatusid from	 leadstatus  where	 leadstatus='Prospect'
+		        $this->db->select('leadstatusid');
+		        $this->db->from('leadstatus');
+		        $this->db->where('leadstatus', $statusname);
+		        $result = $this->db->get();
+		        $ld_status = $result->result_array();
+		        //print_r($ld_status); die;
+		        return $ld_status[0]['leadstatusid'];
+			}
+			function get_leadsub_statusidbyname($sub_statusname)
+			{
+				//SELECT * FROM leadsubstatus WHERE lst_name='Pending with Regional Manager'  ORDER BY 1
+		        $this->db->select('*');
+		        $this->db->from('leadsubstatus');
+		        $this->db->where('lst_name', $sub_statusname);
+		        $result = $this->db->get();
+		        $ld_status = $result->result_array();
+		        //print_r($ld_status); die;
+		        return $ld_status[0]['lst_sub_id'];
+			}
+
+			function get_customer_address($customer_id) 
+     		{
+    
+                $sql_master = "SELECT 
+                            ''::text as leadid,
+                            upper(dtl.city) as cityname, 
+                            ''::text as statecode,
+                            ''::text as countrycode ,
+                            dtl.country as contryname,
+                            dtl.state as statename,
+                            dtl.postal_code as postalcode,
+                            dtl.mobile_no as mobile_no,
+                            dtl.fax as fax,
+                            dtl.cust_account_id,
+                            dtl.address1 as address,
+                            hdr.contact_persion as contact_person,
+                            hdr.contact_no as contact_number,
+                            hdr.contact_mailid as contact_mailid
+                        FROM 
+                            customermasterhdr hdr
+                            LEFT JOIN customermasterdtl dtl ON dtl.id=hdr.id
+                        WHERE 
+                            hdr.id=" .$customer_id. "  AND dtl.addresstypeid  IN (SELECT DISTINCT addresstypeid FROM customermasterdtl  GROUP BY id,addresstypeid ) LIMIT 1";
+              // echo "sql_master".$sql_master; die;
+            $result1 = $this->db->query($sql_master);
+            $customer_detail = $result1->result_array();
+ 
+            return $customer_detail[0];
+        
+    		}
+			
 			
 
 }
