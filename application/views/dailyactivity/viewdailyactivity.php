@@ -2333,7 +2333,7 @@
                                             var customer_source1 =
                                                     {
                                                         datatype: "json",
-                                                        datafields: [{name: 'customergroup', type: 'string'},{name: 'id', type:'number'}],
+                                                        datafields: [{name: 'customergroup', type: 'string'}],
                                                         localdata: rows
                                                     };
 
@@ -2354,8 +2354,7 @@
                                                         showfilterrow: true,
                                                         filterable: true,
                                                         columns: [
-                                                            {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600},
-                                                            {text: 'id', dataField: 'id', width: 500, height: 600},
+                                                            {text: 'Customer Group', dataField: 'customergroup', width: 500, height: 600}
                                                         ]
                                                     });
 
