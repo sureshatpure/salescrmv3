@@ -972,10 +972,11 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 
 			function check_prodgroup_dup_saleorder($customergroup,$prodgroup)
 			{
+
 				$customergroup=urldecode($customergroup);
 				$sql = "select * from vw_lead_check_prod_duplicate WHERE  customergroup='".$customergroup."' AND product_group = '".$prodgroup."'";
 
-         //echo $sql;   die;                
+       //  echo $sql;   die;                
 		        $result = $this->db->query($sql);
 		        $rowcount = $result->num_rows();
 		        if ($rowcount == 0) {
@@ -1034,12 +1035,62 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
               // echo "sql_master".$sql_master; die;
             $result1 = $this->db->query($sql_master);
             $customer_detail = $result1->result_array();
- 
+ 			
+ 			
             return $customer_detail[0];
         
     		}
+
+    		function get_user_branch($user_id)
+    		{
+    			// SELECT upper(location_user) FROM vw_web_user_login where header_user_id=276
+
+    			   $sql ="SELECT upper(location_user) as location_user  FROM vw_web_user_login where header_user_id=".$user_id;
+    			
+		         	$result = $this->db->query($sql);
+		         	$branch = $result->result_array();
+		         	
+		        return $branch[0]['location_user'];
+    		}
+
+
+    		 function get_leadproduct_saletype()
+     		{
+
+	           $sql = "SELECT sale_type_id,n_value_id,n_value,n_value_displayname FROM lead_sale_type";
+	           $result = $this->db->query($sql);
+	           $options = $result->result_array(); 
+	         /*  foreach ($options as $option) 
+	           {
+	            $options_arr[$option['n_value_id']] = $option['n_value'];
+	           }
+	          return $options_arr;*/
+	          return $options;
+     	 }
+
+     	 function get_leadsalestype()
+			{
+			//$sql="SELECT sale_type_id,n_value_id,n_value,n_value_displayname FROM lead_sale_type";
+			$sql="SELECT n_value_id,n_value_displayname FROM lead_sale_type";
+				$result = $this->db->query($sql);
+				$leadst_val = $result->result_array();
+				//print_r($poten_val);
+				$arr =  json_encode($leadst_val);
+				$arr =	 '{ "saletypeid" :'.$arr.' }';
+				return $arr;
+			}
 			
-			
+			function get_salestypeid_byname($salestype)
+			{
+				//SELECT * FROM leadsubstatus WHERE lst_name='Pending with Regional Manager'  ORDER BY 1
+		        $this->db->select('*');
+		        $this->db->from('lead_sale_type');
+		        $this->db->where('n_value_displayname', $salestype);
+		        $result = $this->db->get();
+		        $ld_status = $result->result_array();
+		        //print_r($ld_status); die;
+		        return $ld_status[0]['n_value_id'];
+			}
 
 }
 ?>

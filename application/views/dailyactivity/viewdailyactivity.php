@@ -336,7 +336,7 @@
                                                 success: function (response)
                                                 {
 
-                                                    if (response.ok == false)
+                                                    if (response.ok == false) 
                                                     {
                                                         //  datevalidation=false;
                                                         //validateProductName.html(response.msg);
@@ -418,13 +418,65 @@
                                resultsEditorst: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                                  //  var data.leadid = $('#jqxgrid_add').jqxGrid('getrowdata', row);
-                  
-                                 var leadid =data.leadid;
+                     
+                                  var leadid =data.leadid;
+                                  var createLead =data.create_lead;
                                   switch(data.result_type){
                                      case 'Value':
-                                       editor.jqxDropDownList(
+                                      if(createLead==1)
+                                      {
+                                          geturl=base_url + "dailyactivity/getleadsalestype";
+        
+                                   var sale_tye_list = {
+                                                datatype: "json",
+                                                datafields:
+                                                        [
+                                                            {name: 'n_value_id'},
+                                                            {name: 'n_value_displayname'}
+                                                        ],
+                                                id: 'n_value_id',
+                                                root: "saletypeid",
+                                                url: geturl,
+                                                cache: false,
+                                                async: false
+                                               
+                                            };
+
+                                            sale_tye_listdataAdapter = new $.jqx.dataAdapter(sale_tye_list, {
+                                                autoBind: true,
+                                                buildSelect: function (suboptions)
+                                                {
+                                                    
+                                                     console.log(suboptions);
+                                                    var data = new Array();
+                                                    $.each(suboptions, function (id, value)
+                                                    {
+                                                        var sale_tye_list = records[i];
+                                                        sale_tye_list.statusid = list.statusid;
+                                                        sale_tye_list.statusname = sale_tye_list.statusname;
+                                                        data.push(sale_tye_list);
+                                                    });
+                                                    return data;
+                                                }
+                                            });
+                                    
+                                    
+                                        editor.jqxDropDownList(
+                                            {
+                                                source: sale_tye_listdataAdapter.records, displayMember: "n_value_displayname",autoDropDownHeight: true, valueMember: "n_value_id",promptText:"Sales Type",selectedIndex:0,placeHolder: 'Select Type',renderer: function (index, label, value) 
+                                                    {
+                                                         var option = '<div value="' + value + '">' + label + '</div>';
+                                                           return option;
+                                                    }
+                                            });
+                                      }
+                                      else
+                                      {
+                                        editor.jqxDropDownList(
                                         {source: ["Tanker", "Repacked", "Container", "Textile", "Leather", "Paper", "Exxon Speciality", "Lubricant", "Polymer", "Pure Speciality", "Others"]
                                         });
+                                      }
+                                       
                                      break;
                                      case 'Select':
 
@@ -489,10 +541,10 @@
                                },
                                resultsEditorldsubst: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
-                                   alert(data.toSource());
+                                //   alert(data.toSource());
                                    var status_name = data.statusid;
                                    var leadid =data.leadid;
-                                   alert("in initeditor addform substatus "+status_name);
+                                  // alert("in initeditor addform substatus "+status_name);
                                     if (leadid!="")
                                     {
                                       //  geturl=base_url + "dailyactivity/getldsubstatusforlead/"+leadid;
@@ -1439,9 +1491,9 @@
                                     columns: [
                                         {text: 'UID', datafield: 'uid', width: 150, cellsalign: 'left', hidden: true},
                                         {text: 'Customer Group', datafield: 'custgroup', width: 100, editable: false},
-                                        {text: 'Cust Id', datafield: 'id', width: 100, editable: false},
+                                        {text: 'Cust Id', datafield: 'id', width: 100, editable: false,hidden: true},
                                         {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},   
-                                        {text: 'Prod Id', datafield: 'itemid', width: 100, editable: false},
+                                        {text: 'Prod Id', datafield: 'itemid', width: 100, editable: false,hidden: true},
                                         {text: 'Lead id', datafield: 'leadid', displayfield: 'leadid', width: 127, cellsalign: 'center', cellbeginedit:Results.initResultsEditor, initeditor: Results.resultsEditor, cellsrenderer: Results.renderUnits,promptText:'Select Leadid',
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                         {
@@ -1456,9 +1508,9 @@
                                         },
                                             
 
-                                        {text: 'noofleads', datafield: 'noofleads', hidden:false, width: 20, cellsalign: 'left', editable: false},
-                                        {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
-                                        { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                        {text: 'noofleads', datafield: 'noofleads', hidden:true, width: 20, cellsalign: 'left', editable: false},
+                                        {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
+                                        { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
                                         {text: 'Activity Type', datafield: 'Sub_Activity', width: 110, cellsalign: 'left', cellbeginedit:Results.initResultsEditorat, initeditor: Results.resultsEditorat, cellsrenderer: Results.renderUnitsat
                                         },
                                         {text: 'Potential', datafield: 'Potential_Quantity', width: 75, cellsalign: 'left', editable: false},
@@ -1484,10 +1536,13 @@
                                         {text: 'Status', datafield: 'statusid', width: 150, cellsalign: 'center', cellbeginedit:Results.initResultsEditorldst, initeditor: Results.resultsEditorldst, cellsrenderer: Results.renderUnitsldst,promptText:'Select Status',
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                         {
-                                                            alert("statusid "+datafield); 
+                                                            
                                                             alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
 
                                                           //  alert("datafield "+datafield); 
+                                                           var sid = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "statusid");
+                                                           alert('statusid: ' + sid);
+
                                                               if (newvalue == 0) {
                                                                     return oldvalue;
                                                                 }
@@ -1562,7 +1617,7 @@
                                                     }
                                        
                                         },
-                                        {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:false},
+                                        {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
 
                                         {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
 
