@@ -201,19 +201,46 @@ class dailyactivity extends CI_Controller {
          $execode = $this->session->userdata['empcode'];
          $exename = $this->session->userdata['identity'];
          $user1 = $this->session->userdata['loginname'];
+         $login_username = $this->session->userdata['username'];
          $user_id = $this->session->userdata['user_id'];
         $login_user_id = $this->session->userdata['user_id'];
-        $sales_type_flag="R";
+
+         $assign_to_array = $this->Leads_model->GetAssigntoName($login_user_id);
+         $lead_assign_name = $assign_to_array['0']['location_user'] . "-" . $assign_to_array['0']['aliasloginname'];
+         $duser = $assign_to_array['0']['duser'];
+         $header_user_id = $assign_to_array['0']['header_user_id'];
+         $sales_type_flag="R";
        
         //echo "current_date ".$_POST[0]['currentdate'];
         $hrd_currentdate = $_POST[0]['currentdate'];
         $grid_data = array_slice($_POST, 1, null, true);
-       // echo"<pre>";print_r($grid_data);echo"</pre>"; 
+        echo"<pre> grid data";print_r($grid_data);echo"</pre>"; 
         $check_duplicates = $this->dailyactivity_model->check_dailyhdr_duplicates($hrd_currentdate, $user1);
         //  echo $check_duplicates; die;
         $today_date = date('Y-m-d:H:i:s');
         if ($check_duplicates == 0) {
             if ($_POST['save'] == 'true') {
+
+                /* start insert into dailyhdr table */
+                $daily_hdr_id = $this->dailyactivity_model->GetMaxVal('dailyactivityhdr');
+                $daily_hdr_id = $daily_hdr_id + 1;
+                $daily_hdr = array('id' => $daily_hdr_id,
+                    'currentdate' => $hrd_currentdate,
+                    'execode' => $execode,
+                    'exename' => $exename,
+                    'companycode' => 'PPC',
+                    'accperiod' => '2015-2016',
+                    'user1' => $user1,
+                    'creationuser' => $creationuser,
+                    'creationdate' => $createddate,
+                    'lastupdateuser' => $lastupdateuser
+                    );
+                
+                $daily_hdr_insert_status = $this->dailyactivity_model->save_dailyactivityhdr($daily_hdr);
+                
+
+               
+                /* end of insert into dailyhdr table*/
                 /* Start for inserting into leaddetails*/
                   foreach ($grid_data as $key => $val) 
                   {
@@ -238,9 +265,12 @@ class dailyactivity extends CI_Controller {
                          }
                          
                          $lead_no = 'LEAD-DCV';
+                         $lead_status_name = $val['statusid'];
+                         $lead_sub_status_name =$val['leadsubstatusid'];
                          $lead_status_id = $this->dailyactivity_model->get_leadstatusidbyname($val['statusid']);
                          $lead_substatus_id = $this->dailyactivity_model->get_leadsub_statusidbyname($val['leadsubstatusid']);
                          $sales_type_id = $this->dailyactivity_model->get_salestypeid_byname($val['division']);
+
                          $customer_id=$val['hdn_cust_id'];
                          $customer_address[] = $this->dailyactivity_model->get_customer_address($customer_id);
                          $user_branch = $this->dailyactivity_model->get_user_branch($login_user_id);
@@ -446,7 +476,10 @@ class dailyactivity extends CI_Controller {
                             }
                          /* End for saving in mail_alert_table*/
                          /* Start for inserting into leadproducts*/
-
+                           if ($val['quantity'] == "" || $val['quantity'] == 'undefined') 
+                              {
+                                $val['quantity']=0;
+                              }
                            $leadproducts = array('leadid' => $lead_id,
                             'productid' => $val['hdn_prod_id'],
                             'quantity' => $val['quantity'],
@@ -479,77 +512,554 @@ class dailyactivity extends CI_Controller {
                             $lead_pord_poten_id = $this->Leads_model->save_leadprodpotentypes($lead_prod_poten_type);
 
                             $k = 0;
-                         /* Ene for inserting into lead_prod_potential_types*/
+                         /* End for inserting into lead_prod_potential_types*/
+
+                         /* Start of creating log and sublog details with revert back to previous status*/
+                           $lead_log_details = array('lh_lead_id' => $lead_id,
+                        'lh_user_id' => $login_user_id,
+                        'lh_lead_curr_status' => $lead_status_name,
+                        'lh_lead_curr_statusid' => $lead_status_id,
+                        'lh_created_date' => date('Y-m-d:H:i:s'),
+                        'lh_created_user' => $login_user_id,
+                        'lh_comments' => $this->input->post('comments'),
+                        'action_type' => 'Insert',
+                        'created_user_name' => $login_username,
+                        'assignto_user_id ' => $login_user_id,
+                        'assignto_user_name' => $lead_assign_name
+                    );
+                    
+                    $logid = $this->Leads_model->create_leadlog($lead_log_details);
+
+                    $lead_sublog_details = array(
+                        'lhsub_lh_id' => $logid,
+                        'lhsub_lh_lead_id' => $lead_id,
+                        'lhsub_lh_user_id' => $login_user_id,
+                        'lhsub_lh_lead_curr_status' => $lead_status_name,
+                        'lhsub_lh_lead_curr_statusid' => $lead_status_id,
+                        'lhsub_lh_lead_curr_sub_status' => $lead_sub_status_name,
+                        'lhsub_lh_lead_curr_sub_statusid' => $lead_substatus_id,
+                        'lhsub_lh_comments' => $this->input->post('comments'),
+                        'lhsub_lh_created_date' => date('Y-m-d:H:i:s'),
+                        'lhsub_lh_created_user' => $login_user_id,
+                        'lhsub_action_type' => 'Insert',
+                        'lhsub_created_user_name' => $login_username,
+                        'lhsub_assignto_user_id ' => $login_user_id,
+                        'lhsub_assignto_user_name' => $lead_assign_name
+                    );
+
+
+                    $sublogid = $this->Leads_model->create_lead_sublog($lead_sublog_details);
+                    /* end log details */
+                    // Sample and Trails log and sublog entry for revert back - Start 
+                        
+                        if ($lead_substatus_id == 20 || $lead_substatus_id == 21) 
+                        {   $samle_reject_count=0;
+                            $lead_status_update='Y';
+                            // Start update leaddetails 
+                            $log_lead_status_name = $this->Leads_model->GetLeadStatusName($this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count));
+                            $sublog_lead_substatus_name = $this->Leads_model->GetLeadSubStatusName($this->revert_substatus($lead_substatus_id,$samle_reject_count));
+                            $leaddetails_update = array(
+                                'leadstatus' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                'ldsubstatus' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
+                                'last_modified' => date('Y-m-d:H:i:s'),
+                                'last_updated_user' => $login_user_id
+                            );
+                            
+                            $id = $this->Leads_model->update_lead_status($leaddetails_update, $lead_id);
+
+                            // End update leaddetails_update 
+
+                            // insert a record in lead log details
+                            // Start lead log details revert back 
+                            $lead_log_details_update = array('lh_lead_id' => $lead_id,
+                                'lh_user_id' => $login_user_id,
+                                'lh_lead_curr_status' => $log_lead_status_name,
+                                'lh_lead_curr_statusid' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                'lh_updated_date' => date('Y-m-d:H:i:s'),
+                                'lh_last_updated_user' => $login_user_id,
+                                'lh_comments' => trim($this->input->post('comments')),
+                                'action_type' => 'RevertBack',
+                                'modified_user_name' => $login_username,
+                                'assignto_user_id ' => $login_user_id,
+                                'assignto_user_name' => $lead_assign_name,
+                                'status_update' => $lead_status_update
+                            );
+
+                            $logid = $this->Leads_model->create_leadlog($lead_log_details_update);
+                             //End lead log details revert back 
+
+                            // insert a record in lead sub log details
+                            // Start revert back sub log details 
+                            $lead_sublog_details_update = array(
+                                'lhsub_lh_id' => @$logid,
+                                'lhsub_lh_lead_id' => $lead_id,
+                                'lhsub_lh_user_id' => $login_user_id,
+                                'lhsub_lh_lead_curr_status' => $log_lead_status_name,
+                                'lhsub_lh_lead_curr_statusid' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                'lhsub_lh_lead_curr_sub_status' => $sublog_lead_substatus_name,
+                                'lhsub_lh_lead_curr_sub_statusid' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
+                                'lhsub_lh_updated_date' => date('Y-m-d:H:i:s'),
+                                'lhsub_lh_last_updated_user' => $login_user_id,
+                                'lhsub_lh_comments' => trim($this->input->post('comments')),
+                                'lhsub_action_type' => "RevertBack",
+                                'lhsub_modified_user_name' => $login_username,
+                                'lhsub_assignto_user_id ' => $login_user_id,
+                                'lhsub_assignto_user_name' => $lead_assign_name,
+                                'lhsub_status_update' => $lead_status_update
+                            );
+                            $sublogid = $this->Leads_model->create_lead_sublog($lead_sublog_details_update);
+                         }   
+                         /* End of creating log and sublog details with revert back to previous status*/
 
                       }  // end of if create_lead flag is set to 1
+/********************************************************************************************************************/
+                                    // update function of leaddetails create_flag=0 and nofoleads=1
+/********************************************************************************************************************/
+                      else  //Start if  create_lead flag is set to 0 and no of leads =1 // update function of leaddetails
+                      {
+                        $order_cancelled_reason="test reason";
+                        $closing_comments="test for closing comments";
+                        $lead_close_status=0;
+                        $$lead_close_option="2";
+                        $ld_converted=0;
+
+                         $lead_no = 'LEAD-DCV';
+                         $lead_status_name = $val['statusid'];
+                         $lead_sub_status_name =$val['leadsubstatusid'];
+                         $lead_status_id = $this->dailyactivity_model->get_leadstatusidbyname($val['statusid']);
+                         $lead_substatus_id = $this->dailyactivity_model->get_leadsub_statusidbyname($val['leadsubstatusid']);
+                         $prev_status_id =$val['prevstatusid'];
+                         $prev_substatus_id =$val['prevsubstatusid'];
+
+                         $sales_type_id = $this->dailyactivity_model->get_salestypeid_byname($val['division']);
+
+                         $customer_id=$val['hdn_cust_id'];
+                         $customer_address[] = $this->dailyactivity_model->get_customer_address($customer_id);
+                         $user_branch = $this->dailyactivity_model->get_user_branch($login_user_id);
+
+                         if (($lead_status_id != $prev_status_id) || ($lead_substatus_id != $prev_substatus_id)) {
+                                $update_log = 1;
+                            } else {
+                                $update_log = 0;
+                            }
+
+                            if ($lead_status_id != $prev_status_id || ($lead_substatus_id != $prev_substatus_id )) {
+                                $lead_status_update = 'Y';
+                            } else {
+                                $lead_status_update = 'N';
+                            }
+
+                                $leaddetails = array(
+                                'leadstatus' => $lead_status_id,
+                                'ldsubstatus' => $lead_substatus_id,
+                                'comments' => $this->input->post('comments'),
+                                'email_id' => $this->input->post('email_id'),
+                                'lead_2pa_no' => $this->input->post('lead_2pa_no'),
+                                'lead_crm_soc_no' => "1234",
+                                'lead_close_status' => $lead_close_status,
+                                'lead_close_option' => $lead_close_option,
+                                'lead_close_comments' => $closing_comments,
+                                'converted' => $ld_converted,
+                                'nextstepdate' => date('Y-m-d'),
+                                'last_modified' => date('Y-m-d:H:i:s'),
+                                'last_updated_user' => $login_user_id
+                            );
+
+                            $id = $this->Leads_model->update_lead($leaddetails, $leadid);
+
+                /* Start of substatus validations */
+
+                                /* Start for Managing and implementation*/
+
+                                    $today_date = date('Y-m-d');
+                                    if ($lead_status_id == 6 ) 
+                                        {
+                                            $lead_status_mailalert = array('leadid' => $lead_id,
+                                                'user_id' => $login_user_id,
+                                                'branch' => $user_branch,
+                                                'lead_status_id' => $lead_status_id,
+                                                'lead_substatus_id' => $lead_substatus_id,
+                                                'last_update_user_id' => $login_user_id,
+                                                'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                'mail_alert_date' => "timestamp '" . $today_date . "' +interval '24 hours'",
+                                                'status_action_type' => "Update"
+                                            );
+                                        }
+                                    if ($lead_status_id == 7 ) 
+                                        {
+                                            $lead_status_mailalert = array('leadid' => $lead_id,
+                                                'user_id' => $login_user_id,
+                                                'branch' => $user_branch,
+                                                'lead_status_id' => $lead_status_id,
+                                                'lead_substatus_id' => $lead_substatus_id,
+                                                'last_update_user_id' => $login_user_id,
+                                                'soc_no' => "1234",
+                                                'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                'mail_alert_date' => "timestamp '" . $today_date . "' +interval '48 hours'",
+                                                'status_action_type' => "Update"
+                                            );
+                                        }                        
+
+                                    /* End for Managing and implementation*/
+                            if ($lead_substatus_id == 6) {
+                                $today_date = date('Y-m-d');
+                                $lead_status_mailalert = array('leadid' => $lead_id,
+                                    'user_id' => $login_user_id,
+                                    'branch' => $user_branch,
+                                    'lead_status_id' => $lead_status_id,
+                                    'lead_substatus_id' => $lead_substatus_id,
+                                    'last_update_user_id' => $login_user_id,
+                                    'not_able_to_get_appiontment' => @$reason_no_appointment,
+                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '1 hours'",
+                                    'status_action_type' => "Update"
+                                );
+                            } else {
+                                if (@$appiontment_date != "" && $lead_substatus_id == 4 ) {
+                                    $lead_status_mailalert = array('leadid' => $lead_id,
+                                        'user_id' => $login_user_id,
+                                        'branch' => $user_branch,
+                                        'lead_status_id' => $lead_status_id,
+                                        'lead_substatus_id' => $lead_substatus_id,
+                                        'last_update_user_id' => $login_user_id,
+                                        'appointment_due_date' => $appiontment_date,
+                                        'not_able_to_get_appiontment' => @$reason_no_appointment,
+                                        'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                        'mail_alert_date' => "timestamp '" . $appiontment_date . "' -interval '24 hours'",
+                                        'status_action_type' => "Update"
+                                    );
+                                } else if ($lead_substatus_id == 3) {
+                                    $today_date = date('Y-m-d');
+                                    $lead_status_mailalert = array('leadid' => $lead_id,
+                                        'user_id' => $login_user_id,
+                                        'branch' => $user_branch,
+                                        'lead_status_id' => $lead_status_id,
+                                        'lead_substatus_id' => $lead_substatus_id,
+                                        'last_update_user_id' => $login_user_id,
+                                        'appointment_due_date' => @$appiontment_date,
+                                        'not_able_to_get_appiontment' => @$reason_no_appointment,
+                                        'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                        'mail_alert_date' => "timestamp '" . $today_date . "' +interval '48 hours'",
+                                        'status_action_type' => "Update"
+                                    );
+                                }
+                            }
+                            if ($lead_substatus_id == 7) {
+                                $today_date = date('Y-m-d');
+                                $lead_status_mailalert = array('leadid' => $lead_id,
+                                    'user_id' => $login_user_id,
+                                    'branch' => $user_branch,
+                                    'lead_status_id' => $lead_status_id,
+                                    'lead_substatus_id' => $lead_substatus_id,
+                                    'last_update_user_id' => $login_user_id,
+                                    'not_able_to_get_appiontment' => @$reason_no_appointment,
+                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '0 hours'",
+                                    'status_action_type' => "Update"
+                                );
+                            }
+                             /*Start for Enquiry/Offer*/
+                             if ($lead_substatus_id == 26) {
+                                $today_date = date('Y-m-d');
+                                $lead_status_mailalert = array('leadid' => $lead_id,
+                                    'user_id' => $login_user_id,
+                                    'branch' => $user_branch,
+                                    'lead_status_id' => $lead_status_id,
+                                    'lead_substatus_id' => $lead_substatus_id,
+                                    'last_update_user_id' => $login_user_id,
+                                    'not_able_to_get_appiontment' => @$reason_no_appointment,
+                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '0 hours'",
+                                    'status_action_type' => "Update"
+                                );
+                            }
+                             /*End for Enquiry/Offer*/
+                             // Order Cancelled start
+                             if ($lead_substatus_id == 27) 
+                            {
+                                $today_date = date('Y-m-d:H:i:s');
+                                $lead_status_mailalert = array('leadid' =>$lead_id,
+                                    'user_id' => $login_user_id,
+                                    'branch' => $user_branch,
+                                    'lead_status_id' => $lead_status_id,
+                                    'lead_substatus_id' => $lead_substatus_id,
+                                    'last_update_user_id' => $login_user_id,
+                                    'order_cancelled_reason' => $order_cancelled_reason,
+                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '0 hours'",
+                                    'status_action_type' => "Update"
+                                );
+                            }
+                            // Order Cancelled end 
+                            /*Start for Sample Trails updateleadstatus*/
+                                        if ($lead_substatus_id == 16 || $lead_substatus_id == 17 || $lead_substatus_id == 18 || $lead_substatus_id == 19 || $lead_substatus_id == 20 || $lead_substatus_id == 21 ) 
+                                         {
+                                            if ($lead_substatus_id == 21) 
+                                            {
+                                                $samle_reject_count = $this->Leads_model->get_lead_sample_rejectcnt($lead_id,$lead_substatus_id);
+                                                if ($samle_reject_count>1)
+                                                {
+                                                    $today_date = date('Y-m-d:H:i:s');
+                                                         $lead_status_mailalert = array('leadid' =>$lead_id,
+                                                        'user_id' => $login_user_id,
+                                                        'branch' => $user_branch,
+                                                        'lead_status_id' => 8,
+                                                        'lead_substatus_id' => 33,
+                                                        'last_update_user_id' => $login_user_id,
+                                                        'sample_reject_reason' => $sample_rejected_reason,
+                                                        'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                        'mail_alert_date' => "timestamp '" . $today_date . "' +interval '0 hours'",
+                                                        'status_action_type' => "Sample Rejected"
+                                                    );
+                                                }
+                                                else 
+                                                {
+                                                    $today_date = date('Y-m-d:H:i:s');
+                                                         $lead_status_mailalert = array('leadid' =>$lead_id,
+                                                        'user_id' => $login_user_id,
+                                                        'branch' => $user_branch,
+                                                        'lead_status_id' => $lead_status_id,
+                                                        'lead_substatus_id' => $lead_substatus_id,
+                                                        'last_update_user_id' => $login_user_id,
+                                                        'sample_reject_reason' => $sample_rejected_reason,
+                                                        'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                        'mail_alert_date' => "timestamp '" . $today_date . "' +interval '0 hours'",
+                                                        'status_action_type' => "Update"
+                                                    );
+                                                }
+                                                
+                                            }
+                                            else if ($lead_substatus_id == 20)
+                                            {
+                                                $today_date = date('Y-m-d:H:i:s');
+                                                $lead_status_mailalert = array('leadid' =>$lead_id,
+                                                    'user_id' => $login_user_id,
+                                                    'branch' => $user_branch,
+                                                    'lead_status_id' => $lead_status_id,
+                                                    'lead_substatus_id' => $lead_substatus_id,
+                                                    'last_update_user_id' => $login_user_id,
+                                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '24 hours'",
+                                                    'status_action_type' => "Update"
+                                                );
+                                            }
+                                            else if ($lead_substatus_id == 18 || $lead_substatus_id == 19)
+                                            {
+                                                $today_date = date('Y-m-d:H:i:s');
+                                                $lead_status_mailalert = array('leadid' =>$lead_id,
+                                                    'user_id' => $login_user_id,
+                                                    'branch' => $user_branch,
+                                                    'lead_status_id' => $lead_status_id,
+                                                    'lead_substatus_id' => $lead_substatus_id,
+                                                    'last_update_user_id' => $login_user_id,
+                                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '48 hours'",
+                                                    'status_action_type' => "Update"
+                                                );
+                                            }
+                                            else 
+                                            {
+                                                $today_date = date('Y-m-d:H:i:s');
+                                                $lead_status_mailalert = array('leadid' =>$lead_id,
+                                                    'user_id' => $login_user_id,
+                                                    'branch' => $user_branch,
+                                                    'lead_status_id' => $lead_status_id,
+                                                    'lead_substatus_id' => $lead_substatus_id,
+                                                    'last_update_user_id' => $login_user_id,
+                                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '0 hours'",
+                                                    'status_action_type' => "Update"
+                                                );
+                                            }
+                                        }
+                                       // echo"<pre>";print_r($lead_status_mailalert);echo"</pre>";
+                                        /*END for Sample trails status*/
+                                         $lead_log_details_update = array('lh_lead_id' => $lead_id,
+                                                'lh_user_id' => $login_user_id,
+                                                'lh_lead_curr_status' => $log_lead_status_name,
+                                                'lh_lead_curr_statusid' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                                'lh_updated_date' => date('Y-m-d:H:i:s'),
+                                                'lh_last_updated_user' => $login_user_id,
+                                                'lh_comments' => "updated from daily call",
+                                                'action_type' => 'RevertBack',
+                                                'modified_user_name' => $login_username,
+                                                'assignto_user_name' => $lead_assign_name,
+                                                'status_update' => $lead_status_update
+                                            );
+
+                                            $logid = $this->Leads_model->create_leadlog($lead_log_details_update);
+                                            /* End */
+
+                                            // insert a record in lead sub log details
+                                            /* Start */
+                                            $lead_sublog_details_update = array(
+                                                'lhsub_lh_id' => @$logid,
+                                                'lhsub_lh_lead_id' => $lead_id,
+                                                'lhsub_lh_user_id' => $login_user_id,
+                                                'lhsub_lh_lead_curr_status' => $log_lead_status_name,
+                                                'lhsub_lh_lead_curr_statusid' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                                'lhsub_lh_lead_curr_sub_status' => $sublog_lead_substatus_name,
+                                                'lhsub_lh_lead_curr_sub_statusid' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
+                                                'lhsub_lh_updated_date' => date('Y-m-d:H:i:s'),
+                                                'lhsub_lh_last_updated_user' => $login_user_id,
+                                                'lhsub_lh_comments' => "updated from daily call",
+                                                'lhsub_action_type' => "RevertBack",
+                                                'lhsub_modified_user_name' => $login_username,
+                                                'lhsub_assignto_user_id ' => $this->input->post('hdn_assignto_id'),
+                                                'lhsub_assignto_user_name' => $lead_assign_name,
+                                                'lhsub_status_update' => $lead_status_update
+                                            );
+                                            $sublogid = $this->Leads_model->create_lead_sublog($lead_sublog_details_update);
+                                        if ($samle_reject_count > 1)
+                                            {
+                                                $update_leadstatus_mailalert_revert = array('leadid' => $lead_id,
+                                                    'user_id' => $login_user_id,
+                                                    'branch' => $user_branch,
+                                                    'lead_status_id' => 8,
+                                                    'lead_substatus_id' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
+                                                    'last_update_user_id' => $login_user_id,
+                                                    'assignto_id' => $login_user_id,
+                                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '0 hours'",
+                                                    'status_action_type' => "RevertBack"
+                                                );
+                                            }
+                                             else if($lead_substatus_id == 20)
+                                            {
+                                                $mail_alert_rev_date="timestamp '" . $today_date . "' +interval '24 hours'"; 
+                                            
+                                                 $update_leadstatus_mailalert_revert = array('leadid' => $lead_id,
+                                                    'user_id' => $login_user_id,
+                                                    'branch' => $user_branch,
+                                                    'lead_status_id' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                                    'lead_substatus_id' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
+                                                    'last_update_user_id' => $login_user_id,
+                                                    'assignto_id' => $login_user_id,
+                                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                    'mail_alert_date' => $mail_alert_rev_date,
+                                                    'status_action_type' => "RevertBack"
+                                                );   
+                                            }
+                                            else if ($lead_substatus_id == 21)
+                                            {
+                                                $mail_alert_rev_date="timestamp '" . $today_date . "' +interval '0 hours'";
+                                                 $update_leadstatus_mailalert_revert = array('leadid' => $lead_id,
+                                                    'user_id' => $login_user_id,
+                                                    'branch' => $user_branch,
+                                                    'lead_status_id' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                                    'lead_substatus_id' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
+                                                    'last_update_user_id' => $login_user_id,
+                                                    'assignto_id' => $login_user_id,
+                                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                    'mail_alert_date' => $mail_alert_rev_date,
+                                                    'status_action_type' => "RevertBack"
+                                                );   
+                                            } 
+                                            // Order Cancelled start
+                                             else if ($lead_substatus_id == 27)
+                                            {
+                                                 $mail_alert_rev_date="timestamp '" . $today_date . "' +interval '0 hours'";
+                                                 $update_leadstatus_mailalert_revert = array('leadid' => $lead_id,
+                                                    'user_id' => $login_user_id,
+                                                    'branch' => $user_branch,
+                                                    'lead_status_id' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                                    'lead_substatus_id' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
+                                                    'last_update_user_id' => $login_user_id,
+                                                    'assignto_id' => $login_user_id,
+                                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                    'mail_alert_date' => $mail_alert_rev_date,
+                                                    'status_action_type' => "RevertBack"
+                                                );   
+                                            }
+                                           // Order Cancelled end
+                                            else{
+                                                    
+                                            
+                                                 $update_leadstatus_mailalert_revert = array('leadid' => $lead_id,
+                                                    'user_id' => $login_user_id,
+                                                    'branch' => $user_branch,
+                                                    'lead_status_id' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
+                                                    'lead_substatus_id' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
+                                                    'last_update_user_id' => $login_user_id,
+                                                    'assignto_id' => $login_user_id,
+                                                    'substatus_updated_date' => date('Y-m-d:H:i:s'),
+                                                    'mail_alert_date' => "timestamp '" . $today_date . "' +interval '48 hours'",
+                                                    'status_action_type' => "RevertBack"
+                                                );   
+                                            }
+                                           // echo"revert array ";print_r($update_leadstatus_mailalert_revert);echo"</pre>";
+                                           // echo" samle_reject_count ".$samle_reject_count."<br>";
+                                            if ($samle_reject_count <= 1 ) 
+                                                {
+                                                    $mail_alert_id = $this->Leads_model->insert_leadstatus_mailalert_revert($update_leadstatus_mailalert_revert);
+                                                }
+
+
+
+                      } //End if  create_lead flag is set to 0 and no of leads =1 // update function of leaddetails
+                      /********************************************************************************************************************/
+                                    // update function of leaddetails create_flag=0 and nofoleads=1
+                     /********************************************************************************************************************/
+                      /*start of inserting into dailyactivitydtl*/
+                        if ($val['potentialqty'] == "" || $val['potentialqty'] == 'undefined') {
+                        $val['potentialqty'] = 0;
+                        }
+                        if ($val['itemgroup'] == "" || $val['itemgroup'] == 'undefined') {
+                        $val['itemgroup'] = 0;
+                        }
+                        if ($val['Remarks'] == "" || $val['Remarks'] == 'undefined') {
+                        $val['Remarks'] = 0;
+                        }
+                        if ($val['quantity'] == "" || $val['quantity'] == 'undefined') {
+                        $val['quantity'] = 0;
+                        }
+                        if($val['create_lead']==0)
+                        {
+                             if ($val['leadid'] == "" || $val['leadid'] == 'undefined' || $val['leadid']=='No Leads') {
+                                $val['leadid'] = 0;
+                                }
+                        }
+                        else
+                        {
+                            $val['leadid'] =$lead_id;
+                        }
+                       
+
+                        $daily_dtl[$key]['id'] = $daily_hdr_id;
+                        $daily_dtl[$key]['itemgroup'] = $val['itemgroup'];
+                        $daily_dtl[$key]['custgroup'] = $val['custgroup'];
+                        $daily_dtl[$key]['leadid'] = $val['leadid'];
+                        $daily_dtl[$key]['potentialqty'] = $val['potentialqty'];
+                        $daily_dtl[$key]['subactivity'] = $val['subactivity'];
+                        $daily_dtl[$key]['hour_s'] = $val['hour_s'];
+                        $daily_dtl[$key]['minit'] = $val['minit'];
+                        $daily_dtl[$key]['modeofcontact'] = $val['modeofcontact'];
+                        $daily_dtl[$key]['quantity'] = $val['quantity'];
+                        $daily_dtl[$key]['division'] = $val['division'];
+
+                        $daily_dtl[$key]['remarks'] = $val['Remarks'];
+                        $daily_dtl[$key]['creationdate'] = date('Y-m-d:H:i:s');
+                        $daily_dtl[$key]['creationuser'] = $creationuser;
+                       
+                      /*end of inserting into dailyactivitydtl*/
 
                 } // end of for loop $grid_data
-               
+                 if ($daily_hdr_insert_status) {
+                        // echo"dailyactivitydtl";print_r($daily_dtl);
+                            $daily_dlt_id = $this->dailyactivity_model->save_daily_details($daily_dtl);
+                        }
+
                 
-              /*  echo"leaddetails<pre>";print_r($leaddetails);echo"</pre>";
+                echo"leaddetails<pre>";print_r($leaddetails);echo"</pre>";
                 echo"leadproducts<pre>";print_r($leadproducts);echo"</pre>";
-                echo"lead_prod_poten_type<pre>";print_r($lead_prod_poten_type);echo"</pre>";*/
+                echo"lead_prod_poten_type<pre>";print_r($lead_prod_poten_type);echo"</pre>";
+                echo"lead_log_details<pre>";print_r($lead_log_details);echo"</pre>";
+                echo"lead_sublog_details_update<pre>";print_r($lead_sublog_details_update);echo"</pre>";
+
                 
-//die;
-                $daily_hdr_id = $this->dailyactivity_model->GetMaxVal('dailyactivityhdr');
-                $daily_hdr_id = $daily_hdr_id + 1;
-                $daily_hdr = array('id' => $daily_hdr_id,
-                    'currentdate' => $hrd_currentdate,
-                    'execode' => $execode,
-                    'exename' => $exename,
-                    'companycode' => 'PPC',
-                    'accperiod' => '2013-2014',
-                    'user1' => $user1,
-                    'creationuser' => $creationuser,
-                    'creationdate' => $createddate,
-                    'lastupdateuser' => $lastupdateuser
-                    );
-                
-                $daily_hdr_insert_status = $this->dailyactivity_model->save_dailyactivityhdr($daily_hdr);
-                
-
-                foreach ($grid_data as $key => $val) {
-                    if ($val['potentialqty'] == "" || $val['potentialqty'] == 'undefined') {
-                        $val['potentialqty'] = 0;
-                    }
-                    if ($val['itemgroup'] == "" || $val['itemgroup'] == 'undefined') {
-                        $val['itemgroup'] = 0;
-                    }
-                    if ($val['Remarks'] == "" || $val['Remarks'] == 'undefined') {
-                        $val['Remarks'] = 0;
-                    }
-                    if ($val['quantity'] == "" || $val['quantity'] == 'undefined') {
-                        $val['quantity'] = 0;
-                    }
-                    if ($val['leadid'] == "" || $val['leadid'] == 'undefined' || $val['leadid']=='No Leads') {
-                        $val['leadid'] = 0;
-                    }
-
-                    $daily_dtl[$key]['id'] = $daily_hdr_id;
-                    $daily_dtl[$key]['itemgroup'] = $val['itemgroup'];
-                    $daily_dtl[$key]['custgroup'] = $val['custgroup'];
-                    $daily_dtl[$key]['leadid'] = $val['leadid'];
-                    $daily_dtl[$key]['potentialqty'] = $val['potentialqty'];
-                    $daily_dtl[$key]['subactivity'] = $val['subactivity'];
-                    $daily_dtl[$key]['hour_s'] = $val['hour_s'];
-                    $daily_dtl[$key]['minit'] = $val['minit'];
-                    $daily_dtl[$key]['modeofcontact'] = $val['modeofcontact'];
-                    $daily_dtl[$key]['quantity'] = $val['quantity'];
-                    $daily_dtl[$key]['division'] = $val['division'];
-                   
-                    $daily_dtl[$key]['remarks'] = $val['Remarks'];
-                    $daily_dtl[$key]['creationdate'] = date('Y-m-d:H:i:s');
-                    $daily_dtl[$key]['creationuser'] = $creationuser;
-
-                }
-
-
-                if ($daily_hdr_insert_status) {
-                    //	 print_r($daily_dtl);
-
-                    $daily_dlt_id = $this->dailyactivity_model->save_daily_details($daily_dtl);
-                }
-            }
+die;
+               
+            }  // end of $_POST=save is true
             //	$message = "Daily Activity Created Successfully";
             $message = "true";
         } else {
@@ -822,6 +1332,71 @@ class dailyactivity extends CI_Controller {
         $data = $this->dailyactivity_model->get_leadsalestype();
         print_r($data);
     }
+
+    function revert_status($status_rever, $substatus_rever,$samle_reject_count=0) {
+        /*echo" status_rever ".$status_rever."<br>";
+        echo" substatus_rever ".$substatus_rever."<br>";
+        echo" in revert_status samle_reject_count ".$samle_reject_count."<br>";*/
+        
+        if ($status_rever == 1) {
+            return $status_rever;
+
+        } else if (($status_rever == 3) && ($substatus_rever == 15)) {
+            return 8;
+        }
+        else if (($status_rever == 3) && ($substatus_rever != 15)) {
+            return $status_rever;
+        }
+        else if (($status_rever == 4) && ($substatus_rever == 21) && ($samle_reject_count<=1)) {
+         //   echo "samle_reject_count < 0"."<br>"; echo "return status 4"."<br>";
+            return 4;
+        }
+        else if (($status_rever == 4) && ($substatus_rever == 21) && ($samle_reject_count>1)) {
+           // echo "samle_reject_count > 0"."<br>"; echo "return status 8"."<br>";
+            return 8;
+        }
+        else if (($status_rever == 4) && ($substatus_rever == 20)) {
+                   //echo "return status same"."<br>";
+            return 5;
+        }
+        else if (($status_rever == 4) && ($substatus_rever != 21)) {
+                 //  echo "return status same"."<br>";
+            return $status_rever;
+        }
+        else if (($status_rever == 5) && ($substatus_rever == 27)) { // Order Cancelled
+                 //  echo "return status same"."<br>";
+            return $status_rever;
+        }
+    }
+
+    function revert_substatus($substatus_rever,$samle_reject_count) {
+        /*echo" in revert_substatus substatus id ".$substatus_rever."<br>";
+        echo" in revert_substatus samle_reject_count ".$samle_reject_count."<br>";*/
+        if ($substatus_rever == 5) {
+            return 3;
+        } else if ($substatus_rever == 15) {
+            return 30;
+        }
+        else if ($substatus_rever == 21 && $samle_reject_count <= 1) {
+            //echo "return 16"."<br>";
+            return 16;
+        }
+        else if ($substatus_rever == 21 && $samle_reject_count > 1) {
+              //echo "return 33"."<br>";
+            return 33;
+        }
+        else if ($substatus_rever == 20 ) {
+              //echo "return 24"."<br>";
+            return 24;
+        }
+        else if ($substatus_rever == 27 ) {  // Order Cancelled
+              //echo "return 24"."<br>";
+            return 23;
+        }
+        else 
+            return $substatus_rever;
+    }
+    
 
 
    

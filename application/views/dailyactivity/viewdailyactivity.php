@@ -1017,8 +1017,7 @@
                                                 autoBind: true,
                                                 buildSelect: function (suboptions)
                                                 {
-                                                    
-                                                     console.log(suboptions);
+                                                    console.log(suboptions);
                                                     var data = new Array();
                                                     $.each(suboptions, function (id, value)
                                                     {
@@ -1508,9 +1507,9 @@
                                         },
                                             
 
-                                        {text: 'noofleads', datafield: 'noofleads', hidden:true, width: 20, cellsalign: 'left', editable: false},
+                                        {text: 'noofleads', datafield: 'noofleads', hidden:false, width: 20, cellsalign: 'left', editable: false},
                                         {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
-                                        { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
+                                        { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
                                         {text: 'Activity Type', datafield: 'Sub_Activity', width: 110, cellsalign: 'left', cellbeginedit:Results.initResultsEditorat, initeditor: Results.resultsEditorat, cellsrenderer: Results.renderUnitsat
                                         },
                                         {text: 'Potential', datafield: 'Potential_Quantity', width: 75, cellsalign: 'left', editable: false},
@@ -1537,11 +1536,11 @@
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                         {
                                                             
-                                                            alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
+                                                          //  alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
 
                                                           //  alert("datafield "+datafield); 
                                                            var sid = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "statusid");
-                                                           alert('statusid: ' + sid);
+                                                          // alert('statusid: ' + sid);
 
                                                               if (newvalue == 0) {
                                                                     return oldvalue;
@@ -1617,6 +1616,12 @@
                                                     }
                                        
                                         },
+                                         
+                                        {text: 'PrevStatus', datafield: 'prevstatusid', width: 150, cellsalign: 'center',readonly:true,editable:false, hidden:false
+                                        },
+                                         {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:false
+                                         },
+
                                         {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
 
                                         {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
@@ -2053,8 +2058,12 @@
                                     lead_appointmentdt = convertdmy_ymd(griddata.appiontmnt_dt);
                                    
                                 }
-                                alert("type of object itemid id"+typeof(griddata.itemid));
-                                alert("itemid  "+griddata.itemid);
+                               
+                                alert("noofleads  "+griddata.noofleads);
+                                alert("prevstatusid  "+griddata.prevsubstatusid);
+                                alert(" type noofleads "+typeof(griddata.noofleads));
+                                
+                                
                                 rowval["currentdate"] = currentdate;
                                 rowval["custgroup"] = griddata.custgroup;
                                 rowval["hdn_cust_id"] = griddata.id;
@@ -2062,6 +2071,7 @@
                                 rowval["itemgroup"] = griddata.itemgroup;
                                 rowval["potentialqty"] = griddata.Potential_Quantity;
                                 rowval["subactivity"] = griddata.Sub_Activity;
+                                rowval["noofleads"] = griddata.noofleads;
                                 //alert("currentdate  "+currentdate);
                                 rowval["hour_s"] = griddata.hour;
                                 rowval["minit"] = griddata.minute;
@@ -2070,7 +2080,24 @@
                                 rowval["division"] = griddata.division;
                                 rowval["leadid"] = griddata.leadid;
                                 rowval["statusid"] = griddata.statusid;
+                                if (typeof(griddata.prevstatusid)=='undefined')
+                                {
+                                    rowval["prevstatusid"] = 0;    
+                                }
+                                else
+                                {
+                                    rowval["prevstatusid"] = griddata.prevstatusid;
+                                }
+                                if (typeof(griddata.prevsubstatusid)=='undefined')
+                                {
+                                    rowval["prevsubstatusid"] = 0;    
+                                }
+                                else
+                                {
+                                    rowval["prevsubstatusid"] = griddata.prevsubstatusid;
+                                }
                                 rowval["leadsubstatusid"] = griddata.leadsubstatusid;
+
                                 rowval["lead_appointmentdt"] = lead_appointmentdt;
                                 rowval["not_able_to_get_appointment"] = griddata.not_able_to_get_appointment;
                                 if (griddata.create_lead==undefined)
@@ -2702,6 +2729,8 @@
                                                 lead_req = rows[0].requirement;
                                                 lead_salestype =rows[0].lead_sale_type;
                                                 lead_email_id =rows[0].email_id;
+                                                lead_curr_stsid =rows[0].curr_stats_id;
+                                                lead_curr_substsid =rows[0].curr_substats_id;
                                             }
                                         });
                                          $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "Potential_Quantity", lead_poten);
@@ -2710,6 +2739,8 @@
                                          $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "Mode_Of_Contact", lead_email_id);
                                          $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "Sub_Activity", "LEADS");
                                          $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "create_lead", 0);
+                                         $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "prevstatusid", lead_curr_stsid);
+                                         $("#jqxgrid_add").jqxGrid('setcellvalue', rowindex, "prevsubstatusid", lead_curr_substsid);
                                          
 
     

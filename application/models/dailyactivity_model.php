@@ -637,7 +637,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 						INNER JOIN lead_prod_potential_types ON lead_prod_potential_types.leadid=leaddetails.leadid
 						WHERE leaddetails.leadid=".$leaid." GROUP BY leadproducts.quantity ";*/
 
-						$sql="SELECT lead_prod_potential_types.potential,leadproducts.quantity as requirement,leaddetails.leadid,lead_prod_potential_types.product_type_id as id,lead_sale_type.n_value_displayname as lead_sale_type, leadsource.leadsource as lead_source_name,leaddetails.email_id
+						$sql="SELECT lead_prod_potential_types.potential,leadproducts.quantity as requirement,leaddetails.leadid,leaddetails.leadstatus as curr_stats_id, leaddetails.ldsubstatus as curr_substats_id,lead_prod_potential_types.product_type_id as id,lead_sale_type.n_value_displayname as lead_sale_type, leadsource.leadsource as lead_source_name,leaddetails.email_id
 							FROM leaddetails 
 							INNER JOIN leadproducts ON leaddetails.leadid = leadproducts.leadid 
 							INNER JOIN leadsource ON leaddetails.leadsource = leadsource.leadsourceid
@@ -654,6 +654,8 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 					$poten_val['0']['potential']=0;
 					$poten_val['0']['requirement']=0;
 					$poten_val['0']['lead_sale_type']=0;
+					$poten_val['0']['curr_stats_id']=0;
+					$poten_val['0']['curr_substats_id']=0;
 				}
 				else
 				{
