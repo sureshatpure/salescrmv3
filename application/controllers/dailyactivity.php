@@ -243,7 +243,7 @@ class dailyactivity extends CI_Controller {
                 /* end of insert into dailyhdr table*/
                 /* Start for inserting into leaddetails*/
                   foreach ($grid_data as $key => $val) 
-                  {
+                  { $samle_reject_count=0;
                       if ($val['create_lead']==1)
                       {
                          if($val['lead_appointmentdt']=='null' or $val['lead_appointmentdt']=='undefined')
@@ -617,20 +617,23 @@ class dailyactivity extends CI_Controller {
 /********************************************************************************************************************/
                       else  //Start if  create_lead flag is set to 0 and no of leads =1 // update function of leaddetails
                       {
+                        $lead_id=$val['leadid'];
                         $order_cancelled_reason="test reason";
                         $closing_comments="test for closing comments";
                         $lead_close_status=0;
-                        $$lead_close_option="2";
+                        $lead_close_option="2";
                         $ld_converted=0;
 
                          $lead_no = 'LEAD-DCV';
                          $lead_status_name = $val['statusid'];
+                         $log_lead_status_name = $val['statusid'];
                          $lead_sub_status_name =$val['leadsubstatusid'];
+                         $sublog_lead_substatus_name = $val['leadsubstatusid'];
                          $lead_status_id = $this->dailyactivity_model->get_leadstatusidbyname($val['statusid']);
                          $lead_substatus_id = $this->dailyactivity_model->get_leadsub_statusidbyname($val['leadsubstatusid']);
                          $prev_status_id =$val['prevstatusid'];
                          $prev_substatus_id =$val['prevsubstatusid'];
-
+                        echo " substatus id ".$lead_substatus_id."<br>";
                          $sales_type_id = $this->dailyactivity_model->get_salestypeid_byname($val['division']);
 
                          $customer_id=$val['hdn_cust_id'];
@@ -665,7 +668,7 @@ class dailyactivity extends CI_Controller {
                                 'last_updated_user' => $login_user_id
                             );
 
-                            $id = $this->Leads_model->update_lead($leaddetails, $leadid);
+                            $id = $this->Leads_model->update_lead($leaddetails, $lead_id);
 
                 /* Start of substatus validations */
 
@@ -796,7 +799,7 @@ class dailyactivity extends CI_Controller {
                                          {
                                             if ($lead_substatus_id == 21) 
                                             {
-                                                $samle_reject_count = $this->Leads_model->get_lead_sample_rejectcnt($lead_id,$lead_substatus_id);
+                                            $samle_reject_count = $this->Leads_model->get_lead_sample_rejectcnt($lead_id,$lead_substatus_id);
                                                 if ($samle_reject_count>1)
                                                 {
                                                     $today_date = date('Y-m-d:H:i:s');
@@ -905,7 +908,7 @@ class dailyactivity extends CI_Controller {
                                                 'lhsub_lh_comments' => "updated from daily call",
                                                 'lhsub_action_type' => "RevertBack",
                                                 'lhsub_modified_user_name' => $login_username,
-                                                'lhsub_assignto_user_id ' => $this->input->post('hdn_assignto_id'),
+                                                'lhsub_assignto_user_id ' => $login_user_id,
                                                 'lhsub_assignto_user_name' => $lead_assign_name,
                                                 'lhsub_status_update' => $lead_status_update
                                             );
@@ -1050,11 +1053,12 @@ class dailyactivity extends CI_Controller {
                         }
 
                 
-                echo"leaddetails<pre>";print_r($leaddetails);echo"</pre>";
-                echo"leadproducts<pre>";print_r($leadproducts);echo"</pre>";
-                echo"lead_prod_poten_type<pre>";print_r($lead_prod_poten_type);echo"</pre>";
-                echo"lead_log_details<pre>";print_r($lead_log_details);echo"</pre>";
-                echo"lead_sublog_details_update<pre>";print_r($lead_sublog_details_update);echo"</pre>";
+                echo"leaddetails<pre>";print_r(@$leaddetails);echo"</pre>";
+                echo"lead_status_mailalert "; print_r($lead_status_mailalert);echo"</pre>";
+                echo"leadproducts<pre>";print_r(@$leadproducts);echo"</pre>";
+                echo"lead_prod_poten_type<pre>";print_r(@$lead_prod_poten_type);echo"</pre>";
+                echo"lead_log_details<pre>";print_r(@$lead_log_details);echo"</pre>";
+                echo"lead_sublog_details_update<pre>";print_r(@$lead_sublog_details_update);echo"</pre>";
 
                 
 die;

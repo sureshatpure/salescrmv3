@@ -520,6 +520,7 @@ class dailyactivity_model extends CI_Model
 			function get_potential_item_customer($item,$customer)
 			{
 					$customer = urldecode($customer);
+					$customer = trim($customer);
 					$item = urldecode($item);
 
 					$sql="SELECT 	leaddetails.leadid,leaddetails.leadid as id,sum(lead_prod_potential_types.potential)as potential
@@ -531,7 +532,7 @@ class dailyactivity_model extends CI_Model
 					INNER JOIN lead_prod_potential_types ON lead_prod_potential_types.leadid=leaddetails.leadid 
 					WHERE replace(trim(customermasterhdr.customergroup),'''','')='".$customer."' AND trim(view_tempitemmaster_grp.itemgroup)='".$item."' AND leaddetails.lead_close_status=0 and converted=0 
 					GROUP BY leaddetails.leadid";
-				
+				//echo $sql."<br>";
 				$sql1="SELECT   business_plan_customer_group_id.header_id as custgroup_id,  sum(business_yearly_gc_plan.potential_annual_qty)  as potential 
 				FROM  	business_yearly_gc_plan  
 				INNER JOIN business_plan_customer_group_id ON business_yearly_gc_plan.customer_group_id=business_plan_customer_group_id.header_id
@@ -540,7 +541,7 @@ class dailyactivity_model extends CI_Model
 					replace(business_plan_customer_group_id.customer_group,'''','') ='".$customer."' 
 					AND business_plan_item_group_id.item_group='".$item."'
 					GROUP BY custgroup_id";
-				
+			//echo $sql1;	
 				$result = $this->db->query($sql);
 
 				
