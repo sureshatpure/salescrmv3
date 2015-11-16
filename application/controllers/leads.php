@@ -1652,7 +1652,8 @@ class Leads extends CI_Controller {
               {
                 $samle_reject_count = $this->Leads_model->get_lead_sample_rejectcnt($leadid,$substatus_id[0]);
                } 
-            if ($substatus_id[0] == 15) {
+            if ($substatus_id[0] == 15) 
+            {
                 $sublog_lead_substatus_name = $this->Leads_model->GetLeadSubStatusName($this->revert_substatus($substatus_id[0],$samle_reject_count));
                 $leaddetails_close = array(
                     'lead_close_status' => 1,

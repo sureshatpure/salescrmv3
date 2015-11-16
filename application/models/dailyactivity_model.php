@@ -213,7 +213,7 @@ class dailyactivity_model extends CI_Model
 				//$sql="select lower(dtl_fld) as datafield, lower(dlblch) as text,cellwidth  :: INTEGER*10 AS  width   from formdtl where formcode='SMKT140' and cellwidth>'0' order by seqno";
 				$sql="select lower(dtl_fld) as datafield, lower(dlblch) as text,cellwidth  :: INTEGER*10 AS  width   from formdtl where formcode='SMKT140' and cellwidth>'0'  
 					UNION 
-					SELECT unnest(string_to_array('noofleads,result_type,leadid' , ','))  as datafield,  unnest(string_to_array('noofleads,result_type,leadid' , ',')), unnest(string_to_array('60,100,60' , ',')) ::integer*10";
+					SELECT unnest(string_to_array('noofleads,result_type,leadid', ','))  as datafield,  unnest(string_to_array('noofleads,result_type,leadid' , ',')), unnest(string_to_array('60,100,60' , ',')) ::integer*10";
 
 
 				$db_dc= $this->load->database('forms', TRUE);
@@ -320,7 +320,7 @@ class dailyactivity_model extends CI_Model
              AND ld.leadstatus= ls.leadstatusid 
              AND ld.ldsubstatus = sub.lst_sub_id";*/
 
-             $sql="SELECT id,custgroup,exename,branch,itemgroup,potentialqty,subactivity,modeofcontact,hour_s,minit,quantity,division,date,remarks,l1status,complaints, user_id,d.leadid,ls.leadstatus as statusname,sub.lst_name as substatusname
+             $sql="SELECT line_id,id,custgroup,exename,branch,itemgroup,potentialqty,actualpotenqty,0 as create_lead,subactivity,modeofcontact,hour_s,minit,quantity,division,date,remarks,l1status,complaints, user_id,d.leadid,ls.leadstatus as statusname,sub.lst_name as substatusname
 				 				from 
 							 vw_web_daily_activity d 
 							LEFT JOIN leaddetails ld ON ld.leadid=d.leadid 
@@ -328,7 +328,7 @@ class dailyactivity_model extends CI_Model
 						LEFT JOIN leadsubstatus sub ON sub.lst_sub_id=ld.ldsubstatus 
              WHERE d.id=".$header_id;
 
-
+             //echo $sql; die;
 				$result = $this->db->query($sql);
 				$activitydetails = $result->result_array();
 				$all_record_count = count($activitydetails);
@@ -344,6 +344,7 @@ class dailyactivity_model extends CI_Model
 				{    
 					$row = array();
 				//	$row["id"] = $activitydetails[$i]["id"];
+					$row["line_id"] = $activitydetails[$i]["line_id"];
 					$row["custgroup"] = $activitydetails[$i]["custgroup"];
 					$row["itemgroup"] = $activitydetails[$i]["itemgroup"];
 					$row["potentialqty"] = $activitydetails[$i]["potentialqty"];
@@ -354,6 +355,8 @@ class dailyactivity_model extends CI_Model
 					$row["hour_s"] = $activitydetails[$i]["hour_s"];
 					$row["minit"] = $activitydetails[$i]["minit"];
 					$row["quantity"] = $activitydetails[$i]["quantity"];
+					$row["actualpotenqty"] = $activitydetails[$i]["actualpotenqty"];
+					$row["create_lead"]= $activitydetails[$i]["create_lead"];
 					$row["division"] = $activitydetails[$i]["division"];
 					$row["date"] = $activitydetails[$i]["date"];
 					$row["remarks"] = $activitydetails[$i]["remarks"];
@@ -444,8 +447,20 @@ class dailyactivity_model extends CI_Model
 				return $this->db->insert_batch('dailyactivitydtl', $dailydtls);
 			}
 			
+			/*function save_daily_details_up($dailydtls,$delid)
+			{
+
+				
+							$this->db->where('id',$delid);
+			              	$this->db->delete('dailyactivitydtl');
+							$this->db->insert_batch('dailyactivitydtl', $dailydtls);
+						
+			return TRUE;
+			}*/
+			
 			function save_daily_details_up($dailydtls,$delid)
 			{
+				
 				$this->db->db_debug = FALSE;
 				try {
 						$this->db->trans_start();
@@ -471,6 +486,7 @@ class dailyactivity_model extends CI_Model
 					}
 			$this->db->db_debug = TRUE; 
 			}
+			
 
 	
 			function check_dailyhdr_duplicates($hrd_currentdate,$user1)
@@ -670,7 +686,45 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 				
 			}
 
+		function get_lead_potential_update($leaid)
+		{
+
+				$sql="SELECT lead_prod_potential_types.potential,leadproducts.quantity as requirement,leaddetails.leadid,leaddetails.leadstatus as curr_stats_id, leaddetails.ldsubstatus as curr_substats_id,lead_prod_potential_types.product_type_id as id,lead_sale_type.n_value_displayname as lead_sale_type, leadsource.leadsource as lead_source_name,leaddetails.email_id,  leadstatus.leadstatus as leadstatusname,leadsubstatus.lst_name as leadsubstatusname
+							FROM leaddetails 
+							INNER JOIN leadproducts ON leaddetails.leadid = leadproducts.leadid 
+							INNER JOIN leadsource ON leaddetails.leadsource = leadsource.leadsourceid
+							INNER JOIN leadstatus ON leadstatus.leadstatusid =leaddetails.leadstatus
+							INNER JOIN leadsubstatus ON leadsubstatus.lst_sub_id =leaddetails.ldsubstatus
+							INNER JOIN customermasterhdr ON leaddetails.company = customermasterhdr.id 
+							INNER JOIN view_tempitemmaster_grp ON view_tempitemmaster_grp.id=leadproducts.productid 
+							INNER JOIN lead_prod_potential_types ON lead_prod_potential_types.leadid=leaddetails.leadid 
+							INNER JOIN lead_sale_type ON lead_sale_type.n_value_id = lead_prod_potential_types.product_type_id
+							WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".$leaid." ORDER BY lead_prod_potential_types.potential desc LIMIT 1";
+				
+				$result = $this->db->query($sql);
+				
+				if($result->num_rows()==0)
+				{
+					$poten_val['0']['potential']=0;
+					$poten_val['0']['requirement']=0;
+					$poten_val['0']['lead_sale_type']=0;
+					$poten_val['0']['curr_stats_id']=0;
+					$poten_val['0']['curr_substats_id']=0;
+					$poten_val['0']['leadstatusname']=0;
+					$poten_val['0']['leadsubstatusname']=0;
+
+				}
+				else
+				{
+					$poten_val = $result->result_array();
+				}
+
+				//print_r($poten_val);
+				$arr =  json_encode($poten_val);
+				$arr =	 '{ "rows" :'.$arr.' }';
+				return $arr;
 			
+		}
        
 			
 
@@ -767,6 +821,28 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 				//print_r($poten_val);
 				$arr =  json_encode($leadst_val);
 				$arr =	 '{ "statusid" :'.$arr.' }';
+				return $arr;
+			}
+			function get_ldstatusname($lead_id)
+			{
+			$sql="SELECT  leadstatus as statusname  FROM leadstatus WHERE order_by >= (SELECT  s.order_by as order_id
+ FROM  leadstatus s,leaddetails d  WHERE leadid=".$lead_id." and d.leadstatus = s.leadstatusid AND d.lead_close_status=0 and d.converted=0) ORDER BY order_by";
+
+				$result = $this->db->query($sql);
+				if($result->num_rows()==0)
+				{
+					
+					$leadst_val['0']['statusname']=0;
+					
+				}
+				else
+				{
+					$leadst_val = $result->result_array();
+				}
+
+				//print_r($poten_val);
+				$arr =  json_encode($leadst_val);
+				$arr =	 '{ "statusname" :'.$arr.' }';
 				return $arr;
 			}
 
@@ -998,7 +1074,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 		        $result = $this->db->get();
 		        $ld_status = $result->result_array();
 		        //print_r($ld_status); die;
-		        return $ld_status[0]['leadstatusid'];
+		        return @$ld_status[0]['leadstatusid'];
 			}
 			function get_leadsub_statusidbyname($sub_statusname)
 			{
@@ -1009,7 +1085,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 		        $result = $this->db->get();
 		        $ld_status = $result->result_array();
 		        //print_r($ld_status); die;
-		        return $ld_status[0]['lst_sub_id'];
+		        return @$ld_status[0]['lst_sub_id'];
 			}
 
 			function get_customer_address($customer_id) 
@@ -1092,7 +1168,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 		        $result = $this->db->get();
 		        $ld_status = $result->result_array();
 		        //print_r($ld_status); die;
-		        return $ld_status[0]['n_value_id'];
+		        return @$ld_status[0]['n_value_id'];
 			}
 
 }
