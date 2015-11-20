@@ -80,6 +80,13 @@
                 <!-- End of jqwidgets -->
                 <link rel="stylesheet" href="<?= base_url() ?>public/jqwidgets/styles/jqx.black.css" type="text/css" />
                 <script type="text/javascript">
+                    function openpopup(id)
+                    {
+                        // alert("company id passed is "+id);
+                        $('#jqxsoc').jqxWindow('open');
+                        $("#jqxsoc").jqxWindow({width: 600, height: 220, isModal: true});
+
+                    }
                     var actionmode;
                     var base_url = '<?php echo site_url(); ?>';
                     function _createElements()
@@ -116,8 +123,15 @@
                             $("#appiontment_date").jqxDateTimeInput({ width: '107px',height: '41px',formatString: 'dd/MM/yyyy' });
                             $("#appiontment_date").val(null);
                         $("#popupWindowNot").jqxWindow({ width: 360,height: 101, title:'Enter the reason for not able to get the appiontment', resizable: false, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
+                        $("#popupWindowReject").jqxWindow({ width: 360,height: 101, title:'Enter the reason for Sample Rejected', resizable: false, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
+                        $("#popupWindowOrdercancel").jqxWindow({ width: 360,height: 101, title:'Enter the reason for Order cancelled', resizable: false, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
+                        $("#popupWindowSoc").jqxWindow({ width: 800, height: 340, title:'select the SOC Number', resizable: true, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
                         
                             $("#not_able_to_get_appointment").jqxInput({ width: 107,height:41});
+                            $("#sample_rejected_reason").jqxInput({ width: 107,height:41});
+                            $("#order_cancelled_reason").jqxInput({ width: 107,height:41});
+                            $("#crm_soc_number").jqxInput({ width: 107,height:28});
+                            
                             var validateProductName = $('#validateProductName');
                             
                         var dhdr_headerid;
@@ -544,6 +558,8 @@
                                 //   alert(data.toSource());
                                    var status_name = data.statusid;
                                    var leadid =data.leadid;
+                                    status_name = status_name.replace(/\//gi, "-");
+
                                   // alert("in initeditor addform substatus "+status_name);
                                     if (leadid!="")
                                     {
@@ -1058,6 +1074,7 @@
                                 //   var substatus_name = data.leadsubstatusid;
 
                                    var status_name = data.leadstatusid;
+                                     status_name = status_name.replace(/\//gi, "-");
 
                                    var leadid =data.leadid;
                                   // alert("in initeditor for update substatus "+status_name);
@@ -1391,11 +1408,142 @@
                                                                                           if (newvalue == 0)  {
                                                                                            return oldvalue;
                                                                                       } 
-                                                                                       else if (newvalue!=oldvalue)
+                                                                                       else if (newvalue!=oldvalue && newvalue!='Expanding And Build Relationship')
                                                                                        {
                                                                                        $("#jqxgrid_n").jqxGrid('setcellvalue', row, "leadsubstatusid", "Select Substatus");
                                                                                         return newvalue;
                                                                                        }
+                       /*get soc number start*/
+                       else if (newvalue!=oldvalue && newvalue=='Expanding And Build Relationship')
+                        {
+                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "leadsubstatusid", "Expanding And Build Relationship");
+                           // alert("in update form to get soc number");
+                            var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                            var url;
+                                var cust_grp =data.custgroup;
+                                //alert("customer group "+cust_grp);
+                                var prodgroup =data.itemgroup;
+                              //  alert("item group "+prodgroup);
+                               url= base_url + 'dailyactivity/getsynchedproducts/'+cust_grp+'/'+prodgroup;
+                                 
+                                            var rows = {};
+                                            jQuery.ajax({
+                                                dataType: "html",
+                                                url: url,
+                                                type: "POST",
+                                                async: false,
+                                                error: function (xhr, status) {
+                                                    //  alert("check "+status+" test");
+                                                },
+                                                success: function (result) {
+                                                    //  console.log(result);
+                                                    var obj = jQuery.parseJSON(result);
+                                                    rows = obj.rows;
+                                                    //   rows = obj[1].rows;
+                                                    //  commonCols=obj[0].columns;
+                                                }
+                                            });
+
+
+                                          var source =
+                                                        {
+                                                            datatype: "json",
+                                                            datafields:
+                                                                    [
+                                                                        {name: 'crm_soc_no'},
+                                                                        {name: 'itemdesc'},
+                                                                        {name: 'customer_id'},
+                                                                        {name: 'customer_name', type: 'string'},
+                                                                        {name: 'lead_cusomer_ref_id'},
+                                                                        {name: 'customer_number'},
+                                                                    ],
+                                                            localdata: rows,
+                                                            pagenum: 0, pagesize: 35, pager: function (pagenum, pagesize, oldpagenum) {
+                                                                // callback called when a page or page size is changed.
+                                                            }
+
+                                                        };
+
+                                            var dataAdapter = new $.jqx.dataAdapter(source);
+                                          
+                                            $("#jqxcustomergrid").jqxGrid(
+                                                                {
+                                                                    width: 560,
+                                                                    height: 250,
+                                                                    source: dataAdapter,
+                                                                    selectionmode: 'singlerow',
+                                                                    theme: 'energyblue',
+                                                                    sortable: true,
+                                                                    pageable: true,
+                                                                    columnsresize: true,
+                                                                    editable: false,
+                                                                    showfilterrow: true,
+                                                                    filterable: true,
+                                                                    autoheight: true,
+                                                                    showtoolbar: true,
+                                                                    pageable: true,
+                                                                            columns: [
+                                                                                {text: 'SocID', datafield: 'crm_soc_no', width: 100},
+                                                                                {text: 'Customer Id', datafield: 'customer_id', cellsalign: 'left', width: 100},
+                                                                                {text: 'Product', datafield: 'itemdesc', cellsalign: 'left', width: 100},
+                                                                                {text: 'Customer Name', datafield: 'customer_name', cellsalign: 'left', width: 200},
+                                                                                {text: 'Customer Number', datafield: 'customer_number', cellsalign: 'left', width: 100}
+                                                                            ]
+                                                                });
+                                
+
+                             $("#popupWindowSoc").jqxWindow('show');
+                             $("#jqxcustomergrid").on('celldoubleclick', function (event)
+                                {
+                                    var column = event.args.column;
+                                    var rowindex = event.args.rowindex;
+                                    var jqxcustomergrid_row_index = rowindex;
+                                    var columnindex = event.args.columnindex;
+                                    var columnname = column.datafield;
+                                    var custgroup_val = $('#jqxcustomergrid').jqxGrid('getcellvalue', rowindex, "crm_soc_no");
+                                  //  alert("custgroup_val "+custgroup_val);
+                                  //  alert("jqxgrid_n_row_index "+jqxgrid_n_row_index);
+                                  //  alert("row  "+row);
+
+                                    $('#crm_soc_number').val(custgroup_val);
+                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "crm_soc_number",custgroup_val);
+                                    
+                                    $("#jqxcustomergrid").on("cellselect", function (event)
+                                    {
+                                        var column = event.args.column;
+                                        var rowindex = event.args.rowindex;
+                                        var jqxcustomergrid_row_index = rowindex;
+                                        var columnindex = event.args.columnindex;
+                                        var columnname = column.datafield;
+                                        var custgroup_val = $('#jqxcustomergrid').jqxGrid('getcellvalue', rowindex, "crm_soc_no");
+                                         $("#jqxgrid_n").jqxGrid('setcellvalue', row, "crm_soc_number",custgroup_val);
+
+                                    });
+                                     $('#popupWindowSoc').jqxWindow('hide');
+
+                                });
+                             $("#save_socnumber").click(function (event){
+
+                                
+                            
+                                    var reason_text = $('#crm_soc_number').val();
+                                    if(reason_text=="")
+                                    {
+                                        alert("Enter SOC Number");
+                                        return false;
+                                    }
+                                    else
+                                    {
+
+                                         $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row_index, "crm_soc_number",reason_text);
+                                        $("#popupWindowSoc").jqxWindow('close');
+                                    }
+                               
+                            });
+                        
+                            return newvalue;
+                        } 
+                        /*get soc number end*/
 
 
                                                                                     }
@@ -1405,8 +1553,8 @@
                                                                     {text: 'SubStatus', datafield: 'leadsubstatusid', width: 200, cellsalign: 'left',readonly:false,cellbeginedit:Resultsupdate.initResultsEditorldsubst, initeditor: Resultsupdate.resultsEditorldsubst, cellsrenderer: Resultsupdate.renderUnitsldsubst,cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                                                 {
                                                                                    // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
-                                                                                   alert(" jqxgrid_n_row_index"+jqxgrid_n_row_index);
-                                                                                   alert(" row "+row);
+                                                                                 //  alert(" jqxgrid_n_row_index"+jqxgrid_n_row_index);
+                                                                                 //  alert(" row "+row);
 
                                                                                       if (newvalue == 0)  {
                                                                                        return oldvalue;
@@ -1462,6 +1610,52 @@
                                                                                         
                                                                                      }
                                                                                      /* Not able to get appointment end*/
+                                                                                     /*Sample rejected reason start*/
+                                                                                      if(newvalue=='Sample Rejected')
+                                                                                     {
+                                                                                        $("#popupWindowReject").jqxWindow('show');
+                                                                                        $("#save_samplerej").click(function (event){
+                                                                                        
+                                                                                                var reason_text = $('#sample_rejected_reason').val();
+                                                                                                if(reason_text=="")
+                                                                                                {
+                                                                                                    alert("Please Enter the Reason");
+                                                                                                    return false;
+                                                                                                }
+                                                                                                else
+                                                                                                {
+
+                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "sample_rejected_reason",reason_text);
+                                                                                                    $("#popupWindowReject").jqxWindow('close');
+                                                                                                }
+                                                                                           
+                                                                                        });
+                                                                                        
+                                                                                     }
+                                                                                     /* Sample rejected reason End*/
+                                                                                     /*Order Cancel reason start*/
+                                                                                      if(newvalue=='Order Cancelled')
+                                                                                     {
+                                                                                        $("#popupWindowOrdercancel").jqxWindow('show');
+                                                                                        $("#save_ordercancel").click(function (event){
+                                                                                        
+                                                                                                var reason_text = $('#order_cancelled_reason').val();
+                                                                                                if(reason_text=="")
+                                                                                                {
+                                                                                                    alert("Please Enter the Reason");
+                                                                                                    return false;
+                                                                                                }
+                                                                                                else
+                                                                                                {
+
+                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "order_cancelled_reason",reason_text);
+                                                                                                    $("#popupWindowOrdercancel").jqxWindow('close');
+                                                                                                }
+                                                                                           
+                                                                                        });
+                                                                                        
+                                                                                     }
+                                                                                     /* Sample rejected reason End*/
                                                                                      return newvalue;
                                                                                    }
 
@@ -1476,6 +1670,14 @@
                                                                     {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:false},
 
                                                                     {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:false, editable:false},
+
+                                                                    {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:false, editable:false},
+
+                                                                     {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
+
+                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:false, editable:false},
+
+                                                                     
 
                                                                 {text: 'Mode of Contact', datafield: 'modeofcontact', width: 100, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorcon, createeditor: Resultsupdate.resultsEditorcon, cellsrenderer: Resultsupdate.renderUnitsst
                                                                 },
@@ -1703,6 +1905,7 @@
                                                                    $("#jqxgrid_add").jqxGrid('setcellvalue', row, "leadsubstatusid", "Select Substatus");
                                                                     return newvalue;
                                                                 } 
+                                                                
 
                                                         }
                                         },
@@ -1763,6 +1966,56 @@
                                                             
                                                          }
                                                          /* Not able to get appointment end*/
+                                                         /*Sample rejected reason start*/
+                                                          if(newvalue=='Sample Rejected')
+                                                         {
+                                                            
+                                                                                                  
+                                                            $("#popupWindowReject").jqxWindow('show');
+                                                            $("#save_samplerej").click(function (event){
+                                                            
+                                                                    var reason_text = $('#sample_rejected_reason').val();
+                                                                    if(reason_text=="")
+                                                                    {
+                                                                        alert("Please Enter the Reason");
+                                                                        return false;
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "sample_rejected_reason",reason_text);
+                                                                        $("#popupWindowReject").jqxWindow('close');
+                                                                    }
+                                                               
+                                                            });
+                                                            
+                                                         }
+                                                         /* Sample rejected reason End*/
+                                                         /*Order Cancelled reason start*/
+                                                          if(newvalue=='Order Cancelled')
+                                                         {
+                                                            
+                                                                                                  
+                                                            $("#popupWindowOrdercancel").jqxWindow('show');
+                                                            $("#save_ordercancel").click(function (event){
+                                                            
+                                                                    var reason_text = $('#order_cancelled_reason').val();
+                                                                    if(reason_text=="")
+                                                                    {
+                                                                        alert("Enter Order cancel Reason");
+                                                                        return false;
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "order_cancelled_reason",reason_text);
+                                                                        $("#popupWindowOrdercancel").jqxWindow('close');
+                                                                    }
+                                                               
+                                                            });
+                                                            
+                                                         }
+                                                         /* Sample rejected reason End*/
                                                          return newvalue;
                                                        }
 
@@ -1778,6 +2031,8 @@
                                         {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
 
                                         {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
+                                        {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:false, editable:false},
+                                         {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
 
                                         {text: 'Mode of Contact', datafield: 'Mode_Of_Contact', width: 100, cellsalign: 'left', cellbeginedit:Results.initResultsEditorcon, initeditor: Results.resultsEditorcon, cellsrenderer: Results.renderUnitsst
                                         },
@@ -2213,10 +2468,10 @@
                                    
                                 }
                                
-                                alert("noofleads  "+griddata.noofleads);
+                                /*alert("noofleads  "+griddata.noofleads);
                                 alert("actualpotenqty  "+griddata.actualpotenqty);
                                 alert("prevstatusid  "+griddata.prevsubstatusid);
-                                alert(" type noofleads "+typeof(griddata.noofleads));
+                                alert(" type noofleads "+typeof(griddata.noofleads));*/
                                 
                                 
                                 rowval["currentdate"] = currentdate;
@@ -2256,6 +2511,9 @@
 
                                 rowval["lead_appointmentdt"] = lead_appointmentdt;
                                 rowval["not_able_to_get_appointment"] = griddata.not_able_to_get_appointment;
+                                rowval["sample_rejected_reason"] = griddata.sample_rejected_reason;
+                                rowval["order_cancelled_reason"] = griddata.order_cancelled_reason;
+                                
                                 if (griddata.create_lead==undefined)
                                 {
                                     rowval["create_lead"] = false;    
@@ -2523,6 +2781,9 @@
                                 }
                                 rowval["lead_appointmentdt"] = lead_appointmentdt;
                                 rowval["not_able_to_get_appointment"] = griddata.not_able_to_get_appointment;
+                                rowval["sample_rejected_reason"] = griddata.sample_rejected_reason;
+                                rowval["order_cancelled_reason"] = griddata.order_cancelled_reason;
+                                rowval["crm_soc_number"] = griddata.crm_soc_number;
                                 data[i] = rowval;
                             }
 
@@ -2957,7 +3218,7 @@
 
                                 if(args.datafield=='itemgroup')
                                 {
-                                    alert("in cellendedit add mode itemgroup");
+                                    //alert("in cellendedit add mode itemgroup");
                                 }
 
                                 
@@ -3157,6 +3418,62 @@
                                         </div>
                                     </div>
                                 <!-- Select Appiontment Date popup End -->
+                                <!-- Select Sample Rejected Reason Start --> 
+                                    <div id="popupWindowReject">
+                                        <div style="overflow: hidden; margin-top: 0px;">
+                                            <table>
+                                                <tr>
+                                                    <td align="right">
+                                                        Reason:
+                                                    </td>
+                                                    <td align="left">
+                                                    <input type="text" id="sample_rejected_reason" name="sample_rejected_reason" style="margin-top: 0px;" />
+                                                       
+                                                        <input style="margin-right: 5px;" type="button" name="save_samplerej" id="save_samplerej" value="Save" />
+                                                    </td>
+                                                </tr>
+                                            </table> 
+                                        </div>
+                                    </div>
+                                <!-- Select Sample Rejected Reason  End -->
+                                 <!-- Order Cancelled Reason Start --> 
+                                    <div id="popupWindowOrdercancel">
+                                        <div style="overflow: hidden; margin-top: 0px;">
+                                            <table>
+                                                <tr>
+                                                    <td align="right">
+                                                        Reason:
+                                                    </td>
+                                                    <td align="left">
+                                                    <input type="text" id="order_cancelled_reason" name="order_cancelled_reason" style="margin-top: 0px;" />
+                                                       
+                                                        <input style="margin-right: 5px;" type="button" name="save_ordercancel" id="save_ordercancel" value="Save" />
+                                                    </td>
+                                                </tr>
+                                            </table> 
+                                        </div>
+                                    </div>
+                                <!-- Order cancelled Reason  End -->
+                                <!-- Start for get soc number start-->
+                                    <div id="popupWindowSoc">
+                                        <div style="overflow: hidden; margin-top: 0px;">
+                                            <table>
+                                                <tr>
+                                                    <td align="left">CRM SOC Number:</td>
+                                                    <td align="left">
+                                                    <input type="text" id="crm_soc_number" readonly="true" name="crm_soc_number" style="margin-top: 0px;" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                 <td colspan="2">
+                                                       <div id="jqxcustomergrid"></div>
+                                                     <input style="margin-right: 5px;" type="button" name="save_socnumber" id="save_socnumber" value="Save" />
+                                                 </td>
+                                                </tr>
+                                            </table> 
+                                        </div>
+                                    </div>
+                                <!-- End for get soc number start -->
 
                             <!--  This part of div contain windows End      -->
                         </div>

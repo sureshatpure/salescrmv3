@@ -699,7 +699,8 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 							INNER JOIN view_tempitemmaster_grp ON view_tempitemmaster_grp.id=leadproducts.productid 
 							INNER JOIN lead_prod_potential_types ON lead_prod_potential_types.leadid=leaddetails.leadid 
 							INNER JOIN lead_sale_type ON lead_sale_type.n_value_id = lead_prod_potential_types.product_type_id
-							WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".$leaid." ORDER BY lead_prod_potential_types.potential desc LIMIT 1";
+							WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".$leaid." ORDER BY lead_prod_potential_types.potential,lead_prod_potential_types.product_type_id  LIMIT 1";
+				//echo $sql;							
 				
 				$result = $this->db->query($sql);
 				
@@ -918,6 +919,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 			function GetLeadStatusid($lst_name) 
 			{
 				$lst_name=urldecode($lst_name);
+				$lst_name=str_replace("-","/",$lst_name);
 				$this->db->select('leadstatusid');
 		        $this->db->from('leadstatus');
 		        $this->db->where('leadstatus', $lst_name);
@@ -1169,6 +1171,15 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 		        $ld_status = $result->result_array();
 		        //print_r($ld_status); die;
 		        return @$ld_status[0]['n_value_id'];
+			}
+
+			function get_synched_products($sql)
+			{
+				//$sql='SELECT  DISTINCT  itemgroup FROM itemmaster ORDER BY description asc';
+				$result = $this->db->query($sql);
+				$arr =  json_encode($result->result_array());
+				$arr =	 '{ "rows" :'.$arr.' }';
+				return $arr;
 			}
 
 }
