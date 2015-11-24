@@ -772,7 +772,7 @@ class dailyactivity extends CI_Controller {
                             }
                             if ($lead_substatus_id == 21) 
                               {
-                                $samle_reject_count = $this->Leads_model->get_lead_sample_rejectcnt($leadid,$lead_substatus_id);
+                                $samle_reject_count = $this->Leads_model->get_lead_sample_rejectcnt($lead_id,$lead_substatus_id);
                                } 
                             if ($lead_substatus_id == 15) 
                             {
@@ -786,7 +786,7 @@ class dailyactivity extends CI_Controller {
                                 );
 
 
-                                $id = $this->Leads_model->update_leadclosestatus($leaddetails_close, $leadid);
+                                $id = $this->Leads_model->update_leadclosestatus($leaddetails_close, $lead_id);
                                 //  print_r($leaddetails_close);
                             }
                              /*Start for Enquiry/Offer*/
@@ -836,7 +836,7 @@ class dailyactivity extends CI_Controller {
                                                     if ($samle_reject_count>1)
                                                     {
                                                         $today_date = date('Y-m-d:H:i:s');
-                                                             $lead_status_mailalert = array('leadid' =>$leadid,
+                                                             $lead_status_mailalert = array('leadid' =>$lead_id,
                                                             'user_id' => $login_user_id,
                                                             'branch' => $user_branch,
                                                             'lead_status_id' => 8,
@@ -859,12 +859,12 @@ class dailyactivity extends CI_Controller {
                                                             'last_updated_user' => $login_user_id
                                                             );
 
-                                                            $id = $this->Leads_model->update_leadclosestatus($leaddetails_close, $leadid);
+                                                            $id = $this->Leads_model->update_leadclosestatus($leaddetails_close, $lead_id);
                                                     }
                                                     else 
                                                     {
                                                         $today_date = date('Y-m-d:H:i:s');
-                                                             $lead_status_mailalert = array('leadid' =>$leadid,
+                                                             $lead_status_mailalert = array('leadid' =>$lead_id,
                                                             'user_id' => $login_user_id,
                                                             'branch' => $user_branch,
                                                             'lead_status_id' => $lead_status_id,
@@ -1160,7 +1160,7 @@ class dailyactivity extends CI_Controller {
                          $samle_reject_count=0;
                          $user_branch = $this->dailyactivity_model->get_user_branch($login_user_id);
 
-                         if($val['crm_soc_number']=='undefined')
+                         if($val['crm_soc_number']=='undefined' || $val['crm_soc_number']=="")
                          {
                             $crm_first_soc_no=0;
                             $ld_converted = 0;
@@ -1174,7 +1174,7 @@ class dailyactivity extends CI_Controller {
 
                         if ($val['line_id']==0)
                         {/* code for creating lead start*/
-                             if($val['crm_soc_number']=='undefined')
+                             if($val['crm_soc_number']=='undefined' || $val['crm_soc_number']=="")
                              {
                                 $val['crm_soc_number']=0;
                                 $ld_converted = 0;
@@ -1288,6 +1288,7 @@ class dailyactivity extends CI_Controller {
                                     );
                                 } else if ($lead_substatus_id == 3) {
                                 $today_date = date('Y-m-d:H:i:s');
+                                if($appiontment_date==""){$appiontment_date=null;}
                                 $lead_status_mailalert = array('leadid' => $lead_id,
                                     'user_id' => $login_user_id,
                                     'branch' => $user_branch,
@@ -1548,6 +1549,17 @@ class dailyactivity extends CI_Controller {
                            //echo "lead update is to be done for ".$val['leadid'];
                            //echo"lead_status_id ".$lead_status_id."<br>";
                            //echo"lead_substatus_id ".$lead_substatus_id."<br>";
+                             if($val['crm_soc_number']=='undefined' || $val['crm_soc_number']=="")
+                             {
+                                $crm_first_soc_no=0;
+                                $ld_converted = 0;
+                             }
+                             else
+                             {
+                                
+                                $crm_first_soc_no =$val['crm_soc_number'];
+                                $ld_converted = 1;
+                             }
                              if($val['not_able_to_get_appointment']=='null' or $val['not_able_to_get_appointment']=='undefined')
                              {
                                 $reason_no_appointment=NULL;
@@ -2311,6 +2323,45 @@ class dailyactivity extends CI_Controller {
         $viewdata = $activitydata['datacustomermaster'];
         header('Content-Type: application/x-json; charset=utf-8');
         echo $viewdata;
+    }
+
+    function save_newproduct() {
+       // print_r($_POST);
+/*                $data['body'] = "Product Added Sucessfully";
+                $this->load->view('dailyactivity/sucessitem_view', $data);*/
+/*                action save_newproduct 
+                item_name   toluenenew*/
+        //  
+        if ($this->input->post('action')) {
+           
+            $product_currval = $this->dailyactivity_model->GetNextMaxVal('temp_item_id', 'tempitemmaster');
+            //$company_currval= $this->Company_model->GetCurrVal('tempcustomermaster_id_seq');
+            //  $company_currval= $this->Company_model->GetNextVal('tempcustomermaster_id_seq');
+            $product_nextid = $product_currval + 1;
+            //tempcustomer_id_seq
+            //INSERT INTO tempcustomermaster (temp_cust_sync_id,temp_customername,creationdate)
+            //VALUES    ('TEMP'||CURRVAL('tempcustomermaster_id_seq'),'Pures Chemicals','2013-09-27:09:20:35')
+            $item_syn_id = "TEMP" . $product_nextid;
+            //$user_id = $this->input->post('hdn_userid');
+            $user_id = 676;
+            $productdetails = array(
+                'temp_item_sync_id' => $item_syn_id,
+                'temp_itemname' => strtoupper($this->input->post('item_name')),
+                'user_id' => 676,
+                //'lead_id' => $leadid,         
+                'creationdate' => date('Y-m-d h:i:s')
+            );
+            $id = $this->dailyactivity_model->save_tempitem($productdetails);
+            // echo "the returned id is ".$id."<br>";
+            if ($id != "") {
+                $data['body'] = "Product Added Sucessfully";
+                $this->load->view('product/sucessitem_view', $data);
+            } else {
+                $data['body'] = "Please Try Again";
+                $this->load->view('product/retryitem_view', $data);
+            }
+            //redirect('leads');    
+        }
     }
     
 

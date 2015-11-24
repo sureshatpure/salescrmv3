@@ -20,6 +20,8 @@
         <link rel="stylesheet" href="<?= base_url() ?>public/css/jquery.css" type="text/css" media="screen">
         <script type="text/javascript" src="<?= base_url() ?>public/js/jquery_007.js"></script>
         <script type="text/javascript" src="<?= base_url() ?>public/jquery/jqueryui.js"></script>
+        <script type="text/javascript" src="<?= base_url() ?>public/js/jquery.min.js"></script>
+        <script type="text/javascript" src="<?= base_url() ?>public/js/jquery.validate.min.js"></script>
     </head>
     <body>
 
@@ -34,6 +36,8 @@
                 <!-- jqwidgets scripts -->
                 <link rel="stylesheet" href="<?= base_url() ?>public/jqwidgets/styles/jqx.base.css" type="text/css" />
                 <link rel="stylesheet" href="<?= base_url() ?>public/jqwidgets/styles/jqx.energyblue.css" type="text/css" />
+                <link rel="stylesheet" href="<?= base_url() ?>public/jqwidgets/styles/jqx.classic.css" type="text/css" />
+                
                 <style type="text/css">
                     .editedRow {
                         color: #b90f0f;
@@ -93,7 +97,7 @@
                     {
                         // alert("action mode in _createElements  "+actionmode);
                         // code start for view formdetail window
-                        $('#customWindow').jqxWindow({theme: 'energyblue', showCollapseButton: true, autoOpen: false, width: 1013, height: 400, resizable: true, title: 'View Daily Call Activity&nbsp;&nbsp;<input id="update_add_row"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" value="Add New Row" />&nbsp;&nbsp;<input id="update_delete_row" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" value="Delete Selected Row" />&nbsp;&nbsp;<input id="update_data"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue"  type="button" value="Update" />&nbsp;&nbsp;<input id="excelExport"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" title="Currently you cannot export all the data,instead filter the data and try to use Export to Excel option"   alt="Currently you cannot export all the data,instead filter the data and try to use Export to Excel option" value="Export to Excel"/>',
+                        $('#customWindow').jqxWindow({theme: 'energyblue', showCollapseButton: true, autoOpen: false, width: 1013, height: 400, resizable: true, title: 'View Daily Call Activity&nbsp;&nbsp;<input id="update_add_row"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" value="Add New Row" />&nbsp;&nbsp;<input id="addnewprod_add"   class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue addnewprod_add" type="button" value="Add New Product" />&nbsp;&nbsp;<input id="update_delete_row" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" value="Delete Selected Row" />&nbsp;&nbsp;<input id="update_data"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue"  type="button" value="Update" />&nbsp;&nbsp;<input id="excelExport"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" title="Currently you cannot export all the data,instead filter the data and try to use Export to Excel option"   alt="Currently you cannot export all the data,instead filter the data and try to use Export to Excel option" value="Export to Excel"/>',
                             initContent: function () {
                                 $('#jqxgrid_n').jqxGrid({disabled: false});
                             }
@@ -103,7 +107,7 @@
 
                         // code end for view formdetail window
                         // code start for add window
-                        $('#addWindow').jqxWindow({theme: 'energyblue', autoOpen: false, showCollapseButton: true, height: 400, resizable: true, title: 'Add Daily Call Activity&nbsp;&nbsp; <input id="addrowbutton"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" value="Add New Row" />&nbsp;&nbsp;<input id="deleterowbutton"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" value="Delete Selected Row" />&nbsp;&nbsp;<input id="save"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" value="Save Data" />',
+                        $('#addWindow').jqxWindow({theme: 'energyblue', autoOpen: false, showCollapseButton: true, height: 400, resizable: true, title: 'Add Daily Call Activity&nbsp;&nbsp; <input id="addrowbutton"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" value="Add New Row" />&nbsp;&nbsp;<input id="deleterowbutton"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" value="Delete Selected Row" />&nbsp;&nbsp;<input id="addnewprod"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue addnewprod" type="button" value="Add New Product" />&nbsp;&nbsp;<input id="save"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" value="Save Data" />',
                             initContent: function () {
                                 $('#jqxgrid_add').jqxGrid({disabled: false, width: 790, theme: 'energyblue'});
                             },position: 'top, left'
@@ -125,7 +129,8 @@
                         $("#popupWindowNot").jqxWindow({ width: 360,height: 101, title:'Enter the reason for not able to get the appiontment', resizable: false, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
                         $("#popupWindowReject").jqxWindow({ width: 360,height: 101, title:'Enter the reason for Sample Rejected', resizable: false, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
                         $("#popupWindowOrdercancel").jqxWindow({ width: 360,height: 101, title:'Enter the reason for Order cancelled', resizable: false, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
-                        $("#popupWindowSoc").jqxWindow({ width: 800, height: 340, title:'select the SOC Number', resizable: true, theme: 'energyblue', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
+                        $("#popupWindowSoc").jqxWindow({ width: 800, height: 340, title:'select the SOC Number', resizable: true, theme: 'classic', isModal: true, autoOpen: false,cancelButton: $("#Cancel"), modalOpacity: 0.01 });
+
                         
                             $("#not_able_to_get_appointment").jqxInput({ width: 107,height:41});
                             $("#sample_rejected_reason").jqxInput({ width: 107,height:41});
@@ -133,6 +138,8 @@
                             $("#crm_soc_number").jqxInput({ width: 107,height:28});
                             
                             var validateProductName = $('#validateProductName');
+                            var validateProductName_add = $('#validateProductName_add');
+                            
                             
                         var dhdr_headerid;
                         var header_date;
@@ -157,6 +164,7 @@
                         
                         $('#win_selectItemMaster').jqxWindow({ autoOpen:false}); 
                         $('#win_selectCustMaster').jqxWindow({ autoOpen:false}); 
+                        $('#win_newproduct').jqxWindow({ autoOpen:false}); 
                         $('#win_selectCustMaster').jqxWindow('bringToFront');
                         $("#update_add_row").jqxButton({theme: 'black', width: '150', height: '25'});
                         $("#jqxgrid_add").jqxGrid({theme: 'energyblue'});
@@ -349,20 +357,23 @@
                                                 dataType: 'json',
                                                 success: function (response)
                                                 {
-
+                                                   // alert(response.msg);
                                                     if (response.ok == false) 
                                                     {
                                                         //  datevalidation=false;
                                                         //validateProductName.html(response.msg);
                                                              //alert("This product group has been already billed for this customer")
-                                                             validateProductName.html(response.msg);
+
+                                                             validateProductName_add.html(response.msg);
                                                             // editor.jqxCheckBox({ checked: false, hasThreeStates:false});
                                                             $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "create_lead",0);
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "statusid",'No Status');
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "leadsubstatusid",'No Substatus');
                                                     }
                                                     else
                                                     {
                                                         // datevalidation=true;
-                                                        validateProductName.html(response.msg);
+                                                        validateProductName_add.html(response.msg);
                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "create_lead",1);
                                                     }
 
@@ -1360,11 +1371,11 @@
                                                             filterable: true,
                                                             columns: [
                                                                 {text: 'UID', datafield: 'id', width: 150, cellsalign: 'left', hidden: true},
-                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: false},
+                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: true},
                                                                 {text: 'Customer Group', datafield: 'custgroup', width: 150, editable: false},
-                                                                {text: 'Cust Id', datafield: 'custid', width: 100, editable: false,hidden: false},
+                                                                {text: 'Cust Id', datafield: 'custid', width: 100, editable: false,hidden: true},
                                                                 {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},
-                                                                {text: 'Prod Id', datafield: 'itemid', width: 100, editable: false,hidden: false},
+                                                                {text: 'Prod Id', datafield: 'itemid', width: 100, editable: false,hidden: true},
                                                                 {text: 'Lead id', datafield: 'leadid',cellsformat:'n', displayfield: 'leadid', width: 127, cellsalign: 'center', cellbeginedit: Resultsupdate.initResultsEditor, initeditor: Resultsupdate.resultsEditor, cellsrenderer: Resultsupdate.renderUnits,promptText:'Select Leadid',cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                                         {
                                                                            // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
@@ -1374,8 +1385,8 @@
                                                                         }
                                                                 },
                                                                 {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
-                                                                { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                                                {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
+                                                                { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
                                                                 {text: 'Activity Type', datafield: 'subactivity', width: 110, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorat, initeditor: Resultsupdate.resultsEditorat, cellsrenderer: Resultsupdate.renderUnitsat
                                                                 },
                                                                 
@@ -1468,11 +1479,11 @@
                                           
                                             $("#jqxcustomergrid").jqxGrid(
                                                                 {
-                                                                    width: 560,
+                                                                    width: 700,
                                                                     height: 250,
                                                                     source: dataAdapter,
                                                                     selectionmode: 'singlerow',
-                                                                    theme: 'energyblue',
+                                                                    theme: 'classic',
                                                                     sortable: true,
                                                                     pageable: true,
                                                                     columnsresize: true,
@@ -1578,7 +1589,7 @@
                                                                                                 else
                                                                                                 {
 
-                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row_index, "appiontmnt_dt",date_text);
+                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "appiontmnt_dt",date_text);
                                                                                                     $("#popupWindow").jqxWindow('close');
                                                                                                 }
                                                                                            
@@ -1662,20 +1673,20 @@
                                                                                 }
                                                                    
                                                                     },
-                                                                     {text: 'PrevStatus', datafield: 'prevstatusid', width: 150, cellsalign: 'center',readonly:true,editable:false, hidden:false
+                                                                     {text: 'PrevStatus', datafield: 'prevstatusid', width: 150, cellsalign: 'center',readonly:true,editable:false, hidden:true
                                                                     },
-                                                                     {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:false
+                                                                     {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:true
                                                                      },
 
-                                                                    {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:false},
+                                                                    {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
 
-                                                                    {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:false, editable:false},
+                                                                    {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
 
-                                                                    {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:false, editable:false},
+                                                                    {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:true, editable:false},
 
-                                                                     {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
+                                                                     {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:true, editable:false},
 
-                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:false, editable:false},
+                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:false},
 
                                                                      
 
@@ -1785,6 +1796,9 @@
                             row["result_type"] = '';
                             row["appiontmnt_dt"] = '';
                             row["not_able_to_get_appointment"] = '';
+                            row['statusid']='No Status';
+                            row['leadsubstatusid']='No SubStatus';
+                            
                             return row;
 
                         }
@@ -1862,9 +1876,9 @@
                                         },
                                             
 
-                                        {text: 'noofleads', datafield: 'noofleads', hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                        {text: 'noofleads', datafield: 'noofleads', hidden:true, width: 20, cellsalign: 'left', editable: false},
                                         {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
-                                        { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                        { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
                                         {text: 'Activity Type', datafield: 'Sub_Activity', width: 110, cellsalign: 'left', cellbeginedit:Results.initResultsEditorat, initeditor: Results.resultsEditorat, cellsrenderer: Results.renderUnitsat
                                         },
                                         {text: 'Potential', datafield: 'Potential_Quantity', width: 75, cellsalign: 'left', editable: false},
@@ -1885,7 +1899,7 @@
 
                                                     }
                                         },
-                                        {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Results.initResultsEditorst, initeditor: Results.resultsEditorst, cellsrenderer: Results.renderUnitsst
+                                        {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Results.initResultsEditorst, initeditor: Results.resultsEditorst, cellsrenderer: Results.renderUnitsstleadsubstatusid
                                         },
                                         {text: 'Status', datafield: 'statusid', width: 150, cellsalign: 'center', cellbeginedit:Results.initResultsEditorldst, initeditor: Results.resultsEditorldst, cellsrenderer: Results.renderUnitsldst,promptText:'Select Status',
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
@@ -1897,14 +1911,149 @@
                                                            var sid = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "statusid");
                                                           // alert('statusid: ' + sid);
 
-                                                              if (newvalue == 0) {
-                                                                    return oldvalue;
-                                                                }
-                                                                else if (newvalue!=oldvalue)
+                                            
+                                                                if (newvalue == 0)  
                                                                 {
-                                                                   $("#jqxgrid_add").jqxGrid('setcellvalue', row, "leadsubstatusid", "Select Substatus");
-                                                                    return newvalue;
+                                                                    return oldvalue;
                                                                 } 
+                                                               else if (newvalue!=oldvalue && newvalue!='Expanding And Build Relationship')
+                                                               {
+                                                               $("#jqxgrid_n").jqxGrid('setcellvalue', row, "leadsubstatusid", "Select Substatus");
+                                                                return newvalue;
+                                                               }
+                        /*get soc number start*/
+                       else if (newvalue!=oldvalue && newvalue=='Expanding And Build Relationship')
+                        {
+                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "leadsubstatusid", "Expanding And Build Relationship");
+                           // alert("in update form to get soc number");
+                            var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                            var url;
+                                var cust_grp =data.custgroup;
+                                //alert("customer group "+cust_grp);
+                                var prodgroup =data.itemgroup;
+                              //  alert("item group "+prodgroup);
+                               url= base_url + 'dailyactivity/getsynchedproducts/'+cust_grp+'/'+prodgroup;
+                                 
+                                            var rows = {};
+                                            jQuery.ajax({
+                                                dataType: "html",
+                                                url: url,
+                                                type: "POST",
+                                                async: false,
+                                                error: function (xhr, status) {
+                                                    //  alert("check "+status+" test");
+                                                },
+                                                success: function (result) {
+                                                    //  console.log(result);
+                                                    var obj = jQuery.parseJSON(result);
+                                                    rows = obj.rows;
+                                                    //   rows = obj[1].rows;
+                                                    //  commonCols=obj[0].columns;
+                                                }
+                                            });
+
+
+                                          var source =
+                                                        {
+                                                            datatype: "json",
+                                                            datafields:
+                                                                    [
+                                                                        {name: 'crm_soc_no'},
+                                                                        {name: 'itemdesc'},
+                                                                        {name: 'customer_id'},
+                                                                        {name: 'customer_name', type: 'string'},
+                                                                        {name: 'lead_cusomer_ref_id'},
+                                                                        {name: 'customer_number'},
+                                                                    ],
+                                                            localdata: rows,
+                                                            pagenum: 0, pagesize: 35, pager: function (pagenum, pagesize, oldpagenum) {
+                                                                // callback called when a page or page size is changed.
+                                                            }
+
+                                                        };
+
+                                            var dataAdapter = new $.jqx.dataAdapter(source);
+                                          
+                                            $("#jqxcustomergrid").jqxGrid(
+                                                                {
+                                                                    width: 700,
+                                                                    height: 250,
+                                                                    source: dataAdapter,
+                                                                    selectionmode: 'singlerow',
+                                                                    theme: 'classic',
+                                                                    sortable: true,
+                                                                    pageable: true,
+                                                                    columnsresize: true,
+                                                                    editable: false,
+                                                                    showfilterrow: true,
+                                                                    filterable: true,
+                                                                    autoheight: true,
+                                                                    showtoolbar: true,
+                                                                    pageable: true,
+                                                                            columns: [
+                                                                                {text: 'SocID', datafield: 'crm_soc_no', width: 100},
+                                                                                {text: 'Customer Id', datafield: 'customer_id', cellsalign: 'left', width: 100},
+                                                                                {text: 'Product', datafield: 'itemdesc', cellsalign: 'left', width: 100},
+                                                                                {text: 'Customer Name', datafield: 'customer_name', cellsalign: 'left', width: 200},
+                                                                                {text: 'Customer Number', datafield: 'customer_number', cellsalign: 'left', width: 100}
+                                                                            ]
+                                                                });
+                                
+
+                             $("#popupWindowSoc").jqxWindow('show');
+                             $("#jqxcustomergrid").on('celldoubleclick', function (event)
+                                {
+                                    var column = event.args.column;
+                                    var rowindex = event.args.rowindex;
+                                    var jqxcustomergrid_row_index = rowindex;
+                                    var columnindex = event.args.columnindex;
+                                    var columnname = column.datafield;
+                                    var custgroup_val = $('#jqxcustomergrid').jqxGrid('getcellvalue', rowindex, "crm_soc_no");
+                                  //  alert("custgroup_val "+custgroup_val);
+                                  //  alert("jqxgrid_n_row_index "+jqxgrid_n_row_index);
+                                  //  alert("row  "+row);
+
+                                    $('#crm_soc_number').val(custgroup_val);
+                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "crm_soc_number",custgroup_val);
+                                    
+                                    $("#jqxcustomergrid").on("cellselect", function (event)
+                                    {
+                                        var column = event.args.column;
+                                        var rowindex = event.args.rowindex;
+                                        var jqxcustomergrid_row_index = rowindex;
+                                        var columnindex = event.args.columnindex;
+                                        var columnname = column.datafield;
+                                        var custgroup_val = $('#jqxcustomergrid').jqxGrid('getcellvalue', rowindex, "crm_soc_no");
+                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "crm_soc_number",custgroup_val);
+
+                                    });
+                                     $('#popupWindowSoc').jqxWindow('hide');
+
+                                });
+                             $("#save_socnumber").click(function (event){
+
+                                
+                            
+                                    var reason_text = $('#crm_soc_number').val();
+                                    if(reason_text=="")
+                                    {
+                                        alert("Enter SOC Number");
+                                        return false;
+                                    }
+                                    else
+                                    {
+
+                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "crm_soc_number",reason_text);
+                                        $("#popupWindowSoc").jqxWindow('close');
+                                    }
+                               
+                            });
+                        
+                            return newvalue;
+                        } 
+                        /*get soc number end*/
+
+
                                                                 
 
                                                         }
@@ -1934,7 +2083,7 @@
                                                                     else
                                                                     {
 
-                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "appiontmnt_dt",date_text);
+                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "appiontmnt_dt",date_text);
                                                                         $("#popupWindow").jqxWindow('close');
                                                                     }
                                                                
@@ -1958,7 +2107,7 @@
                                                                     else
                                                                     {
 
-                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "not_able_to_get_appointment",reason_text);
+                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "not_able_to_get_appointment",reason_text);
                                                                         $("#popupWindowNot").jqxWindow('close');
                                                                     }
                                                                
@@ -1983,7 +2132,7 @@
                                                                     else
                                                                     {
 
-                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "sample_rejected_reason",reason_text);
+                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "sample_rejected_reason",reason_text);
                                                                         $("#popupWindowReject").jqxWindow('close');
                                                                     }
                                                                
@@ -2008,7 +2157,7 @@
                                                                     else
                                                                     {
 
-                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "order_cancelled_reason",reason_text);
+                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "order_cancelled_reason",reason_text);
                                                                         $("#popupWindowOrdercancel").jqxWindow('close');
                                                                     }
                                                                
@@ -2023,16 +2172,17 @@
                                        
                                         },
                                          
-                                        {text: 'PrevStatus', datafield: 'prevstatusid', width: 150, cellsalign: 'center',readonly:true,editable:false, hidden:false
+                                        {text: 'PrevStatus', datafield: 'prevstatusid', width: 150, cellsalign: 'center',readonly:true,editable:false, hidden:true
                                         },
-                                         {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:false
+                                         {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:true
                                          },
 
                                         {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
 
                                         {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
-                                        {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:false, editable:false},
-                                         {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
+                                        {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:true, editable:false},
+                                         {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:true, editable:false},
+                                          {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:true},
 
                                         {text: 'Mode of Contact', datafield: 'Mode_Of_Contact', width: 100, cellsalign: 'left', cellbeginedit:Results.initResultsEditorcon, initeditor: Results.resultsEditorcon, cellsrenderer: Results.renderUnitsst
                                         },
@@ -2076,6 +2226,52 @@
                                 }
                                 else
                                 {
+                                        // Source for item master grid start
+                                        var url = "dailyactivity/get_data_itemmaster";
+                                        var rows = {};
+                                        jQuery.ajax({
+                                            dataType: "html",
+                                            url: url,
+                                            type: "POST",
+                                            async: false,
+                                            error: function (xhr, status) {
+                                                //  alert("check "+status+" test");
+                                            },
+                                            success: function (result) {
+                                                var obj = jQuery.parseJSON(result);
+                                                rows = obj.rows;
+                                                //   rows = obj[1].rows;
+                                                //  commonCols=obj[0].columns;
+                                            }
+                                        });
+                                        var item_source =
+                                                {
+                                                    datatype: "json",
+                                                    datafields: [{name: 'itemid', type: 'string'},{name: 'itemgroup', type: 'string'}],
+                                                    id: 'itemgroup',
+                                                    localdata: rows
+                                                };
+
+                                        //  alert("columns "+columns.toSource());    
+                                        var dataAdapterItemMaster = new $.jqx.dataAdapter(item_source);
+                                        $("#jqxgrid_selectItemMaster").jqxGrid(
+                                                {
+                                                    width: '100%',
+                                                    source: dataAdapterItemMaster,
+                                                    theme: theme,
+                                                    selectionmode: 'singlecell',
+                                                    sortable: true,
+                                                    pageable: true,
+                                                    columnsresize: true,
+                                                    sortable: true,
+                                                    showfilterrow: true,
+                                                    filterable: true,
+                                                    columns: [
+                                                        {text: 'Prod Id', dataField: 'itemid', width: 100, height: 600},
+                                                        {text: 'Product Group', dataField: 'itemgroup', width: 500, height: 600},
+                                                    ]
+                                                });
+                                    // Source for item master grid END
                                    // $('#addWindow').hide();
                                     $('#win_selectItemMaster').jqxWindow({theme: 'energyblue', autoOpen: false, width: 400, height: 500, resizable: true, title: 'select product'});
 
@@ -2234,6 +2430,33 @@
                         $("#addrowbutton").bind('click', function () {
                             var commit = $("#jqxgrid_add").jqxGrid('addrow', null, {});
                         });
+                          $("#addnewprod, #addnewprod_add").bind('click', function () {
+                            
+                                        $('#temp_itemname').val(null);
+                                        $('#win_newproduct').jqxWindow({theme: 'energyblue', autoOpen: false, width: 400, height: 100, resizable: true, title: 'Add New Product'});
+                                        $('#win_newproduct').jqxWindow('open');
+
+                                        var x = ($(window).width() - $("#win_newproduct").jqxWindow('width')) / 2 + $(window).scrollLeft();
+                                        var y = ($(window).height() - $("#win_newproduct").jqxWindow('height')) / 1.7 + $(window).scrollTop();
+                                        $("#win_newproduct").jqxWindow({ position: { x: x, y: y-200} });
+                                        $('#win_newproduct').jqxWindow({ zIndex: 99999}); 
+                                        $('#win_newproduct').jqxWindow('bringToFront');
+                                        $('#addWindow').mouseup(function () 
+                                            {
+                                               
+                                                if ($('#win_selectCustMaster').jqxWindow('isOpen')) 
+                                                {
+                                                    $('#win_selectCustMaster').jqxWindow('bringToFront');
+                                                }
+                                                else
+                                                {
+
+                                                    $('#win_selectCustMaster').jqxWindow('bringToFront');
+                                                }
+                                            
+
+                                            });
+                        });
 
                         $("#deleterowbutton").bind('click', function () {
                             var selectedrowindex = $("#jqxgrid_add").jqxGrid('getselectedrowindex');
@@ -2287,6 +2510,7 @@
                             var valid_subgrp = 0;
                             var valid_lead_status=0;
                             var valid_lead_substatus=0;
+                            var valid_crm_soc =0;
                             var entrydate = $('#addcurrentdate').val();
                             entrydate = convertdmy_ymd(entrydate);
                             for (var k = 0; k < rowscount; k++)
@@ -2354,7 +2578,26 @@
                                     valid_lead_substatus = 1;
                                 }
 
-                                
+                                var crm_soc = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "crm_soc_number");
+                                // alert(" lead_status "+lead_status);
+                                //alert("crm_soc "+crm_soc);
+                                if(lead_status=='Expanding And Build Relationship')
+                                {
+                                   if (crm_soc == null || crm_soc == 'undefined' || crm_soc == '')
+                                    {
+                                        $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "statusid", "without soc number you cannot convert this lead. Please revert back to old status");
+                                        valid_crm_soc = 0;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        valid_crm_soc = 1;
+                                    } 
+                                }
+                                else
+                                {
+                                    valid_crm_soc = 1;
+                                }
                                 
                                 
                                 var hr_moc = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "Mode_Of_Contact");
@@ -2430,6 +2673,10 @@
                                 return false;
                             }
                             if (valid_moc == 0)
+                            {
+                                return false;
+                            }
+                            if (valid_crm_soc == 0)
                             {
                                 return false;
                             }
@@ -2566,6 +2813,7 @@
                             var valid_subgrp = 0;
                             var valid_lead_status=0;
                             var valid_lead_substatus=0;
+                            var valid_crm_soc=0;
 
                             var hdr_id = $('#hdn_hdr_id').val();
 
@@ -2635,6 +2883,27 @@
                                 {
                                     valid_lead_substatus = 1;
                                 }
+                                var crm_soc = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "crm_soc_number");
+                                 //alert(" lead_status "+lead_status);
+                                //alert("crm_soc "+crm_soc);
+                                if(lead_status=='Expanding And Build Relationship')
+                                {
+                                   if (crm_soc == null || crm_soc == 'undefined' || crm_soc == '')
+                                    {
+                                        $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadstatusid", "without soc number you cannot convert this lead. Please revert back to old status");
+                                        valid_crm_soc = 0;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        valid_crm_soc = 1;
+                                    } 
+                                }
+                                else
+                                {
+                                    valid_crm_soc = 1;
+                                }
+                                
 
                                 var moc_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "modeofcontact");
                                 if (moc_value == null || moc_value == 'undefined') {
@@ -2712,6 +2981,11 @@
                             {
                                 return false;
                             }
+                             if (valid_crm_soc == 0)
+                            {
+                                return false;
+                            }
+                            
 
                             var currentdate = $('#update_header_date').val();
                             currentdate = convert(currentdate);
@@ -2820,6 +3094,54 @@
                             var collector = $("#collector_update").jqxDropDownList('getSelectedItem'); 
                             if (columnname == 'itemgroup')
                             {
+
+                                // Source for item master grid start
+                                    var url = "dailyactivity/get_data_itemmaster";
+                                    var rows = {};
+                                    jQuery.ajax({
+                                        dataType: "html",
+                                        url: url,
+                                        type: "POST",
+                                        async: false,
+                                        error: function (xhr, status) {
+                                            //  alert("check "+status+" test");
+                                        },
+                                        success: function (result) {
+                                            var obj = jQuery.parseJSON(result);
+                                            rows = obj.rows;
+                                            //   rows = obj[1].rows;
+                                            //  commonCols=obj[0].columns;
+                                        }
+                                    });
+                                    var item_source =
+                                            {
+                                                datatype: "json",
+                                                datafields: [{name: 'itemid', type: 'string'},{name: 'itemgroup', type: 'string'}],
+                                                id: 'itemgroup',
+                                                localdata: rows
+                                            };
+
+                                    //  alert("columns "+columns.toSource());    
+                                    var dataAdapterItemMaster = new $.jqx.dataAdapter(item_source);
+                                    $("#jqxgrid_selectItemMaster").jqxGrid(
+                                            {
+                                                width: '100%',
+                                                source: dataAdapterItemMaster,
+                                                theme: theme,
+                                                selectionmode: 'singlecell',
+                                                sortable: true,
+                                                pageable: true,
+                                                columnsresize: true,
+                                                sortable: true,
+                                                showfilterrow: true,
+                                                filterable: true,
+                                                columns: [
+                                                    {text: 'Prod Id', dataField: 'itemid', width: 100, height: 600},
+                                                    {text: 'Product Group', dataField: 'itemgroup', width: 500, height: 600},
+                                                ]
+                                            });
+                                    // Source for item master grid END
+
                               //  $('#customWindow').hide();
                                 $('#win_selectItemMaster').jqxWindow({theme: 'energyblue', autoOpen: false, width: 400, height: 500, resizable: true, title: 'select product'});
 
@@ -2906,7 +3228,7 @@
 
                         // source for Customer Master grid end
                                             $('#win_selectCustMaster').jqxWindow({theme: 'energyblue', autoOpen: false, width: 400, height: 500, resizable: true, title: 'Select Customer'});
-                                            $('#win_selectCustMaster').jqxWindow('open');
+                                                $('#win_selectCustMaster').jqxWindow('open');
                                             var x = ($(window).width() - $("#win_selectCustMaster").jqxWindow('width')) / 2 + $(window).scrollLeft();
                                             var y = ($(window).height() - $("#win_selectCustMaster").jqxWindow('height')) / 2 + $(window).scrollTop();
                                                 $("#win_selectCustMaster").jqxWindow({ position: { x: x, y: y} });
@@ -2940,7 +3262,7 @@
 
 
                         // Source for add grid end
-
+/*
                         // Source for item master grid start
                         var url = "dailyactivity/get_data_itemmaster";
                         var rows = {};
@@ -2988,7 +3310,7 @@
                                 });
 
 
-                        // source for item master grid end
+                        // source for item master grid end*/
 
                         //  return value from item master start
                         $("#jqxgrid_selectItemMaster").on('cellselect', function (event) {
@@ -3253,7 +3575,102 @@
                          return entrydate;
                         }
 
-                    });
+                        $("#newtempitemmaster").submit(function(e) {
+                                e.preventDefault();
+                                }).validate({
+                                errorElement: "span",
+                                ignore: "input[type='text']:hidden",
+                                //set the rules for the fild names
+                                rules: {
+                                    temp_itemname: {
+                                        required: true
+                                    },
+                                    hdn_prod_stat: {
+                                        min: 1
+                                    }
+
+                                },
+                                
+
+                                //set error messages
+                                messages: {
+                                    temp_itemname: {
+                                        required: "Please Enter the Product Name"
+                                    },
+                                    hdn_prod_stat: {
+                                        min: "Enter different product"
+                                    }
+                                },
+                                //our custom error placement
+                                errorElement: "span",
+                                        errorPlacement: function (error, element) {
+                                            error.appendTo(element.parent());
+                                        },
+                                submitHandler: function(form) { 
+                                    //alert("Do some stuff...");
+                                    //submit via ajax
+                                    $.ajax({
+                                            url: base_url+'dailyactivity/save_newproduct',
+                                            data: 'action=save_newproduct&item_name=' + temp_itemname.value,
+                                            dataType: 'json',
+                                            type: 'post',
+                                            success: function (response) 
+                                            {
+                                                // validateTempitemname.html(response.msg);
+                                                response_msg = response.ok;
+                                               // alert("response_msg "+response_msg);
+                                                validateTempitemname.html(response.msg);
+                                                //$("#hdn_prod_stat").val(response_msg);
+                                                if(response_msg==true)
+                                                document.getElementById("hdn_prod_stat").value = 1;
+                                                else
+                                                document.getElementById("hdn_prod_stat").value = 0;    
+                                            }
+                                        });
+                                    alert("New Product Added..!");
+                                    $('#win_newproduct').jqxWindow('close');
+                                    return false;  //This doesn't prevent the form from submitting.
+                                }
+
+
+
+                                });
+
+
+                                var validateTempitemname = $('#validateTempitemname');
+                                $('#temp_itemname').keyup(function () {
+                                var temp_itemname = this;
+                                if (this.value != this.lastValue) {
+                                    if (this.timer)
+                                        clearTimeout(this.timer);
+                                    validateTempitemname.removeClass('error').html('<img src="'+base_url+'public/images/ajax-loader.gif" height="16" width="16" /> checking availability...');
+
+                                    this.timer = setTimeout(function () {
+                                        $.ajax({
+                                            url: base_url+'product/check_itemname',
+                                            data: 'action=check_itemname&item_name=' + temp_itemname.value,
+                                            dataType: 'json',
+                                            type: 'post',
+                                            success: function (response) 
+                                            {
+                                                // validateTempitemname.html(response.msg);
+                                                response_msg = response.ok;
+                                               // alert("response_msg "+response_msg);
+                                                validateTempitemname.html(response.msg);
+                                                //$("#hdn_prod_stat").val(response_msg);
+                                                if(response_msg==true)
+                                                document.getElementById("hdn_prod_stat").value = 1;
+                                                else
+                                                document.getElementById("hdn_prod_stat").value = 0;    
+                                            }
+                                        });
+                                    }, 200);
+
+                                    this.lastValue = this.value;
+                                }
+                        });
+
+                    }); // end of document.ready function
                 </script>
 
                 <div class="announcement noprint" id="announcement">
@@ -3364,7 +3781,21 @@
                                
                                  <!--  This part of div contain windows for view mode End      -->
                                 <!-- add popup start -->
-                                <?php $this->load->view('dailyactivity/jqxgrid_add'); ?>
+                                        <div id="addWindow" style="width:100%; margin-left:200px; display:none;" >
+                                                <div id="addWindowContent" style="float: left; width:100%;">
+                                                    <span id="validateProductName_add"></span>
+                                                    <div style=" float: left; "><label>Entry Date: (you can add entries for the past one week only) </label>
+                                                        <div id="addcurrentdate"></div>
+                                                        <div id='collector'></div>
+                                                    </div>
+
+                                                    <div id="jqxgrid_add" style="; float: left; width:100%;" ></div>
+                                                    <input id="addrowbutton" type="hidden" value="Add New Row" />
+                                                    <input id="deleterowbutton" type="hidden" value="Delete Selected Row" />
+                                                    <input id="save" type="hidden" value="save data" />
+
+                                                </div>           
+                                            </div>
 
                                 <!-- add popup end -->
                                 <!-- Select itemmaster popup start -->
@@ -3474,6 +3905,21 @@
                                         </div>
                                     </div>
                                 <!-- End for get soc number start -->
+                                <!-- add new product start -->
+                                <div id="win_newproduct" style="position: fixed; left: 50%; top: 50%;">
+                                    <div>Header</div>
+                                    <div>
+                                        <form action="dailyactivity/savenewitem" method="post" id="newtempitemmaster" name="newtempitemmaster">
+                                               <input type="text" name="temp_itemname" id="temp_itemname" value="" size="25" />
+                                               <span id="validateTempitemname"></span><?php echo form_error('newtempitemmaster'); ?>  
+                                                <input class="submit" id="savenewitem" name="savenewitem" type="submit" value="Submit" />
+                                                <input type="hidden" id="hdn_userid" name="hdn_userid" value="656"/>
+                                                <input type="hidden" id="hdn_prod_stat" name="hdn_prod_stat" value="0"/>
+                                        </form>
+                                    </div>
+                                </div>
+                                 
+                                <!-- add new product end -->
 
                             <!--  This part of div contain windows End      -->
                         </div>

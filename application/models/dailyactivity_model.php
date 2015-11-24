@@ -1182,6 +1182,29 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 				return $arr;
 			}
 
+			function GetNextMaxVal($id,$tablename)
+			{
+		//select max(id) from customermasterhdr
+				$query = "select max(".$id.") from ".$tablename;
+				$result =$this->db->query($query);
+				
+				if ($result->num_rows() > 0)
+				{
+				   $row = $result->row(); 
+
+				  // echo"next val " .$row->nextval;	die;
+				}
+				
+				return $row->max;
+			}
+
+			function save_tempitem($productdata)
+			{
+		 // print_r($companydata);
+			$this->db->insert('tempitemmaster', $productdata);
+	       return $this->db->insert_id();	
+			}
+
 }
 ?>
 
