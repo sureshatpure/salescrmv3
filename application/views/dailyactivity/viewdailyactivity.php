@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Leads</title>
+        <title>Dailyactivity</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -817,7 +817,7 @@
                                },
                                 initResultsEditorldst: function(row){
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
-                                  if(data.result_type === 'Value')
+                                  /*if(data.result_type === 'Value')
                                     {
                                           this.columntype ='dropdownlist';
                                     } 
@@ -827,24 +827,110 @@
                                       this.columntype ='dropdownlist';
                                    // return false;
 
-                                   }
+                                   }*/
+                                    var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                  //  var rowdata = $("#jqxgrid_n").jqxGrid('getrowdata', row);
+                                    var cust_grp = data.custgroup;
+                                    var prod_grp = data.itemgroup;
+                                    var curr_poten = data.potentialqty;
+                                    var leadstatus = data.leadstatusid;
+                                   // alert("leadstatus "+leadstatus);
+                                    if (leadstatus=='No Status')
+                                    {
+                                        return false;
+                                    }
+                                    else
+                                    {
+                                            if(cust_grp!="" && prod_grp!="")
+                                            {
+                                                //return true;
+                                                    var url = "dailyactivity/get_potentialquantity/"+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp);
+                                                        $.ajax({
+                                                            dataType: "html",
+                                                            url: url,
+                                                            type: "POST",
+                                                            async: false,
+                                                            cache:false,
+                                                            error: function (xhr, status) {
+                                                                alert("check " + status + " test");
+                                                            },
+                                                            success: function (result) {
+                                                                var obj = jQuery.parseJSON(result);
+                                                                rows = obj.rows;
+
+                                                                potential_quantity = rows[0].potential;
+                                                                noofleads =rows[0].noofleads;
+                                                                g_noofleads=noofleads;
+                                                                resulttype =rows[0].result_type;
+
+                                                                if(noofleads>0)
+                                                                {
+                                                                 this.columntype = 'dropdownlist'; 
+                                                                 $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity); 
+                                                                }
+                                                                else
+                                                                {
+                                                                     this.columntype = 'textbox';
+                                                                     potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
+                                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity);
+                                                                }
+
+                                                                
+
+                                                                
+                                                            }
+                                                        });
+
+                                                    
+                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "noofleads", noofleads);
+                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "result_type", resulttype);
+
+
+                                                        var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                                          if(data.result_type === 'Value')
+                                                            {
+                                                                this.columntype = 'textbox';
+                                                            } 
+
+                                                           else if(data.result_type === 'Select') 
+                                                           {
+                                                            this.columntype = 'dropdownlist';
+                                                           }
+                                                
+                                            }
+                                            else
+                                            {
+                                                return false;
+                                            }
+                                    }
+                                    
                                },
 
                                initResultsEditorldsubst: function(row){
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
-                                  if(data.result_type === 'Value')
+                                   var leadsubstatus = data.leadsubstatusid;
+                                  //  alert("leadsubstatus "+leadsubstatus);
+                                    if (leadsubstatus=='No Substatus')
                                     {
-                                        
-                                          this.columntype ='dropdownlist';
+                                        return false;
+                                    }
+                                    else
+                                    {
+                                        if(data.result_type === 'Value')
+                                            {
+                                                
+                                                  this.columntype ='dropdownlist';
 
-                                    } 
+                                            } 
 
-                                   else if(data.result_type ==='Select') 
-                                   {
-                                    this.columntype='dropdownlist';
-                                  //  return false;
+                                           else if(data.result_type ==='Select') 
+                                           {
+                                            this.columntype='dropdownlist';
+                                          //  return false;
 
-                                   }
+                                           }
+                                    }
+                                  
                                },
                                initResultsEditorcon: function(row){
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
@@ -1024,6 +1110,7 @@
                                    },
                                resultsEditorldst: function(row, cellvalue, editor){
                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                 jqxgrid_n_row =row;
                                    var leadid =data.leadid;
                                    //alert("leadid in update resultsEditorldst "+leadid);
                                    if (leadid!="" && leadid!='No Leads') 
@@ -1388,32 +1475,7 @@
                                                                 {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
                                                                 {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
                                                                 { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'Activity Type', datafield: 'subactivity', width: 110, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorat, initeditor: Resultsupdate.resultsEditorat, cellsrenderer: Resultsupdate.renderUnitsat
-                                                                },
-                                                                
-                                                                {text: 'Potential', datafield: 'potentialqty', width: 75, cellsalign: 'left', editable: false},
-                                                                {text: 'ActualPotential', datafield: 'actualpotenqty', width: 75, cellsalign:'left', editable: true},
-
-                                                                {text: 'Required Quantity',datafield: 'quantity', width: 75, cellsalign: 'left',
-                                                                        cellbeginedit: function (row, datafield, columntype) {
-                                                                                    var rowdata = $("#jqxgrid_n").jqxGrid('getrowdata', row);
-                                                                                    var leadid = rowdata.leadid;
-                                                                                   // alert("leadid in quantity cell rendering "+leadid);
-                                                                                    if(leadid==undefined || leadid==0)
-                                                                                    {
-                                                                                        return true;
-                                                                                    }
-                                                                                    else
-                                                                                    {
-                                                                                        return false;
-                                                                                    }
-
-                                                                                }
-                                                                    },
-                                                                    {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Resultsupdate.initResultsEditorst, initeditor: Resultsupdate.resultsEditorst, cellsrenderer: Resultsupdate.renderUnitsst
-
-                                                                    },
-                                                                    {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst, initeditor: Resultsupdate.resultsEditorldst, cellsrenderer: Resultsupdate.renderUnitsldst,promptText:'Select Status',
+                                                                {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst, initeditor: Resultsupdate.resultsEditorldst, cellsrenderer: Resultsupdate.renderUnitsldst,promptText:'Select Status',
                                                                                     cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                                                     {
                                                                                        // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
@@ -1514,11 +1576,11 @@
                                     var columnname = column.datafield;
                                     var custgroup_val = $('#jqxcustomergrid').jqxGrid('getcellvalue', rowindex, "crm_soc_no");
                                   //  alert("custgroup_val "+custgroup_val);
-                                  //  alert("jqxgrid_n_row_index "+jqxgrid_n_row_index);
+                                  //  alert("jqxgrid_n_row "+jqxgrid_n_row);
                                   //  alert("row  "+row);
 
-                                    $('#crm_soc_number').val(custgroup_val);
-                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "crm_soc_number",custgroup_val);
+                                     $('#crm_soc_number').val(custgroup_val);
+                                     $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "crm_soc_number",custgroup_val);
                                     
                                     $("#jqxcustomergrid").on("cellselect", function (event)
                                     {
@@ -1528,7 +1590,10 @@
                                         var columnindex = event.args.columnindex;
                                         var columnname = column.datafield;
                                         var custgroup_val = $('#jqxcustomergrid').jqxGrid('getcellvalue', rowindex, "crm_soc_no");
-                                         $("#jqxgrid_n").jqxGrid('setcellvalue', row, "crm_soc_number",custgroup_val);
+                                       // alert("jqxgrid_n_row "+jqxgrid_n_row);
+                                       // alert("row value is  "+row);
+
+                                         $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "crm_soc_number",custgroup_val);
 
                                     });
                                      $('#popupWindowSoc').jqxWindow('hide');
@@ -1537,7 +1602,8 @@
                              $("#save_socnumber").click(function (event){
 
                                 
-                            
+                                     //  alert("jqxgrid_n_row  in save "+jqxgrid_n_row);
+                                     //   alert("row value in save   "+row);
                                     var reason_text = $('#crm_soc_number').val();
                                     if(reason_text=="")
                                     {
@@ -1546,8 +1612,9 @@
                                     }
                                     else
                                     {
-
-                                         $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "crm_soc_number",reason_text);
+                                      //  alert("jqxgrid_n_row  in save "+jqxgrid_n_row);
+                                      //  alert("row value in save   "+row);
+                                        $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "crm_soc_number",reason_text);
                                         $("#popupWindowSoc").jqxWindow('close');
                                     }
                                
@@ -1678,6 +1745,32 @@
                                                                                 }
                                                                    
                                                                     },
+                                                                {text: 'Activity Type', datafield: 'subactivity', width: 110, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorat, initeditor: Resultsupdate.resultsEditorat, cellsrenderer: Resultsupdate.renderUnitsat
+                                                                },
+                                                                
+                                                                {text: 'Potential', datafield: 'potentialqty', width: 75, cellsalign: 'left', editable: false},
+                                                                {text: 'ActualPotential', datafield: 'actualpotenqty', width: 75, cellsalign:'left', editable: true},
+
+                                                                {text: 'Required Quantity',datafield: 'quantity', width: 75, cellsalign: 'left',
+                                                                        cellbeginedit: function (row, datafield, columntype) {
+                                                                                    var rowdata = $("#jqxgrid_n").jqxGrid('getrowdata', row);
+                                                                                    var leadid = rowdata.leadid;
+                                                                                   // alert("leadid in quantity cell rendering "+leadid);
+                                                                                    if(leadid==undefined || leadid==0)
+                                                                                    {
+                                                                                        return true;
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        return false;
+                                                                                    }
+
+                                                                                }
+                                                                    },
+                                                                    {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Resultsupdate.initResultsEditorst, initeditor: Resultsupdate.resultsEditorst, cellsrenderer: Resultsupdate.renderUnitsst
+
+                                                                    },
+                                                                    
                                                                      {text: 'PrevStatus', datafield: 'prevstatusid', width: 150, cellsalign: 'center',readonly:true,editable:false, hidden:true
                                                                     },
                                                                      {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:true
@@ -1691,7 +1784,7 @@
 
                                                                      {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
 
-                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:false},
+                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:false, editable:false},
 
                                                                      
 
@@ -1885,28 +1978,6 @@
                                         {text: 'noofleads', datafield: 'noofleads', hidden:true, width: 20, cellsalign: 'left', editable: false},
                                         {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
                                         { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                        {text: 'Activity Type', datafield: 'Sub_Activity', width: 110, cellsalign: 'left', cellbeginedit:Results.initResultsEditorat, initeditor: Results.resultsEditorat, cellsrenderer: Results.renderUnitsat
-                                        },
-                                        {text: 'Potential', datafield: 'Potential_Quantity', width: 75, cellsalign: 'left', editable: false},
-                                        {text: 'ActualPotential', datafield: 'actualpotenqty', width: 75, cellsalign: 'left', editable: true},
-                                        {text: 'Required Quantity', datafield: 'Quantity_Requirement', width: 75, cellsalign: 'left',
-                                            cellbeginedit: function (row, datafield, columntype) {
-                                                        var rowdata = $("#jqxgrid_add").jqxGrid('getrowdata', row);
-                                                        var leadid = rowdata.leadid;
-                                                       // alert("leadid in quantity cell rendering "+leadid);
-                                                        if(leadid==undefined || leadid==0)
-                                                        {
-                                                            return true;
-                                                        }
-                                                        else
-                                                        {
-                                                            return false;
-                                                        }
-
-                                                    }
-                                        },
-                                        {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Results.initResultsEditorst, initeditor: Results.resultsEditorst, cellsrenderer: Results.renderUnitsstleadsubstatusid
-                                        },
                                         {text: 'Status', datafield: 'statusid', width: 150, cellsalign: 'center', cellbeginedit:Results.initResultsEditorldst, initeditor: Results.resultsEditorldst, cellsrenderer: Results.renderUnitsldst,promptText:'Select Status',
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                         {
@@ -2197,6 +2268,29 @@
                                                     }
                                        
                                         },
+                                        {text: 'Activity Type', datafield: 'Sub_Activity', width: 110, cellsalign: 'left', cellbeginedit:Results.initResultsEditorat, initeditor: Results.resultsEditorat, cellsrenderer: Results.renderUnitsat
+                                        },
+                                        {text: 'Potential', datafield: 'Potential_Quantity', width: 75, cellsalign: 'left', editable: false},
+                                        {text: 'ActualPotential', datafield: 'actualpotenqty', width: 75, cellsalign: 'left', editable: true},
+                                        {text: 'Required Quantity', datafield: 'Quantity_Requirement', width: 75, cellsalign: 'left',
+                                            cellbeginedit: function (row, datafield, columntype) {
+                                                        var rowdata = $("#jqxgrid_add").jqxGrid('getrowdata', row);
+                                                        var leadid = rowdata.leadid;
+                                                       // alert("leadid in quantity cell rendering "+leadid);
+                                                        if(leadid==undefined || leadid==0)
+                                                        {
+                                                            return true;
+                                                        }
+                                                        else
+                                                        {
+                                                            return false;
+                                                        }
+
+                                                    }
+                                        },
+                                        {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Results.initResultsEditorst, initeditor: Results.resultsEditorst, cellsrenderer: Results.renderUnitsstleadsubstatusid
+                                        },
+                                        
                                          
                                         {text: 'PrevStatus', datafield: 'prevstatusid', width: 150, cellsalign: 'center',readonly:true,editable:false, hidden:true
                                         },
