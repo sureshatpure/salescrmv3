@@ -97,7 +97,7 @@
                     {
                         // alert("action mode in _createElements  "+actionmode);
                         // code start for view formdetail window
-                        $('#customWindow').jqxWindow({theme: 'energyblue', showCollapseButton: true, autoOpen: false, width: 1013, height: 400, resizable: true, title: 'View Daily Call Activity&nbsp;&nbsp;<input id="update_add_row"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" value="Add New Row" />&nbsp;&nbsp;<input id="addnewprod_add"   class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue addnewprod_add" type="button" value="Add New Product" />&nbsp;&nbsp;<input id="update_delete_row" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" value="Delete Selected Row" />&nbsp;&nbsp;<input id="update_data"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue"  type="button" value="Update" />&nbsp;&nbsp;<input id="excelExport"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" title="Currently you cannot export all the data,instead filter the data and try to use Export to Excel option"   alt="Currently you cannot export all the data,instead filter the data and try to use Export to Excel option" value="Export to Excel"/>',
+                        $('#customWindow').jqxWindow({theme: 'energyblue', showCollapseButton: true, autoOpen: false, width: 1013, height: 400, resizable: true, title: 'View Daily Call Activity&nbsp;&nbsp;<input id="update_add_row"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" value="Add New Row" />&nbsp;&nbsp;<input id="update_delete_row" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" value="Delete Selected Row" />&nbsp;&nbsp;<input id="addnewprod_add"   class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue addnewprod_add" type="button" value="Add New Product" />&nbsp;&nbsp;<input id="update_data"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue"  type="button" value="Update" />&nbsp;&nbsp;<input id="excelExport"  class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" type="button" class="jqx-rc-all jqx-rc-all-energyblue jqx-button jqx-button-energyblue jqx-widget jqx-widget-energyblue jqx-fill-state-normal jqx-fill-state-normal-energyblue" title="Currently you cannot export all the data,instead filter the data and try to use Export to Excel option"   alt="Currently you cannot export all the data,instead filter the data and try to use Export to Excel option" value="Export to Excel"/>',
                             initContent: function () {
                                 $('#jqxgrid_n').jqxGrid({disabled: false});
                             }
@@ -154,6 +154,7 @@
                         //var leadlistdataAdapter;
                         var listdataAdapter;
                         var g_noofleads;
+                        var jqxgrid_n_row;
 
 
                         var permission = <?php echo $grpperm; ?>;
@@ -1083,7 +1084,7 @@
                                resultsEditorldsubst: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                 //   var substatus_name = data.leadsubstatusid;
-
+                                    jqxgrid_n_row =row;
                                    var status_name = data.leadstatusid;
                                      status_name = status_name.replace(/\//gi, "-");
 
@@ -1546,7 +1547,7 @@
                                     else
                                     {
 
-                                         $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row_index, "crm_soc_number",reason_text);
+                                         $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "crm_soc_number",reason_text);
                                         $("#popupWindowSoc").jqxWindow('close');
                                     }
                                
@@ -1588,8 +1589,10 @@
                                                                                                 }
                                                                                                 else
                                                                                                 {
+                                                                                                     //alert("in update row vlaue for date fix "+row);
+                                                                                                   // alert("in update1 jqxgrid_n_row_index vlaue for date fix is "+jqxgrid_n_row);
 
-                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "appiontmnt_dt",date_text);
+                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "appiontmnt_dt",date_text);
                                                                                                     $("#popupWindow").jqxWindow('close');
                                                                                                 }
                                                                                            
@@ -1612,8 +1615,10 @@
                                                                                                 }
                                                                                                 else
                                                                                                 {
+                                                                                                    // alert("in update row value is "+row);
+                                                                                                   // alert("in update jqxgrid_n_row_index value is "+jqxgrid_n_row);
 
-                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row_index, "not_able_to_get_appointment",reason_text);
+                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "not_able_to_get_appointment",reason_text);
                                                                                                     $("#popupWindowNot").jqxWindow('close');
                                                                                                 }
                                                                                            
@@ -1636,7 +1641,7 @@
                                                                                                 else
                                                                                                 {
 
-                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "sample_rejected_reason",reason_text);
+                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "sample_rejected_reason",reason_text);
                                                                                                     $("#popupWindowReject").jqxWindow('close');
                                                                                                 }
                                                                                            
@@ -1659,7 +1664,7 @@
                                                                                                 else
                                                                                                 {
 
-                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "order_cancelled_reason",reason_text);
+                                                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', jqxgrid_n_row, "order_cancelled_reason",reason_text);
                                                                                                     $("#popupWindowOrdercancel").jqxWindow('close');
                                                                                                 }
                                                                                            
@@ -1678,13 +1683,13 @@
                                                                      {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:true
                                                                      },
 
-                                                                    {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
+                                                                    {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:false},
 
-                                                                    {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
+                                                                    {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:false, editable:false},
 
-                                                                    {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:true, editable:false},
+                                                                    {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:false, editable:false},
 
-                                                                     {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:true, editable:false},
+                                                                     {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
 
                                                                      {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:false},
 
@@ -1858,6 +1863,7 @@
                                     columnsresize: true,
                                     columns: [
                                         {text: 'UID', datafield: 'uid', width: 150, cellsalign: 'left', hidden: true},
+                                        {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: true},
                                         {text: 'Customer Group', datafield: 'custgroup', width: 100, editable: false},
                                         {text: 'Cust Id', datafield: 'id', width: 100, editable: false,hidden: true},
                                         {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},   
@@ -2060,6 +2066,8 @@
                                         },
                                         {text: 'SubStatus', datafield: 'leadsubstatusid', width: 200, cellsalign: 'left',readonly:false,cellbeginedit:Results.initResultsEditorldsubst, initeditor: Results.resultsEditorldsubst, cellsrenderer: Results.renderUnitsldsubst,cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                     {
+                                                       // alert("current row is "+row);
+                                                     //   alert("jqxgrid_add_row_index is "+jqxgrid_add_row_index);
                                                        // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
                                                           if (newvalue == 0)  {
                                                            return oldvalue;
@@ -2082,8 +2090,15 @@
                                                                     }
                                                                     else
                                                                     {
+                                                                        //alert("in side "+row);
+                                                                       // alert("in side jqxgrid_add_row_index "+jqxgrid_add_row_index);
 
-                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "appiontmnt_dt",date_text);
+                                                                        /* $("#jqxgrid_add").jqxGrid('setcellvalue', row, "appiontmnt_dt",date_text);*/
+                                                                         if(jqxgrid_add_row_index==row)
+                                                                            {
+                                                                                $("#jqxgrid_add").jqxGrid('setcellvalue', row, "appiontmnt_dt",date_text);
+                                                                            }
+
                                                                         $("#popupWindow").jqxWindow('close');
                                                                     }
                                                                
@@ -2107,7 +2122,13 @@
                                                                     else
                                                                     {
 
-                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "not_able_to_get_appointment",reason_text);
+                                                                         /*$("#jqxgrid_add").jqxGrid('setcellvalue', row, "not_able_to_get_appointment",reason_text);*/
+                                                                         if(jqxgrid_add_row_index==row)
+                                                                            {
+                                                                                $("#jqxgrid_add").jqxGrid('setcellvalue', row, "not_able_to_get_appointment",reason_text);
+                                                                            }
+
+
                                                                         $("#popupWindowNot").jqxWindow('close');
                                                                     }
                                                                
@@ -2131,8 +2152,10 @@
                                                                     }
                                                                     else
                                                                     {
-
-                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "sample_rejected_reason",reason_text);
+                                                                        if(jqxgrid_add_row_index==row)
+                                                                            {
+                                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "sample_rejected_reason",reason_text);
+                                                                            }
                                                                         $("#popupWindowReject").jqxWindow('close');
                                                                     }
                                                                
@@ -2156,8 +2179,11 @@
                                                                     }
                                                                     else
                                                                     {
-
-                                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "order_cancelled_reason",reason_text);
+                                                                         if(jqxgrid_add_row_index==row)
+                                                                         {
+                                                                             $("#jqxgrid_add").jqxGrid('setcellvalue', row, "order_cancelled_reason",reason_text);
+                                                                         }
+                                                                        
                                                                         $("#popupWindowOrdercancel").jqxWindow('close');
                                                                     }
                                                                
@@ -2177,12 +2203,12 @@
                                          {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:true
                                          },
 
-                                        {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
+                                        {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:false},
 
-                                        {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
-                                        {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:true, editable:false},
-                                         {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:true, editable:false},
-                                          {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:true},
+                                        {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:false, editable:false},
+                                        {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:false, editable:false},
+                                         {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
+                                        {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:false, editable:false},
 
                                         {text: 'Mode of Contact', datafield: 'Mode_Of_Contact', width: 100, cellsalign: 'left', cellbeginedit:Results.initResultsEditorcon, initeditor: Results.resultsEditorcon, cellsrenderer: Results.renderUnitsst
                                         },
@@ -2690,9 +2716,6 @@
                             }
 
 
-
-
-
                             var currentdate = $('#addcurrentdate').val();
                             currentdate = convertdmy_ymd(currentdate);
                             var griddata;
@@ -2704,7 +2727,7 @@
                                 var lead_appointmentdt=null;
                                 var rowval = {};
                                 griddata = $('#jqxgrid_add').jqxGrid('getrowdata', i);
-                               // alert("griddata "+griddata.toSource());
+                               	//alert("griddata  create_lead "+griddata.create_lead);
              /*                   alert(" gird row  "+i+" appiontmnt_dt "+griddata.appiontmnt_dt);
                                 alert("type of object "+typeof(griddata.appiontmnt_dt));*/
                                 var objType= typeof(griddata.appiontmnt_dt);
@@ -2720,7 +2743,14 @@
                                 alert("prevstatusid  "+griddata.prevsubstatusid);
                                 alert(" type noofleads "+typeof(griddata.noofleads));*/
                                 
-                                
+                                 if (typeof(griddata.line_id)=='undefined')
+                                {
+                                    rowval["line_id"] = 0;    
+                                }
+                                else
+                                {
+                                    rowval["line_id"] = griddata.line_id;
+                                }
                                 rowval["currentdate"] = currentdate;
                                 rowval["custgroup"] = griddata.custgroup;
                                 rowval["hdn_cust_id"] = griddata.id;
@@ -2760,10 +2790,11 @@
                                 rowval["not_able_to_get_appointment"] = griddata.not_able_to_get_appointment;
                                 rowval["sample_rejected_reason"] = griddata.sample_rejected_reason;
                                 rowval["order_cancelled_reason"] = griddata.order_cancelled_reason;
+                                rowval["crm_soc_number"] = griddata.crm_soc_number;
                                 
                                 if (griddata.create_lead==undefined)
                                 {
-                                    rowval["create_lead"] = false;    
+                                    rowval["create_lead"] = 0;    
                                 }
                                 else
                                 {
@@ -3080,9 +3111,18 @@
                         });
                         // end of Update Click function
 
-
+                        $("#jqxgrid_n").bind('rowselect', function (event) {
+                         
+                             jqxgrid_n_row = event.args.rowindex;
+                           // alert("in rowselect row value is "+row);
+                             //  alert("in rowselect jqxgrid_n_row_index value is "+jqxgrid_n_row);
+                            jqxgrid_n_row = jqxgrid_n_row;
+                               //alert("in rowselect jqxgrid_n_row_index value after is "+jqxgrid_n_row);
+                            
+                            });
 
                         // view grid double click function start
+
                         $("#jqxgrid_n").on("celldoubleclick", function (event)
                         {
                             var column = event.args.column;
@@ -3256,61 +3296,6 @@
                             }
                         });
                         // view grid double click function end
-
-                        //
-                        
-
-
-                        // Source for add grid end
-/*
-                        // Source for item master grid start
-                        var url = "dailyactivity/get_data_itemmaster";
-                        var rows = {};
-                        jQuery.ajax({
-                            dataType: "html",
-                            url: url,
-                            type: "POST",
-                            async: false,
-                            error: function (xhr, status) {
-                                //  alert("check "+status+" test");
-                            },
-                            success: function (result) {
-                                var obj = jQuery.parseJSON(result);
-                                rows = obj.rows;
-                                //   rows = obj[1].rows;
-                                //  commonCols=obj[0].columns;
-                            }
-                        });
-                        var item_source =
-                                {
-                                    datatype: "json",
-                                    datafields: [{name: 'itemid', type: 'string'},{name: 'itemgroup', type: 'string'}],
-                                    id: 'itemgroup',
-                                    localdata: rows
-                                };
-
-                        //  alert("columns "+columns.toSource());    
-                        var dataAdapterItemMaster = new $.jqx.dataAdapter(item_source);
-                        $("#jqxgrid_selectItemMaster").jqxGrid(
-                                {
-                                    width: '100%',
-                                    source: dataAdapterItemMaster,
-                                    theme: theme,
-                                    selectionmode: 'singlecell',
-                                    sortable: true,
-                                    pageable: true,
-                                    columnsresize: true,
-                                    sortable: true,
-                                    showfilterrow: true,
-                                    filterable: true,
-                                    columns: [
-                                        {text: 'Prod Id', dataField: 'itemid', width: 100, height: 600},
-                                        {text: 'Product Group', dataField: 'itemgroup', width: 500, height: 600},
-                                    ]
-                                });
-
-
-                        // source for item master grid end*/
 
                         //  return value from item master start
                         $("#jqxgrid_selectItemMaster").on('cellselect', function (event) {
@@ -3700,11 +3685,11 @@
                     <div class="row-fluid">
                         <div class="sideBarContents">
                             <div class="quickLinksDiv">
-                                <p onclick="#" id="Leads_sideBar_link_LBL_RECORDS_LIST" class="selectedQuickLink ">
+                                <p onclick="#"  class="selectedQuickLink">
                                     <a class="quickLinks" href="<?= base_url() ?>leads"><strong>Leads List</strong>
                                     </a>
                                 </p>
-                                <p onclick="#" id="Leads_sideBar_link_LBL_DASHBOARD" class="unSelectedQuickLink"><a class="quickLinks" href="<?= base_url() ?>dashboard"><strong>Dashboard</strong></a></p>
+                                <p onclick="#"  class="unSelectedQuickLink"><a class="quickLinks" href="<?= base_url() ?>dashboard"><strong>Dashboard</strong></a></p>
                             </div>
                             <div class="clearfix"></div>
                             <div class="quickWidgetContainer accordion">

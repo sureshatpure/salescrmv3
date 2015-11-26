@@ -221,7 +221,7 @@ class dailyactivity extends CI_Controller {
         //echo "current_date ".$_POST[0]['currentdate'];
         $hrd_currentdate = $_POST[0]['currentdate'];
         $grid_data = array_slice($_POST, 1, null, true);
-      //  echo"<pre> grid data";print_r($grid_data);echo"</pre>"; 
+        //echo"<pre> grid data";print_r($grid_data);echo"</pre>"; 
         $check_duplicates = $this->dailyactivity_model->check_dailyhdr_duplicates($hrd_currentdate, $user1);
         //  echo $check_duplicates; die;
         $today_date = date('Y-m-d:H:i:s');
@@ -251,7 +251,7 @@ class dailyactivity extends CI_Controller {
                 /* Start for inserting into leaddetails*/
                   foreach ($grid_data as $key => $val) 
                   { 
-                    if($val['lead_appointmentdt']=='null' or $val['lead_appointmentdt']=='undefined')
+                    if($val['lead_appointmentdt']=='null' or $val['lead_appointmentdt']=='undefined' ||  $val['lead_appointmentdt']=="")
                          {
                             $appiontment_date=NULL;
                          }
@@ -287,7 +287,6 @@ class dailyactivity extends CI_Controller {
                             'leadstatus' => $lead_status_id,
                             'company' => $customer_id,
                             'customer_id' => $customer_id,
-                            'email_id' => trim($this->input->post('email_id')),
                             'assignleadchk' => $user_id,
                             'leadsource' => 13,
                             'ldsubstatus' => $lead_substatus_id,
@@ -622,7 +621,7 @@ class dailyactivity extends CI_Controller {
 /********************************************************************************************************************/
                                     // update function of leaddetails create_flag=0 and nofoleads=1
 /********************************************************************************************************************/
-                      else  //Start if  create_lead flag is set to 0 and no of leads =1 // update function of leaddetails
+                      else  //Start of condtion if create_lead flag is set to 0 and no of leads =1 // update function of leaddetails
                       {
                         $lead_id=$val['leadid'];
                         //$order_cancelled_reason=$val['order_cancelled_reason'];
@@ -632,6 +631,7 @@ class dailyactivity extends CI_Controller {
                         $ld_converted=0;
                         $samle_reject_count=0;
                         $sample_rejected_reason=$val['sample_rejected_reason'];
+
                         
                          $lead_no = 'LEAD-DCV';
                          $lead_status_name = $val['statusid'];
@@ -660,14 +660,25 @@ class dailyactivity extends CI_Controller {
                             } else {
                                 $lead_status_update = 'N';
                             }
+                            if($val['crm_soc_number']=='undefined' || $val['crm_soc_number']=="")
+                             {
+                                $crm_first_soc_no=0;
+                                $ld_converted = 0;
+                             }
+                             else
+                             {
+                                
+                                $crm_first_soc_no =$val['crm_soc_number'];
+                                $ld_converted = 1;
+                             }
 
                                 $leaddetails = array(
                                 'leadstatus' => $lead_status_id,
                                 'ldsubstatus' => $lead_substatus_id,
-                                'comments' => $this->input->post('comments'),
+                                'comments' => "updated from dailyactivity",
                                 'email_id' => $this->input->post('email_id'),
                                 'lead_2pa_no' => 0,
-                                'lead_crm_soc_no' => "1234",
+                                'lead_crm_soc_no' => $crm_first_soc_no,
                                 'lead_close_status' => $lead_close_status,
                                 'lead_close_option' => $lead_close_option,
                                 'lead_close_comments' => $closing_comments,
@@ -1172,7 +1183,7 @@ class dailyactivity extends CI_Controller {
                             $ld_converted = 1;
                          }
 
-                        if ($val['line_id']==0)
+                        if ($val['line_id']==0 && $val['create_lead']==1)
                         {/* code for creating lead start*/
                              if($val['crm_soc_number']=='undefined' || $val['crm_soc_number']=="")
                              {
@@ -1184,7 +1195,7 @@ class dailyactivity extends CI_Controller {
                                 $ld_converted = 1;
                              }
                             
-                             if($val['lead_appointmentdt']=='null' or $val['lead_appointmentdt']=='undefined')                                
+                         if($val['lead_appointmentdt']=='null' or $val['lead_appointmentdt']=='undefined' ||  $val['lead_appointmentdt']=="")
                             {
                                 
                               $appiontment_date=NULL;
@@ -1900,7 +1911,7 @@ class dailyactivity extends CI_Controller {
                                     $leaddetails_update = array(
                                         'leadstatus' => $this->revert_status($lead_status_id, $lead_substatus_id,$samle_reject_count),
                                         'ldsubstatus' => $this->revert_substatus($lead_substatus_id,$samle_reject_count),
-                                        'lead_crm_soc_no' => $crm_soc_number,
+                                        'lead_crm_soc_no' => $crm_first_soc_no,
                                         'converted' => $ld_converted,
                                         'comments' => "updated from dailyactivity leaddetails_update ",
                                         'last_modified' => date('Y-m-d:H:i:s'),
@@ -1975,6 +1986,7 @@ class dailyactivity extends CI_Controller {
                                         'mail_alert_date' => $mail_alert_rev_date,
                                         'status_action_type' => "RevertBack"
                                     );
+                                    //echo"samle_reject_count ".$samle_reject_count."<br>";
                                     //echo"<pre> revert array"; print_r($update_leadstatus_mailalert_revert); echo"</pre>";
                               
                                      if ($samle_reject_count <= 1 )  
@@ -2039,7 +2051,7 @@ class dailyactivity extends CI_Controller {
                     $daily_dtl[$key]['lastupdatedate'] = date('Y-m-d:H:i:s');
                     $daily_dtl[$key]['lastupdateuser'] = $creationuser;
 
-              //  echo"<pre> Leaddetails ";print_r($leaddetails);echo"</pre>";    
+                   
 
                 } /*End of loop of grid data*/
 
