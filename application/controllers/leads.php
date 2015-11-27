@@ -1121,6 +1121,7 @@ class Leads extends CI_Controller {
                         $leadproducts = array('leadid' => $lead_id,
                             'productid' => $hdn_grid_row_data[$key]['product_id'],
                             'quantity' => $hdn_grid_row_data[$key]['requirment'],
+                            'product_group' => $itemgroup_name,
                             'created_date' => date('Y-m-d:H:i:s'),
                             'created_user' => $login_user_id
                         );
@@ -3426,8 +3427,8 @@ select  cast(customermasterhdr.id as varchar(50)), customermasterhdr.tempcustnam
     }
 
     function selectproducts_all() {
-
-        $sql = 'SELECT  DISTINCT on (description) id, description FROM view_tempitemmaster ORDER BY description asc';
+         $sql='SELECT  min(id) as id, itemgroup as description FROM view_tempitemmaster_pg   GROUP BY itemgroup ORDER BY itemgroup asc';
+       // $sql = 'SELECT  DISTINCT on (description) id, description FROM view_tempitemmaster ORDER BY description asc';
         //$sql='SELECT    itemgroup as id,  itemgroup as description FROM itemmaster  WHERE length(itemgroup) >1  GROUP BY itemgroup  ORDER BY itemgroup asc';
         //		$sql='SELECT    id,  itemgroup as description FROM itemmaster  WHERE length(itemgroup) >1  GROUP BY itemgroup  ORDER BY itemgroup asc';
         $activitydata['dataitemmaster'] = $this->Leads_model->get_all_products($sql);
