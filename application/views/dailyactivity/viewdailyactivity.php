@@ -1112,7 +1112,7 @@
                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                  jqxgrid_n_row =row;
                                    var leadid =data.leadid;
-                                   //alert("leadid in update resultsEditorldst "+leadid);
+                                   alert("leadid in update resultsEditorldst "+leadid);
                                    if (leadid!="" && leadid!='No Leads') 
                                     {
                                         geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
@@ -1142,7 +1142,7 @@
                                                 buildSelect: function (suboptions)
                                                 {
                                                     
-                                                     console.log(suboptions);
+                                                    console.log(suboptions);
                                                     var data = new Array();
                                                     $.each(suboptions, function (id, value)
                                                     {
@@ -1176,7 +1176,8 @@
                                      status_name = status_name.replace(/\//gi, "-");
 
                                    var leadid =data.leadid;
-                                  // alert("in initeditor for update substatus "+status_name);
+                                   alert("in initeditor for update substatus "+status_name);
+                                   alert("in initeditor for update leadid "+leadid);
                                     if (leadid!="" && leadid!='No Leads')
                                     {
                                       //  geturl=base_url + "dailyactivity/getldsubstatusforlead/"+leadid;
@@ -1236,7 +1237,7 @@
                                },
                                resultsEditorcon: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
-                                 //  var data.leadid = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                 //  var data.leadid = $('#jqxgrid_n').jqxGrid('getrowdata', renderUnitsldstrow);
                   
                                  var leadid =data.leadid;
                                   switch(data.result_type){
@@ -1276,6 +1277,7 @@
                                renderUnitsldst:function(row, columnfield, value, defaulthtml, columnproperties)
                                {
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                  alert("in updates cellrender ldstatus function");
                                 /*  if(data.result_type === 'Value' && data.result !== ''){
                                     
                                      defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>No Leads</div>');
@@ -1473,7 +1475,7 @@
                                                                         }
                                                                 },
                                                                 {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
+                                                                {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
                                                                 { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
                                                                 {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst, initeditor: Resultsupdate.resultsEditorldst, cellsrenderer: Resultsupdate.renderUnitsldst,promptText:'Select Status',
                                                                                     cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 

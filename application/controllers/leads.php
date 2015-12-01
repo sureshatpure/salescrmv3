@@ -1833,7 +1833,7 @@ class Leads extends CI_Controller {
             $proddata[0]['quantity'] = $_POST['customFieldValue'][0];
             $proddata[0]['last_modified'] = date('Y-m-d:H:i:s');
             $proddata[0]['last_updated_user'] = $login_user_id;
-              echo"<pre>_POST ";print_r($_POST);echo"</pre>";
+            //  echo"<pre>proddata ";print_r($proddata);echo"</pre>";
             foreach ($_POST['customDispatch'] as $key => $val) 
             {
 

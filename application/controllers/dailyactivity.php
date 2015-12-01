@@ -100,7 +100,8 @@ class dailyactivity extends CI_Controller {
     function get_data_itemmaster() {
        
         /*$sql = 'SELECT  DISTINCT  itemgroup FROM view_tempitemmaster_grp ORDER BY itemgroup asc';*/
-        $sql = 'SELECT  min(id) as itemid, itemgroup FROM view_tempitemmaster_grp GROUP BY itemgroup ORDER BY itemgroup asc';
+        //$sql = 'SELECT  min(id) as itemid, itemgroup FROM view_tempitemmaster_grp GROUP BY itemgroup ORDER BY itemgroup asc';
+        $sql = 'SELECT  min(id) as itemid, itemgroup FROM view_tempitemmaster_pg GROUP BY itemgroup ORDER BY itemgroup asc';
         $activitydata['dataitemmaster'] = $this->dailyactivity_model->get_products($sql);
         $viewdata = $activitydata['dataitemmaster'];
         header('Content-Type: application/x-json; charset=utf-8');
@@ -281,6 +282,12 @@ class dailyactivity extends CI_Controller {
                          $customer_id=$val['hdn_cust_id'];
                          $customer_address[] = $this->dailyactivity_model->get_customer_address($customer_id);
                          $user_branch = $this->dailyactivity_model->get_user_branch($login_user_id);
+                         $itemgroup_name = $this->Leads_model->GetItemgroup($val['hdn_prod_id']);
+                        if ($itemgroup_name['itemgroup'] != "") {
+                            $itemgroup_name = $itemgroup_name['itemgroup'];
+                        } else {
+                            $itemgroup_name = $itemgroup_name['description'];
+                        }
                          //print_r($customer_address);
                          /* Start for inserting into leaddetails*/
                          $leaddetails = array('lead_no' => $lead_no,
@@ -486,9 +493,11 @@ class dailyactivity extends CI_Controller {
                               {
                                 $val['quantity']=0;
                               }
+
                            $leadproducts = array('leadid' => $lead_id,
                             'productid' => $val['hdn_prod_id'],
                             'quantity' => $val['quantity'],
+                            'product_group' => $itemgroup_name,
                             'created_date' => date('Y-m-d:H:i:s'),
                             'created_user' => $login_user_id
                         );
@@ -1157,6 +1166,12 @@ class dailyactivity extends CI_Controller {
                          $lead_status_id = $this->dailyactivity_model->get_leadstatusidbyname($val['statusid']);
                          $lead_substatus_id = $this->dailyactivity_model->get_leadsub_statusidbyname($val['leadsubstatusid']);
                          $sales_type_id = $this->dailyactivity_model->get_salestypeid_byname($val['division']);
+                        $itemgroup_name = $this->Leads_model->GetItemgroup($val['hdn_prod_id']);
+                        if ($itemgroup_name['itemgroup'] != "") {
+                            $itemgroup_name = $itemgroup_name['itemgroup'];
+                        } else {
+                            $itemgroup_name = $itemgroup_name['description'];
+                        }
                          $lead_close_status=0;
                          $lead_close_option="2";
                          $ld_converted=0;
@@ -1246,6 +1261,7 @@ class dailyactivity extends CI_Controller {
                               }
                            $leadproducts = array('leadid' => $lead_id,
                             'productid' => $val['hdn_prod_id'],
+                            'product_group' => $itemgroup_name,
                             'quantity' => $val['quantity'],
                             'created_date' => date('Y-m-d:H:i:s'),
                             'created_user' => $login_user_id
