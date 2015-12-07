@@ -1112,14 +1112,14 @@
                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                  jqxgrid_n_row =row;
                                    var leadid =data.leadid;
-                                   alert("leadid in update resultsEditorldst "+leadid);
+                                   //alert("leadid in update resultsEditorldst "+leadid);
                                    if (leadid!="" && leadid!='No Leads') 
                                     {
                                         geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
                                     }
                                     else
                                     {
-                                        geturl=base_url + "dailyactivity/getldstatus";
+                                        geturl=base_url + "dailyactivity/getldstatusupdate";
                                         
                                     }
                                    var stslist = {
@@ -1142,7 +1142,7 @@
                                                 buildSelect: function (suboptions)
                                                 {
                                                     
-                                                    console.log(suboptions);
+                                                     console.log(suboptions);
                                                     var data = new Array();
                                                     $.each(suboptions, function (id, value)
                                                     {
@@ -1176,8 +1176,7 @@
                                      status_name = status_name.replace(/\//gi, "-");
 
                                    var leadid =data.leadid;
-                                   alert("in initeditor for update substatus "+status_name);
-                                   alert("in initeditor for update leadid "+leadid);
+                                  // alert("in initeditor for update substatus "+status_name);
                                     if (leadid!="" && leadid!='No Leads')
                                     {
                                       //  geturl=base_url + "dailyactivity/getldsubstatusforlead/"+leadid;
@@ -1237,7 +1236,7 @@
                                },
                                resultsEditorcon: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
-                                 //  var data.leadid = $('#jqxgrid_n').jqxGrid('getrowdata', renderUnitsldstrow);
+                                 //  var data.leadid = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                   
                                  var leadid =data.leadid;
                                   switch(data.result_type){
@@ -1277,7 +1276,6 @@
                                renderUnitsldst:function(row, columnfield, value, defaulthtml, columnproperties)
                                {
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
-                                  alert("in updates cellrender ldstatus function");
                                 /*  if(data.result_type === 'Value' && data.result !== ''){
                                     
                                      defaulthtml = defaulthtml.replace(/>.+<\/div>/ , '>No Leads</div>');
@@ -1475,7 +1473,7 @@
                                                                         }
                                                                 },
                                                                 {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
+                                                                {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
                                                                 { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
                                                                 {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst, initeditor: Resultsupdate.resultsEditorldst, cellsrenderer: Resultsupdate.renderUnitsldst,promptText:'Select Status',
                                                                                     cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
@@ -1767,7 +1765,7 @@
                                                                                         return false;
                                                                                     }
 
-                                                                                }
+                                                                                },editable: true
                                                                     },
                                                                     {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Resultsupdate.initResultsEditorst, initeditor: Resultsupdate.resultsEditorst, cellsrenderer: Resultsupdate.renderUnitsst
 
@@ -1977,9 +1975,9 @@
                                         },
                                             
 
-                                        {text: 'noofleads', datafield: 'noofleads', hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                        {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
-                                        { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
+                                        {text: 'noofleads', datafield: 'noofleads', hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                        {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
+                                        { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
                                         {text: 'Status', datafield: 'statusid', width: 150, cellsalign: 'center', cellbeginedit:Results.initResultsEditorldst, initeditor: Results.resultsEditorldst, cellsrenderer: Results.renderUnitsldst,promptText:'Select Status',
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                         {
@@ -2299,12 +2297,12 @@
                                          {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:true
                                          },
 
-                                        {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:false},
+                                        {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
 
-                                        {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:false, editable:false},
-                                        {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:false, editable:false},
-                                         {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
-                                        {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:false, editable:false},
+                                        {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
+                                        {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:true, editable:false},
+                                         {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:true, editable:false},
+                                        {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:false},
 
                                         {text: 'Mode of Contact', datafield: 'Mode_Of_Contact', width: 100, cellsalign: 'left', cellbeginedit:Results.initResultsEditorcon, initeditor: Results.resultsEditorcon, cellsrenderer: Results.renderUnitsst
                                         },

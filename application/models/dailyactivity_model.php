@@ -751,7 +751,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 				return $arr;
 			}*/
 
-	public function get_collectors($reporting_user_id) 
+	/*public function get_collectors($reporting_user_id) 
     {
         if (@$this->session->userdata['reportingto'] == "")
         {
@@ -771,7 +771,31 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 			    UNION SELECT 'NO COLLECTOR' as collector";
         }
        
-       // echo $sql; die;
+       
+        $result = $this->db->query($sql);
+        $arr = "{\"rows\":" .json_encode($result->result_array()). "}";
+        return $arr;
+    }*/
+    public function get_collectors($reporting_user_id) 
+    {
+        if (@$this->session->userdata['reportingto'] == "")
+        {
+             $sql = "SELECT  a.collector FROM (
+                		SELECT 
+								customermasterhdr.collector 
+                 AS collector
+                FROM customermasterhdr WHERE length(collector) > 0 ) a GROUP BY  a.collector ORDER BY collector";
+        }
+        else
+        {
+            $sql="SELECT collector FROM customermasterhdr  WHERE cust_account_id is NOT NULL  and cust_account_id >0 AND  mc_code in (
+                SELECT  
+                mc_sub_id
+                FROM vw_web_user_login 
+                 JOIN market_circle_hdr on market_circle_hdr.gc_executive_code= vw_web_user_login.header_user_id AND vw_web_user_login.header_user_id in (".$reporting_user_id.") ) GROUP BY collector";
+        }
+       
+       
         $result = $this->db->query($sql);
         $arr = "{\"rows\":" .json_encode($result->result_array()). "}";
         return $arr;
@@ -852,6 +876,15 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 			function get_ldstatus()
 			{
 				$sql="SELECT leadstatusid as statusid, leadstatus as statusname FROM leadstatus WHERE leadstatusid<=6 ORDER BY 1";
+				$result = $this->db->query($sql);
+			//	$arr =  json_encode($result->result_array());
+				$arr = "{\"statusid\":" .json_encode($result->result_array()). "}";
+				return $arr;
+			
+			}
+			function get_ldstatus_update()
+			{
+				$sql="SELECT leadstatusid as leadstatusid, leadstatus as statusname FROM leadstatus WHERE leadstatusid<=6 ORDER BY 1";
 				$result = $this->db->query($sql);
 			//	$arr =  json_encode($result->result_array());
 				$arr = "{\"statusid\":" .json_encode($result->result_array()). "}";
@@ -1057,7 +1090,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 				$customergroup=urldecode($customergroup);
 				$sql = "select * from vw_lead_check_prod_duplicate WHERE  customergroup='".$customergroup."' AND product_group = '".$prodgroup."'";
 
-       //  echo $sql;   die;                
+        // echo $sql;   die;                
 		        $result = $this->db->query($sql);
 		        $rowcount = $result->num_rows();
 		        if ($rowcount == 0) {
