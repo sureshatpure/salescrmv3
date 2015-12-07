@@ -155,6 +155,7 @@
                         var listdataAdapter;
                         var g_noofleads;
                         var jqxgrid_n_row;
+                        var g_create_lead;
 
 
                         var permission = <?php echo $grpperm; ?>;
@@ -653,7 +654,7 @@
                                   switch(data.result_type){
                                      case 'Value':
                                        editor.jqxDropDownList(
-                                        {source: ["NEW CUSTOEMR", "EXSISTING CUSTOMER", "ORDER FOLLOWUP", "ORDER AND PAYMENT", "TENDER", "PAYMENT FOLLOW UP", "BALANCE SHEET", "TANKER  DIVERTION", "INVOICE", "PROFORM INVOICE", "PAYMENT COLLECTION"]
+                                        {source: ["NEW CUSTOMER", "EXSISTING CUSTOMER", "ORDER FOLLOWUP", "ORDER AND PAYMENT", "TENDER", "PAYMENT FOLLOW UP", "BALANCE SHEET", "TANKER  DIVERTION", "INVOICE", "PROFORM INVOICE", "PAYMENT COLLECTION"]
                                         });
                                      break;
                                      case 'Select':
@@ -721,7 +722,7 @@
 
                         /* change column type dynamic end*/
                             var  Resultsupdate ={
-                               initResultsEditor: function (row, datafield, columntype) {
+                               initResultsEditor_update: function (row, datafield, columntype) {
                             var rowdata = $("#jqxgrid_n").jqxGrid('getrowdata', row);
                             var cust_grp = rowdata.custgroup;
                             var prod_grp = rowdata.itemgroup;
@@ -790,8 +791,8 @@
                             }
 
                         },
-                               initResultsEditorat: function(row){
-                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                               initResultsEditorat_update: function(row){
+                                 /* var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                   if(data.result_type === 'Value')
                                     {
                                         this.columntype = 'dropdownlist';
@@ -800,7 +801,90 @@
                                    else if(data.result_type === 'Select') 
                                    {
                                     this.columntype = 'dropdownlist';
+                                   }*/
+
+                                    var rowdata = $("#jqxgrid_n").jqxGrid('getrowdata', row);
+                                    var cust_grp = rowdata.custgroup;
+                                    var prod_grp = rowdata.itemgroup;
+                                    var curr_poten = rowdata.potentialqty;
+                                   
+                                    if(cust_grp!="" && prod_grp!="")
+                                    {
+                                        //return true;
+                                            var url = "dailyactivity/get_potentialquantity/"+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp);
+                                                $.ajax({
+                                                    dataType: "html",
+                                                    url: url,
+                                                    type: "POST",
+                                                    async: false,
+                                                    cache:false,
+                                                    error: function (xhr, status) {
+                                                        alert("check " + status + " test");
+                                                    },
+                                                    success: function (result) {
+                                                        var obj = jQuery.parseJSON(result);
+                                                        rows = obj.rows;
+
+                                                        potential_quantity = rows[0].potential;
+                                                        noofleads =rows[0].noofleads;
+                                                        g_noofleads=noofleads;
+                                                        resulttype =rows[0].result_type;
+
+                                                        if(noofleads>0)
+                                                        {
+                                                         g_create_lead=0;
+                                                         this.columntype = 'dropdownlist'; 
+                                                         $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity); 
+                                                         $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead); 
+                                                        }
+                                                        else
+                                                        {
+                                                             this.columntype = 'textbox';
+                                                             g_create_lead=0;
+                                                             potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
+                                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity);
+                                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead);
+                                                        }
+
+                                                        
+         
+                                                        
+                                                    }
+                                                });
+
+                                            
+                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "noofleads", noofleads);
+                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "result_type", resulttype);
+                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead);
+
+
+                                                var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                                  if(data.result_type === 'Value')
+                                                    {
+                                                        this.columntype = 'textbox';
+                                                    } 
+
+                                                   else if(data.result_type === 'Select') 
+                                                   {
+                                                    this.columntype = 'dropdownlist';
+                                                   }
+                                        
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                    if(data.result_type === 'Value')
+                                    {
+                                        this.columntype = 'dropdownlist';
+                                    } 
+
+                                   else if(data.result_type === 'Select') 
+                                   {
+                                    this.columntype = 'dropdownlist';
                                    }
+
+                        
                                },
                                initResultsEditorst: function(row){
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
@@ -816,18 +900,6 @@
                                    }
                                },
                                 initResultsEditorldst_update: function(row){
-                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
-                                  /*if(data.result_type === 'Value')
-                                    {
-                                          this.columntype ='dropdownlist';
-                                    } 
-
-                                   else if(data.result_type ==='Select') 
-                                   {
-                                      this.columntype ='dropdownlist';
-                                   // return false;
-
-                                   }*/
                                     var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                   //  var rowdata = $("#jqxgrid_n").jqxGrid('getrowdata', row);
                                     var cust_grp = data.custgroup;
@@ -903,6 +975,17 @@
                                                 return false;
                                             }
                                     }
+                                    if(data.result_type === 'Value')
+                                        {
+                                              this.columntype ='dropdownlist';
+                                        } 
+
+                                    else if(data.result_type ==='Select') 
+                                       {
+                                          this.columntype ='dropdownlist';
+                                       // return false;
+
+                                       }
                                     
                                },
 
@@ -1042,7 +1125,7 @@
                                   }
                     
                                },
-                                resultsEditorst: function(row, cellvalue, editor)
+                                resultsEditorst_update: function(row, cellvalue, editor)
                                 {
                                       var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                       var leadid =data.leadid;
@@ -1112,8 +1195,9 @@
                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                  jqxgrid_n_row =row;
                                    var leadid =data.leadid;
-                                   //alert("leadid in update resultsEditorldst "+leadid);
-                                   if (leadid!="" && leadid!='No Leads') 
+                                   alert("leadid in update resultsEditorldst_update "+leadid);
+                                   alert("type of object "+typeof(data.leadid));
+                                   if (leadid!="" && leadid!='No Leads' || leadid!=undefined) 
                                     {
                                         geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
                                     }
@@ -1249,18 +1333,44 @@
                                         } // end of switch
                                             
                                },
-                               resultsEditorat: function(row, cellvalue, editor){
+                               /*resultsEditorat_update: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                   switch(data.result_type){
                                      case 'Value':
                                        editor.jqxDropDownList(
-                                        {source: ["NEW CUSTOEMR", "EXSISTING CUSTOMER", "ORDER FOLLOWUP", "ORDER AND PAYMENT", "TENDER", "PAYMENT FOLLOW UP", "BALANCE SHEET", "TANKER  DIVERTION", "INVOICE", "PROFORM INVOICE", "PAYMENT COLLECTION"]
+                                        {source: ["NEW CUSTOMER", "EXSISTING CUSTOMER", "ORDER FOLLOWUP", "ORDER AND PAYMENT", "TENDER", "PAYMENT FOLLOW UP", "BALANCE SHEET", "TANKER  DIVERTION", "INVOICE", "PROFORM INVOICE", "PAYMENT COLLECTION"]
                                         });
                                      break;
                                      case 'Select':
                                          editor.jqxDropDownList({source: ["LEADS"],autoDropDownHeight: true,selectedIndex:0});
                                  }           
-                               },
+                               },*/
+                               resultsEditorat_update: function(row, cellvalue, editor){
+                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                   var leadid =data.leadid;
+                                   var createLead =data.create_lead;
+
+                                   switch(data.result_type){
+                                         case 'Value':
+                                          if(createLead==1)
+                                          {
+                                            editor.jqxDropDownList(
+                                                {source: ["NEW CUSTOMER", "EXSISTING CUSTOMER", "ORDER FOLLOWUP", "ORDER AND PAYMENT", "TENDER", "PAYMENT FOLLOW UP", "BALANCE SHEET", "TANKER  DIVERTION", "INVOICE", "PROFORM INVOICE", "PAYMENT COLLECTION"]
+                                                });
+                                          
+                                          
+                                          }
+                                          else
+                                          {
+                                            editor.jqxDropDownList({source: ["LEADS"],autoDropDownHeight: true,selectedIndex:0});
+                                          }
+                                           
+                                         break;
+                                         case 'Select':
+                                            editor.jqxDropDownList({source: ["LEADS"],autoDropDownHeight: true,selectedIndex:0});
+                                        } // end of switch
+
+                                 },
 
                                renderUnits: function(row, columnfield, value, defaulthtml, columnproperties)
                                {
@@ -1459,12 +1569,12 @@
                                                             filterable: true,
                                                             columns: [
                                                                 {text: 'UID', datafield: 'id', width: 150, cellsalign: 'left', hidden: true},
-                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: true},
+                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: false},
                                                                 {text: 'Customer Group', datafield: 'custgroup', width: 150, editable: false},
                                                                 {text: 'Cust Id', datafield: 'custid', width: 100, editable: false,hidden: true},
                                                                 {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},
                                                                 {text: 'Prod Id', datafield: 'itemid', width: 100, editable: false,hidden: true},
-                                                                {text: 'Lead id', datafield: 'leadid',cellsformat:'n', displayfield: 'leadid', width: 127, cellsalign: 'center', cellbeginedit: Resultsupdate.initResultsEditor, initeditor: Resultsupdate.resultsEditor, cellsrenderer: Resultsupdate.renderUnits,promptText:'Select Leadid',cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
+                                                                {text: 'Lead id', datafield: 'leadid',cellsformat:'n', displayfield: 'leadid', width: 127, cellsalign: 'center', cellbeginedit: Resultsupdate.initResultsEditor_update, initeditor: Resultsupdate.resultsEditor, cellsrenderer: Resultsupdate.renderUnits,promptText:'Select Leadid',cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                                         {
                                                                            // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
                                                                               if (newvalue == 0) {
@@ -1472,9 +1582,9 @@
                                                                           }
                                                                         }
                                                                 },
-                                                                {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
-                                                                { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
+                                                                {text: 'noofleads', datafield: 'noofleads',hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                                                {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
+                                                                { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
                                                                 {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst_update, initeditor: Resultsupdate.resultsEditorldst_update, cellsrenderer: Resultsupdate.renderUnitsldst_update,promptText:'Select Status',
                                                                                     cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                                                     {
@@ -1745,7 +1855,7 @@
                                                                                 }
                                                                    
                                                                     },
-                                                                {text: 'Activity Type', datafield: 'subactivity', width: 110, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorat, initeditor: Resultsupdate.resultsEditorat, cellsrenderer: Resultsupdate.renderUnitsat
+                                                                {text: 'Activity Type', datafield: 'subactivity', width: 110, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorat_update, initeditor: Resultsupdate.resultsEditorat_update, cellsrenderer: Resultsupdate.renderUnitsat
                                                                 },
                                                                 
                                                                 {text: 'Potential', datafield: 'potentialqty', width: 75, cellsalign: 'left', editable: false},
@@ -1767,7 +1877,7 @@
 
                                                                                 },editable: true
                                                                     },
-                                                                    {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Resultsupdate.initResultsEditorst, initeditor: Resultsupdate.resultsEditorst, cellsrenderer: Resultsupdate.renderUnitsst
+                                                                    {text: 'Sales Type', datafield: 'division', width: 110, cellsalign: 'left',readonly:true,cellbeginedit:Resultsupdate.initResultsEditorst, initeditor: Resultsupdate.resultsEditorst_update, cellsrenderer: Resultsupdate.renderUnitsst
 
                                                                     },
                                                                     
