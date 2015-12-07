@@ -815,7 +815,7 @@
                                     this.columntype='textbox';
                                    }
                                },
-                                initResultsEditorldst: function(row){
+                                initResultsEditorldst_update: function(row){
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                   /*if(data.result_type === 'Value')
                                     {
@@ -1108,7 +1108,7 @@
                                             } // end of switch
                                                 
                                    },
-                               resultsEditorldst: function(row, cellvalue, editor){
+                               resultsEditorldst_update: function(row, cellvalue, editor){
                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                  jqxgrid_n_row =row;
                                    var leadid =data.leadid;
@@ -1273,7 +1273,7 @@
                                   return defaulthtml;
                                },
 
-                               renderUnitsldst:function(row, columnfield, value, defaulthtml, columnproperties)
+                               renderUnitsldst_update:function(row, columnfield, value, defaulthtml, columnproperties)
                                {
                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                 /*  if(data.result_type === 'Value' && data.result !== ''){
@@ -1475,7 +1475,7 @@
                                                                 {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
                                                                 {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
                                                                 { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst, initeditor: Resultsupdate.resultsEditorldst, cellsrenderer: Resultsupdate.renderUnitsldst,promptText:'Select Status',
+                                                                {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst_update, initeditor: Resultsupdate.resultsEditorldst_update, cellsrenderer: Resultsupdate.renderUnitsldst_update,promptText:'Select Status',
                                                                                     cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                                                     {
                                                                                        // alert("oldvalue "+oldvalue); alert("newvalue "+newvalue);
