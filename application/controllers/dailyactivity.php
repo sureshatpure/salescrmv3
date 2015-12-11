@@ -282,12 +282,22 @@ class dailyactivity extends CI_Controller {
                          $customer_id=$val['hdn_cust_id'];
                          $customer_address[] = $this->dailyactivity_model->get_customer_address($customer_id);
                          $user_branch = $this->dailyactivity_model->get_user_branch($login_user_id);
-                       /*  $itemgroup_name = $this->Leads_model->GetItemgroup($val['hdn_prod_id']);
-                        if ($itemgroup_name['itemgroup'] != "") {
-                            $itemgroup_name = $itemgroup_name['itemgroup'];
-                        } else {
-                            $itemgroup_name = $itemgroup_name['description'];
-                        }*/
+                         if($val['itemgroup']=="")
+                            {
+                                $itemgroup_name = $this->Leads_model->GetItemgroup($val['hdn_prod_id']);
+                                 if ($itemgroup_name['itemgroup'] != "") {
+                                        $itemgroup_name = $itemgroup_name['itemgroup'];
+                                    } else {
+                                        $itemgroup_name = $itemgroup_name['description'];
+                                    }
+                            }
+                            else
+                            {
+                                $itemgroup_name = $val['itemgroup'];  
+                            }
+                         
+                        
+                       
                          //print_r($customer_address);
                          /* Start for inserting into leaddetails*/
                          $leaddetails = array('lead_no' => $lead_no,
@@ -497,7 +507,7 @@ class dailyactivity extends CI_Controller {
                            $leadproducts = array('leadid' => $lead_id,
                             'productid' => $val['hdn_prod_id'],
                             'quantity' => $val['quantity'],
-                           // 'product_group' => $itemgroup_name,
+                            'product_group' => $itemgroup_name,
                             'created_date' => date('Y-m-d:H:i:s'),
                             'created_user' => $login_user_id
                         );
@@ -1166,12 +1176,20 @@ class dailyactivity extends CI_Controller {
                          $lead_status_id = $this->dailyactivity_model->get_leadstatusidbyname($val['statusid']);
                          $lead_substatus_id = $this->dailyactivity_model->get_leadsub_statusidbyname($val['leadsubstatusid']);
                          $sales_type_id = $this->dailyactivity_model->get_salestypeid_byname($val['division']);
-                        /*$itemgroup_name = $this->Leads_model->GetItemgroup($val['hdn_prod_id']);
-                        if ($itemgroup_name['itemgroup'] != "") {
-                            $itemgroup_name = $itemgroup_name['itemgroup'];
-                        } else {
-                            $itemgroup_name = $itemgroup_name['description'];
-                        }*/
+                        if($val['itemgroup']=="")
+                        {
+                            $itemgroup_name = $this->Leads_model->GetItemgroup($val['hdn_prod_id']);
+                            if ($itemgroup_name['itemgroup'] != "") {
+                                $itemgroup_name = $itemgroup_name['itemgroup'];
+                            } else {
+                                $itemgroup_name = $itemgroup_name['description'];
+                            }
+                        }
+                        else
+                        {
+                          $itemgroup_name = $val['itemgroup'];   
+                        }
+                        
                          $lead_close_status=0;
                          $lead_close_option="2";
                          $ld_converted=0;
@@ -1261,7 +1279,7 @@ class dailyactivity extends CI_Controller {
                               }
                            $leadproducts = array('leadid' => $lead_id,
                             'productid' => $val['hdn_prod_id'],
-                           // 'product_group' => $itemgroup_name,
+                            'product_group' => $itemgroup_name,
                             'quantity' => $val['quantity'],
                             'created_date' => date('Y-m-d:H:i:s'),
                             'created_user' => $login_user_id
@@ -2257,6 +2275,37 @@ class dailyactivity extends CI_Controller {
                    $response = array(
                    'ok' => true,
                     'msg' => "<font color=green> A lead will be created </font>");  
+                } 
+            }
+
+            
+        echo json_encode($response);
+
+    }
+    function checkduplicate_product_update($prodgrp, $customergroup) {
+
+            $leaddata1['response'] = $this->dailyactivity_model->check_prodgroup_dup_saleorder($prodgrp, $customergroup);
+            if ($customergroup=='undefined')
+            {
+
+                    $response = array(
+                   'ok' => false,
+                    'msg' => "<font color=red>No Product has been selected,hence lead will not be created</font>");
+               
+            }
+            else
+            {
+               if($leaddata1['response']=='false')
+                {
+                    $response = array(
+                   'ok' => false,
+                    'msg' => "<font color=red>This product group has been already billed for this customer</font>");
+                }
+                else
+                {
+                   $response = array(
+                   'ok' => true,
+                    'msg' => "<font color=green>&nbsp;&nbsp;No Leads </font>");  
                 } 
             }
 

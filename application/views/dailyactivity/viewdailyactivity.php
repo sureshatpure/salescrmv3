@@ -827,12 +827,11 @@
 
                                                         potential_quantity = rows[0].potential;
                                                         noofleads =rows[0].noofleads;
-                                                        g_noofleads=noofleads;
                                                         resulttype =rows[0].result_type;
 
                                                         if(noofleads>0)
                                                         {
-                                                         g_create_lead=0;
+                                                         g_create_lead=1;
                                                          this.columntype = 'dropdownlist'; 
                                                          $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity); 
                                                          $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead); 
@@ -1032,13 +1031,14 @@
                                 var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                 var cust_grp = $('#jqxgrid_n').jqxGrid('getcellvalue', row, "custgroup");
                                 var prod_grp = $('#jqxgrid_n').jqxGrid('getcellvalue', row, "itemgroup");
-
+                                var line_id = $('#jqxgrid_n').jqxGrid('getcellvalue', row, "line_id");
+                                
                                 switch(data.result_type){
                                  case 'Value':
                                 editor.jqxInput({ placeHolder: "No Leads" });
                                 $.ajax({
                                         type: "POST",
-                                        url: base_url + 'dailyactivity/checkduplicate_product/'+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp),
+                                        url: base_url + 'dailyactivity/checkduplicate_product_update/'+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp),
                                         data: 'prodgroup=' + encodeURIComponent(prod_grp) + '&customergroup=' + encodeURIComponent(cust_grp),
                                         dataType: 'json',
                                         success: function (response)
@@ -1049,6 +1049,11 @@
                                                 //  datevalidation=false;
                                                 //validateProductName.html(response.msg);
                                                      //alert("This product group has been already billed for this customer")
+                                                     if(line_id===undefined)
+                                                     {
+                                                       response.msg="<font color=green>&nbsp;&nbsp;A Lead will be created </font>";
+                                                     }
+
                                                      validateProductName.html(response.msg);
                                                     // editor.jqxCheckBox({ checked: false, hasThreeStates:false});
                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead",0);
@@ -1195,16 +1200,38 @@
                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                  jqxgrid_n_row =row;
                                    var leadid =data.leadid;
-                                   alert("leadid in update resultsEditorldst_update "+leadid);
-                                   alert("type of object "+typeof(data.leadid));
-                                   if (leadid!="" && leadid!='No Leads' || leadid!=undefined) 
+                                 
+                                    if (typeof(data.leadid)==="undefined")
                                     {
-                                        geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
+                                        alert("yes undefined");
+
                                     }
                                     else
                                     {
-                                        geturl=base_url + "dailyactivity/getldstatusupdate";
+                                        alert("not matching");
+                                    }
+                                     if (data.leadid==null)
+                                    {
+                                        alert("yes null");
+
+                                    }
+                                    else
+                                    {
+                                        alert("null not matching");
+                                    }
+                                   if (data.leadid===null && leadid!='No Leads' || typeof(data.leadid)==="undefined") 
+                                    {
+                                       geturl=base_url + "dailyactivity/getldstatusupdate"
+                                    }
+                                    else if (typeof(data.leadid)==="string" && data.leadid.length >0)
+                                    {
                                         
+                                         geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
+                                        
+                                    }
+                                    else
+                                    {
+                                       geturl=base_url + "dailyactivity/getldstatusupdate"  
                                     }
                                    var stslist = {
                                                 datatype: "json",
@@ -1261,17 +1288,20 @@
 
                                    var leadid =data.leadid;
                                   // alert("in initeditor for update substatus "+status_name);
-                                    if (leadid!="" && leadid!='No Leads')
+                                  // alert("in initeditor for update leadid "+leadid);
+                                    if (leadid!="" && leadid!='No Leads'|| typeof(data.leadid)==="undefined") 
                                     {
-                                      //  geturl=base_url + "dailyactivity/getldsubstatusforlead/"+leadid;
-                                      //geturl=base_url + "dailyactivity/getldsubstatusbynameid_update/"+status_name+"/"+leadid;
-                                      geturl=base_url + "dailyactivity/getldsubstatusbynameid/"+status_name+"/"+leadid;
+                                      geturl=base_url + "dailyactivity/getldsubstatusbyname/"+status_name;
                                       
+                                    }
+                                    else  if (typeof(data.leadid)==="string" && data.leadid.length >0)
+                                    {
+                                        geturl=base_url + "dailyactivity/getldsubstatusbynameid/"+status_name+"/"+leadid;
+                                       
                                     }
                                     else
                                     {
                                         geturl=base_url + "dailyactivity/getldsubstatusbyname/"+status_name;
-                                        
                                     }
                                    var substslist = {
                                                 datatype: "json",
@@ -1349,10 +1379,10 @@
                                    var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                    var leadid =data.leadid;
                                    var createLead =data.create_lead;
-
+                                  // alert("createLead in resultsEditorat_update "+createLead);
                                    switch(data.result_type){
                                          case 'Value':
-                                          if(createLead==1)
+                                          if(createLead==0)
                                           {
                                             editor.jqxDropDownList(
                                                 {source: ["NEW CUSTOMER", "EXSISTING CUSTOMER", "ORDER FOLLOWUP", "ORDER AND PAYMENT", "TENDER", "PAYMENT FOLLOW UP", "BALANCE SHEET", "TANKER  DIVERTION", "INVOICE", "PROFORM INVOICE", "PAYMENT COLLECTION"]
@@ -3094,30 +3124,50 @@
                                 }
 
                                 var lead_status = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "leadstatusid");
+                                var create_lead = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "create_lead");
                                // alert("status "+lead_status);
-                                if (lead_status == null || lead_status == 'undefined')
+                                
+                                if (create_lead==1)
                                 {
-                                    $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadstatusid", "Please select the Lead status");
-                                    valid_lead_status = 0;
-                                    break;
+                                    if (lead_status == null || lead_status == 'undefined')
+                                    {
+                                        $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadstatusid", "Please select the Lead status");
+                                        valid_lead_status = 0;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        valid_lead_status = 1;
+                                    }
+
                                 }
                                 else
                                 {
-                                    valid_lead_status = 1;
+                                     valid_lead_status = 1;
                                 }
 
+                                
                                 var lead_substatus = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "leadsubstatusid");
-                               // alert("substatus "+lead_substatus);
-                                if (lead_substatus == null || lead_substatus == 'undefined' || lead_substatus == 'Select Substatus')
+                                var create_lead = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "create_lead");
+                                if (create_lead==1)
                                 {
-                                    $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead substatus");
-                                    valid_lead_substatus = 0;
-                                    break;
+                                    if (lead_substatus == null || lead_substatus == 'undefined' || lead_substatus == 'Select Substatus')
+                                    {
+                                        $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead substatus");
+                                        valid_lead_substatus = 0;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        valid_lead_substatus = 1;
+                                    }
                                 }
                                 else
                                 {
-                                    valid_lead_substatus = 1;
+                                     valid_lead_substatus = 1;
                                 }
+
+                                
                                 var crm_soc = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "crm_soc_number");
                                  //alert(" lead_status "+lead_status);
                                 //alert("crm_soc "+crm_soc);
@@ -3234,6 +3284,8 @@
                                 
                                 var rowval = {};
                                 griddata = $('#jqxgrid_n').jqxGrid('getrowdata', i);
+                                //alert("create lead "+griddata.create_lead);
+                                
                                 var lead_appointmentdt=null;
                                 var objType= typeof(griddata.appiontmnt_dt);
                                 if(objType=='string')
@@ -3262,6 +3314,7 @@
                                 rowval["subactivity"] = griddata.subactivity;
                                 rowval["hdn_cust_id"] = griddata.custid;
                                 rowval["hdn_prod_id"] = griddata.itemid;
+                                rowval["create_lead"] = griddata.create_lead;
                                 // alert("currentdate  "+currentdate);
                                 rowval["hour_s"] = griddata.hour_s;
                                 rowval["minit"] = griddata.minit;
@@ -3272,6 +3325,8 @@
                                 rowval["Remarks"] = griddata.remarks;
                                 rowval["statusid"] = griddata.leadstatusid;
                                 rowval["leadsubstatusid"] = griddata.leadsubstatusid;
+                               // alert("statusid "+griddata.leadstatusid);
+                               // alert("substatusid  "+griddata.leadsubstatusid);
                                 if (typeof(griddata.prevstatusid)=='undefined')
                                 {
                                     rowval["prevstatusid"] = 0;    

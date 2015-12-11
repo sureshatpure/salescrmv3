@@ -3443,12 +3443,15 @@ select  cast(customermasterhdr.id as varchar(50)), customermasterhdr.tempcustnam
     function checkduplicate_product($prodid, $customerid) {
         $prodid = $_POST['prodid'];
         $prodgroup = $this->Leads_model->GetItemgroup($prodid);
+        $customergroup =$this->Leads_model->GetCustmerGroup($customerid);
+       
+
       //  print_r($prodgroup); die;
         $customerid = $_POST['customerid'];
         $user1 = $this->session->userdata['loginname'];
         //echo "prodid ".$prodid; 			echo "customerid ".$customerid; die;
-          $leaddata['response'] = $this->Leads_model->check_prodnameduplicates_lead($prodid, $customerid);
-         $leaddata1['response'] = $this->Leads_model->check_prodgroup_dup_saleorder($prodgroup['itemgroup'], $customerid);
+         $leaddata['response'] = $this->Leads_model->check_prodnameduplicates_lead($prodid, $customerid);
+         $leaddata1['response'] = $this->Leads_model->check_prodgroup_dup_saleorder($prodgroup['itemgroup'], $customerid,$customergroup['customergroup']);
         //	echo $activitydata['response'];
         if ($leaddata['response'] == 'true' && $leaddata1['response'] == 'true' ) {
             $response = array(

@@ -1088,9 +1088,10 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 			{
 
 				$customergroup=urldecode($customergroup);
+				$prodgroup =urldecode($prodgroup);
 				$sql = "select * from vw_lead_check_prod_duplicate WHERE  customergroup='".$customergroup."' AND product_group = '".$prodgroup."'";
 
-        // echo $sql;   die;                
+         //echo $sql;   die;                
 		        $result = $this->db->query($sql);
 		        $rowcount = $result->num_rows();
 		        if ($rowcount == 0) {

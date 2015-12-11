@@ -2166,7 +2166,7 @@ class Leads_model extends CI_Model {
         $result = $this->db->get();
         $ld_status = $result->result_array();
         //print_r($ld_status); die;
-        return $ld_status[0]['leadstatus'];
+        return @$ld_status[0]['leadstatus'];
          
     }
     public function GetSalesName($name) {
@@ -2186,7 +2186,7 @@ class Leads_model extends CI_Model {
         $this->db->where('lst_sub_id', $substs_id);
         $result = $this->db->get();
         $ld_status = $result->result_array();
-        return $ld_status[0]['lst_name'];
+        return @$ld_status[0]['lst_name'];
         // print_r($ld_status);
     }
 
@@ -2247,7 +2247,7 @@ class Leads_model extends CI_Model {
                     LEFT JOIN customermasterdtl dtl ON dtl.id=hdr.id
                 WHERE 
                     hdr.id=" .$customerid."  AND dtl.addresstypeid  IN (SELECT DISTINCT addresstypeid FROM customermasterdtl  GROUP BY id,addresstypeid ) LIMIT 1";
-           // echo $sql; die;
+           
                  $result = $this->db->query($sql);
          $customer_address= $result->result_array();
          return $customer_address[0];
@@ -2938,10 +2938,12 @@ SELECT
             return "false";
         }
     }
-    function check_prodgroup_dup_saleorder($prodgrp, $customerid) {
-          $sql = "select * from vw_lead_check_prod_duplicate WHERE  lead_customer_ref_id=".$customerid." AND product_group = '".$prodgrp."'";
+    function check_prodgroup_dup_saleorder($prodgrp, $customerid,$customergroup) {
+          //$sql = "select * from vw_lead_check_prod_duplicate WHERE  lead_customer_ref_id=".$customerid." AND product_group = '".$prodgrp."'";
+        $sql = "select * from vw_lead_check_prod_duplicate WHERE lead_customer_ref_id=".$customerid." or  customergroup ='".$customergroup."' AND product_group = '".$prodgrp."'";
 
-        // echo $sql;   die;                
+
+      //   echo $sql;   die;                
         $result = $this->db->query($sql);
         $rowcount = $result->num_rows();
         if ($rowcount == 0) {
@@ -3245,6 +3247,17 @@ SELECT
                return $isExecutive;
 
             }
+
+        public function GetCustmerGroup($company) {
+        $this->db->select('customergroup');
+        $this->db->from('vw_lead_get_customerdetails');
+        $this->db->where('id', $company);
+        $result = $this->db->get();
+        $ld_status = $result->result_array();
+
+        return $ld_status[0];
+        //print_r($ld_status);
+    }
 
 
 
