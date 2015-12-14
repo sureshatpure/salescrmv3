@@ -92,7 +92,7 @@ $message_content="Welcome to email templating";
 
 					// Replace the % with the actual information
 					   // Send email to BM and executive
-     					   $exe_address=explode(",", $row["sales_ref_mailid"]);
+     				   $exe_address=explode(",", $row["sales_ref_mailid"]);
 					   $bm_address = explode(",", $row["bm_mailid"]);
 					   $to_address = array_merge($exe_address,$bm_address);
 					   $to_address = array_unique($to_address);

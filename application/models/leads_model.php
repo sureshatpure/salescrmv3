@@ -2260,7 +2260,7 @@ class Leads_model extends CI_Model {
         $result = $this->db->query($sql);
         $productdetails = $result->result_array();
 
-        return $productdetails[0];
+        return @$productdetails[0];
     }
 
      public function get_leadpotentials($lead_id,$sales_type_flag) {
