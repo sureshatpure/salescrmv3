@@ -1652,8 +1652,14 @@ class dailyactivity extends CI_Controller {
                                 'last_modified' => date('Y-m-d:H:i:s'),
                                 'last_updated_user' => $login_user_id
                             );
-
+                                $leadproducts = array(
+                                'quantity' => $val['quantity'],
+                                'last_modified' => date('Y-m-d:H:i:s'),
+                                'last_updated_user' => $login_user_id
+                            );
+                                
                             $id = $this->Leads_model->update_lead($leaddetails, $lead_id);
+                            $id = $this->Leads_model->update_leadproducts($leadproducts, $lead_id);
 
 
                              /* Start for Managing and implementation*/
@@ -1951,7 +1957,8 @@ class dailyactivity extends CI_Controller {
                                         'last_modified' => date('Y-m-d:H:i:s'),
                                         'last_updated_user' => $login_user_id
                                     );
-                                    $id = $this->Leads_model->update_lead($leaddetails_update, $lead_id);
+                                    
+                                    $prodid = $this->Leads_model->update_lead($leaddetails_update, $lead_id);
 
                                     /* Endt update leaddetails_update */
 

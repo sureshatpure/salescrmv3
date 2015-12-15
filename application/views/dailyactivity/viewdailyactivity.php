@@ -272,7 +272,7 @@
 
                                initResultsEditorat: function(row){
                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
-                                  if(data.result_type === 'Value')
+                                 /* if(data.result_type === 'Value')
                                     {
                                         this.columntype = 'dropdownlist';
 
@@ -282,11 +282,10 @@
                                    {
                                     this.columntype = 'dropdownlist';
                                    // return false;
-                                   }
-                                    /*var data = $("#jqxgrid_add").jqxGrid('getrowdata', row);
+                                   }*/
                                     var cust_grp = data.custgroup;
                                     var prod_grp = data.itemgroup;
-                                    var curr_poten = data.potentialqty;
+                                    var curr_poten = data.Potential_Quantity;
                                    
                                     if(cust_grp!="" && prod_grp!="")
                                     {
@@ -311,17 +310,24 @@
 
                                                         if(noofleads>0)
                                                         {
-                                                         g_create_lead_add=1;
-                                                         this.columntype = 'dropdownlist'; 
-                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity); 
+                                                         g_create_lead_add=0;
+                                                         
+                                                         $("#jqxgrid_add").jqxGrid('setcellvalue', row, "Potential_Quantity", potential_quantity); 
                                                          $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead", g_create_lead_add); 
                                                         }
                                                         else
                                                         {
-                                                             this.columntype = 'textbox';
-                                                             g_create_lead_add=0;
+                                                             if(prod_grp==undefined)
+                                                             {
+                                                               g_create_lead_add=0; 
+                                                             }
+                                                             else
+                                                             {
+                                                                g_create_lead_add=1;
+                                                             }
+                                                             
                                                              potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
-                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity);
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "Potential_Quantity", potential_quantity);
                                                             $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead", g_create_lead_add);
                                                         }
 
@@ -340,7 +346,7 @@
                                                 
                                                   if(data.result_type === 'Value')
                                                     {
-                                                        this.columntype = 'textbox';
+                                                        this.columntype = 'dropdownlist';
                                                     } 
 
                                                    else if(data.result_type === 'Select') 
@@ -361,7 +367,7 @@
                                    else if(data.result_type === 'Select') 
                                    {
                                     this.columntype = 'dropdownlist';
-                                   }*/
+                                   }
                                },
                                initResultsEditorst: function(row){
                                   var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
@@ -912,7 +918,7 @@
 
                                                         if(noofleads>0)
                                                         {
-                                                         g_create_lead=1;
+                                                         g_create_lead=0;
                                                          this.columntype = 'dropdownlist'; 
                                                          $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity); 
                                                          $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead); 
@@ -920,7 +926,15 @@
                                                         else
                                                         {
                                                              this.columntype = 'textbox';
-                                                             g_create_lead=0;
+
+                                                             if(prod_grp==undefined)
+                                                             {
+                                                               g_create_lead=0; 
+                                                             }
+                                                             else
+                                                             {
+                                                                g_create_lead=1;
+                                                             }
                                                              potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
                                                             $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity);
                                                             $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead);
@@ -986,9 +1000,10 @@
                                     var prod_grp = data.itemgroup;
                                     var curr_poten = data.potentialqty;
                                     var leadstatus = data.leadstatusid;
-                                   // alert("leadstatus "+leadstatus);
+                                    //alert("leadstatus "+leadstatus);
                                     if (leadstatus=='No Status')
                                     {
+
                                         return false;
                                     }
                                     else
@@ -1983,7 +1998,7 @@
                                                                                     }
                                                                                     else
                                                                                     {
-                                                                                        return false;
+                                                                                        return true;
                                                                                     }
 
                                                                                 },editable: true
@@ -2216,7 +2231,7 @@
                                                                 } 
                                                                else if (newvalue!=oldvalue && newvalue!='Expanding And Build Relationship')
                                                                {
-                                                               $("#jqxgrid_n").jqxGrid('setcellvalue', row, "leadsubstatusid", "Select Substatus");
+                                                               $("#jqxgrid_add").jqxGrid('setcellvalue', row, "leadsubstatusid", "Select Substatus");
                                                                 return newvalue;
                                                                }
                         /*get soc number start*/
@@ -2504,7 +2519,7 @@
                                                         }
                                                         else
                                                         {
-                                                            return false;
+                                                            return true;
                                                         }
 
                                                     }
@@ -2929,30 +2944,48 @@
                                 }
 
                                  var lead_status = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "statusid");
+                                 var create_lead = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "create_lead");
                                // alert("status in add "+lead_status);
-                                if (lead_status == null || lead_status == 'undefined')
+                                if (create_lead==1)
                                 {
-                                    $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "statusid", "Please select the Lead status");
-                                    valid_lead_status = 0;
-                                    break;
+                                    if (lead_status == null || lead_status == 'undefined')
+                                        {
+                                            $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "statusid", "Please select the Lead status");
+                                            valid_lead_status = 0;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            valid_lead_status = 1;
+                                        }
                                 }
                                 else
                                 {
                                     valid_lead_status = 1;
                                 }
+                                
 
                                 var lead_substatus = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "leadsubstatusid");
+                                var create_lead = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "create_lead");
                               //  alert("substatus in add "+lead_substatus);
-                                if (lead_substatus == null || lead_substatus == 'undefined' || lead_substatus == 'Select Substatus')
+                              if (create_lead==1)
                                 {
-                                    $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead substatus");
-                                    valid_lead_substatus = 0;
-                                    break;
+                                    if (lead_substatus == null || lead_substatus == 'undefined' || lead_substatus == 'Select Substatus')
+                                    {
+                                        $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead substatus");
+                                        valid_lead_substatus = 0;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        valid_lead_substatus = 1;
+                                    }
                                 }
                                 else
                                 {
                                     valid_lead_substatus = 1;
                                 }
+                                
 
                                 var crm_soc = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "crm_soc_number");
                                 // alert(" lead_status "+lead_status);

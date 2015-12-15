@@ -3259,6 +3259,13 @@ SELECT
         //print_r($ld_status);
     }
 
+     function update_leadproducts($leadprod, $leadid) {
+
+        $this->db->where('leadid', $leadid);
+        $this->db->update('leadproducts', $leadprod);
+        return ($this->db->affected_rows() > 0);
+    }
+
 
 
 
