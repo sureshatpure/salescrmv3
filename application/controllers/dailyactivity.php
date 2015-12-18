@@ -270,7 +270,8 @@ class dailyactivity extends CI_Controller {
                             $reason_no_appointment=$val['not_able_to_get_appointment'];
                          }
                       $samle_reject_count=0;
-                      if ($val['create_lead']==1)
+                      /*Start of if create_lead flag is set to 1*/
+                      if ($val['create_lead']==1) 
                       {
                          $lead_no = 'LEAD-DCV';
                          $lead_status_name = $val['statusid'];
@@ -638,9 +639,9 @@ class dailyactivity extends CI_Controller {
 
                       }  // end of if create_lead flag is set to 1
 /********************************************************************************************************************/
-                                    // update function of leaddetails create_flag=0 and nofoleads=1
+                                    // update function of leaddetails create_flag=0 and noofleads=1
 /********************************************************************************************************************/
-                      else  //Start of condtion if create_lead flag is set to 0 and no of leads =1 // update function of leaddetails
+                      else if($val['noofleads']>0) //Start of condtion if create_lead flag is set to 0 and no of leads =1 // update function of leaddetails
                       {
                         $lead_id=$val['leadid'];
                         //$order_cancelled_reason=$val['order_cancelled_reason'];
@@ -1050,7 +1051,7 @@ class dailyactivity extends CI_Controller {
 
                       } //End if  create_lead flag is set to 0 and no of leads =1 // update function of leaddetails
                       /********************************************************************************************************************/
-                                    // update function of leaddetails create_flag=0 and nofoleads=1
+                                    // update function of leaddetails create_flag=0 and noofleads=1
                      /********************************************************************************************************************/
                       /*start of inserting into dailyactivitydtl*/
                         if ($val['potentialqty'] == "" || $val['potentialqty'] == 'undefined') {
@@ -2113,7 +2114,7 @@ class dailyactivity extends CI_Controller {
             }
             
         header('Content-Type: application/x-json; charset=utf-8');
-        echo $message;
+       // echo $message;
     }
 
     function getnullleadids()

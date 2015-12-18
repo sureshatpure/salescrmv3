@@ -115,10 +115,10 @@
         var source =
                 {
                     datatype: "json",
-                    sortcolumn: 'created_date',
+                    sortcolumn: 'leadid',
                     sortdirection: 'desc',
                     datafields: [
-                        {name: 'leadid'},
+                        {name: 'leadid',type: 'number'},
                         {name: 'statusid'},
                         {name: 'substatusid'},
                         {name: 'lead_no'},
@@ -161,10 +161,10 @@
                     showfilterrow: true,
                     filterable: true,
                     columns: [
-                        {text: 'LeadId', dataField: 'leadid', width: 50, hidden: true},
+                        {text: 'LeadId', dataField: 'leadid', width: 75, hidden: false},
                         {text: 'Sid', dataField: 'statusid', width: 50, hidden: true},
                         {text: 'Subid', dataField: 'substatusid', width: 50, hidden: true},
-                        {text: 'LeadNo', dataField: 'lead_no', width: 100},
+                        {text: 'LeadNo', dataField: 'lead_no', width: 100,hidden: true},
                         {text: 'Closed', dataField: 'lead_close_status', width: 75,hidden: true},
                         {text: 'Branch', dataField: 'branch', width: 100, cellsalign: 'left'},
                         {text: 'Lead Status', dataField: 'leadstatus', width: 85},

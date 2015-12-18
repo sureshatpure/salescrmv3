@@ -156,7 +156,7 @@
                         var g_noofleads;
                         var jqxgrid_n_row;
                         var g_create_lead;
-                        var g_create_lead_add;
+              
                         
 
 
@@ -246,7 +246,8 @@
       placeHolder: "Select Collector", displayMember: "collector",autoDropDownHeight:true, valueMember: "collector", width: 200, height: 25
                 });
                         /* change column type dynamic start*/
-                        
+                        var g_create_lead_add=0;
+                        var noofleads=0;
                         var  Results ={
 
                                initResultsEditor: function(row){
@@ -290,12 +291,43 @@
                                     if(cust_grp!="" && prod_grp!="")
                                     {
                                         //return true;
+                                            /* check duplicate start*/
+                                            $.ajax({
+                                                type: "POST",
+                                                url: base_url + 'dailyactivity/checkduplicate_product/'+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp),
+                                                data: 'prodgroup=' + encodeURIComponent(prod_grp) + '&customergroup=' + encodeURIComponent(cust_grp),
+                                                dataType: 'json',
+                                                success: function (response)
+                                                {
+                                                   // alert(response.msg);
+                                                    if (response.ok == false) 
+                                                    {
+                                                        //  datevalidation=false;
+                                                        //validateProductName.html(response.msg);
+                                                             //alert("This product group has been already billed for this customer")
+                                                            g_create_lead_add=0;
+                                                             validateProductName_add.html(response.msg);
+                                                            // editor.jqxCheckBox({ checked: false, hasThreeStates:false});
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead",0);
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "statusid",'No Status');
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "leadsubstatusid",'No Substatus');
+                                                    }
+                                                    else
+                                                    {
+                                                        // datevalidation=true;
+                                                        g_create_lead_add=1;
+                                                        validateProductName_add.html(response.msg);
+                                                        $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead",1);
+                                                    }
+
+                                                }
+                                            })
+                                            /* check duplicate end */
                                             var url = "dailyactivity/get_potentialquantity/"+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp);
                                                 $.ajax({
                                                     dataType: "html",
                                                     url: url,
                                                     type: "POST",
-                                                    async: false,
                                                     cache:false,
                                                     error: function (xhr, status) {
                                                         alert("check " + status + " test");
@@ -307,25 +339,28 @@
                                                         potential_quantity = rows[0].potential;
                                                         noofleads =rows[0].noofleads;
                                                         resulttype =rows[0].result_type;
-
+                                                       /* alert("prod_grp "+prod_grp);
+                                                        alert("noofleads "+noofleads);
+                                                        alert("g_create_lead_add "+g_create_lead_add);*/
+                                                        
                                                         if(noofleads>0)
                                                         {
                                                          g_create_lead_add=0;
-                                                         
+                                                          //alert(" in true g_create_lead_add "+g_create_lead_add);
                                                          $("#jqxgrid_add").jqxGrid('setcellvalue', row, "Potential_Quantity", potential_quantity); 
                                                          $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead", g_create_lead_add); 
                                                         }
                                                         else
                                                         {
-                                                             if(prod_grp==undefined)
+                                                           // alert("prod_grp "+prod_grp);
+                                                            //alert(" in false noofleads "+noofleads);
+                                                             if(typeof(prod_grp)==undefined) 
                                                              {
                                                                g_create_lead_add=0; 
+                                                               noofleads=0;
                                                              }
-                                                             else
-                                                             {
-                                                                g_create_lead_add=1;
-                                                             }
-                                                             
+                                                             //alert("in false noofleads "+noofleads);
+                                                             //alert(" in false g_create_lead_add "+g_create_lead_add);
                                                              potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
                                                             $("#jqxgrid_add").jqxGrid('setcellvalue', row, "Potential_Quantity", potential_quantity);
                                                             $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead", g_create_lead_add);
@@ -436,6 +471,8 @@
                                    var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                                    var cust_grp = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "custgroup");
                                    var prod_grp = $('#jqxgrid_add').jqxGrid('getcellvalue', row, "itemgroup");
+                                 /*  alert(" jqxgrid_add_row_index "+jqxgrid_add_row_index);
+                                   alert(" row value is  "+row);*/
                                   switch(data.result_type){
                                      case 'Value':
                                        editor.jqxInput({ placeHolder: "No Leads" });
@@ -452,25 +489,26 @@
                                                         //  datevalidation=false;
                                                         //validateProductName.html(response.msg);
                                                              //alert("This product group has been already billed for this customer")
-
+                                                            g_create_lead_add=0;
                                                              validateProductName_add.html(response.msg);
                                                             // editor.jqxCheckBox({ checked: false, hasThreeStates:false});
-                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "create_lead",0);
-                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "statusid",'No Status');
-                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "leadsubstatusid",'No Substatus');
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead",0);
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "noofleads",0);
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "statusid",'No Status');
+                                                            $("#jqxgrid_add").jqxGrid('setcellvalue', row, "leadsubstatusid",'No Substatus');
                                                     }
                                                     else
                                                     {
                                                         // datevalidation=true;
+                                                        g_create_lead_add=1;
                                                         validateProductName_add.html(response.msg);
-                                                        $("#jqxgrid_add").jqxGrid('setcellvalue', jqxgrid_add_row_index, "create_lead",1);
+                                                        $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead",1);
                                                     }
 
                                                 }
                                             })
                                      break;
                                      case 'Select':
-
                                      
                                             var list = {
                                                 datatype: "json",
@@ -600,14 +638,16 @@
                                resultsEditorldst: function(row, cellvalue, editor){
                                    var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
                                    var leadid =data.leadid;
-                                  // alert("leadid in resultsEditorldst "+leadid);
-                                   if (leadid!="")
-                                    {
-                                        geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
-                                    }
-                                    else
+                                /*   alert("leadid in resultsEditorldst "+leadid);
+                                   alert("type of leadid "+typeof(data.leadid));*/
+                                   //if (leadid=='undefined' || leadid=="" || leadid==0)
+                                    if (typeof(data.leadid)=='undefined' || leadid==0)
                                     {
                                         geturl=base_url + "dailyactivity/getldstatus";
+                                    }
+                                    else  
+                                    {
+                                        geturl=base_url + "dailyactivity/getldstatusfor/"+leadid;
                                         
                                     }
                                    var stslist = {
@@ -660,15 +700,16 @@
                                    var leadid =data.leadid;
                                     status_name = status_name.replace(/\//gi, "-");
 
-                                  // alert("in initeditor addform substatus "+status_name);
-                                    if (leadid!="")
+                                   //alert("in initeditor addform leadid "+leadid);
+                                    
+                                    if (typeof(data.leadid)=='undefined' || leadid==0)
                                     {
-                                      //  geturl=base_url + "dailyactivity/getldsubstatusforlead/"+leadid;
-                                      geturl=base_url + "dailyactivity/getldsubstatusbynameid/"+status_name+"/"+leadid;
+                                      
+                                      geturl=base_url + "dailyactivity/getldsubstatusbyname/"+status_name;
                                     }
                                     else
                                     {
-                                        geturl=base_url + "dailyactivity/getldsubstatusbyname/"+status_name;
+                                        geturl=base_url + "dailyactivity/getldsubstatusbynameid/"+status_name+"/"+leadid;
                                         
                                     }
                                    var substslist = {
@@ -1695,7 +1736,7 @@
                                                             filterable: true,
                                                             columns: [
                                                                 {text: 'UID', datafield: 'id', width: 150, cellsalign: 'left', hidden: true},
-                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: false},
+                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: true},
                                                                 {text: 'Customer Group', datafield: 'custgroup', width: 150, editable: false},
                                                                 {text: 'Cust Id', datafield: 'custid', width: 100, editable: false,hidden: true},
                                                                 {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},
@@ -1708,9 +1749,9 @@
                                                                           }
                                                                         }
                                                                 },
-                                                                {text: 'noofleads', datafield: 'noofleads',hidden:false, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
-                                                                { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                                                {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
+                                                                {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
+                                                                { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
                                                                 {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst_update, initeditor: Resultsupdate.resultsEditorldst_update, cellsrenderer: Resultsupdate.renderUnitsldst_update,promptText:'Select Status',
                                                                                     cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                                                     {
@@ -2012,15 +2053,15 @@
                                                                      {text: 'PrevSubStatus', datafield: 'prevsubstatusid', width: 200, cellsalign: 'left',readonly:true,editable:false, hidden:true
                                                                      },
 
-                                                                    {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:false},
+                                                                    {text: 'Apptmnt Date', datafield: 'appiontmnt_dt', columntype:'datetimeinput', width: 110, align: 'left', cellsformat: 'd',formatString: 'dd/MM/yyyy',readonly:true,editable:false, hidden:true},
 
-                                                                    {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:false, editable:false},
+                                                                    {text: 'Not Able', datafield: 'not_able_to_get_appointment', width: 110, align: 'left', hidden:true, editable:false},
 
-                                                                    {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:false, editable:false},
+                                                                    {text: 'Sample Reject', datafield: 'sample_rejected_reason', width: 110, align: 'left', hidden:true, editable:false},
 
-                                                                     {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:false, editable:false},
+                                                                     {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:true, editable:false},
 
-                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:false, editable:false},
+                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:true},
 
                                                                      
 
@@ -2192,11 +2233,26 @@
                                     columnsresize: true,
                                     columns: [
                                         {text: 'UID', datafield: 'uid', width: 150, cellsalign: 'left', hidden: true},
-                                        {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: true},
+                                        {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: false},
                                         {text: 'Customer Group', datafield: 'custgroup', width: 100, editable: false},
                                         {text: 'Cust Id', datafield: 'id', width: 100, editable: false,hidden: true},
                                         {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},   
                                         {text: 'Prod Id', datafield: 'itemid', width: 100, editable: false,hidden: true},
+                                        { text: 'Show products', datafield: 'Edit', columntype: 'button', cellsrenderer: function () {
+                                                    return "Show Potentials";
+                                                }, buttonclick: function (row) {
+                                                    editrow = row;
+                                                    var x = $(window).width() / 2 - 125; 
+                                                    var y = $(window).height() / 2 - 110;
+                                                    var windowScrollLeft = $(window).scrollLeft();
+                                                    var windowScrollTop = $(window).scrollTop();
+                                                    $("#popupWindowPotential").jqxWindow({ position: { x: x + windowScrollLeft, y: y + windowScrollTop} });
+
+                                                  
+                                                    // show the popup window.
+                                                    $("#popupWindowPotential").jqxWindow('open');
+                                                }
+                                        },
                                         {text: 'Lead id', datafield: 'leadid', displayfield: 'leadid', width: 127, cellsalign: 'center', cellbeginedit:Results.initResultsEditor, initeditor: Results.resultsEditor, cellsrenderer: Results.renderUnits,promptText:'Select Leadid',
                                                         cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                         {
@@ -2902,12 +2958,13 @@
                             var valid_lead_status=0;
                             var valid_lead_substatus=0;
                             var valid_crm_soc =0;
+                            var valid_select_lead=0;
                             var entrydate = $('#addcurrentdate').val();
                             entrydate = convertdmy_ymd(entrydate);
                             for (var k = 0; k < rowscount; k++)
                             {
                                 var cg_value = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "custgroup");
-                                if (cg_value == null || cg_value == 'undefined')
+                                if (cg_value == null || typeof(cg_value) == 'undefined')
                                 {
                                     $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "custgroup", "Please Select the Customer Group");
                                     valid_custgrp = 0;
@@ -2918,9 +2975,35 @@
                                     valid_custgrp = 1;
                                 }
 
+                                var noofleads = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "noofleads");
+                                var select_leadid = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "leadid");
+                                var prod_grp = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "itemgroup");
+                            /*    alert("typeof prodgroup  "+typeof(prod_grp));
+                                alert(" prodgroup  "+prod_grp);
+                                alert("noofleads "+noofleads);
+                                alert("select_leadid "+select_leadid);*/
+                                if (typeof(prod_grp)=='undefined')
+                                {
+                                    valid_select_lead = 1; 
+                                }
+                                else
+                                {
+                                  if(noofleads>0 && select_leadid==0 || typeof(select_leadid)=='undefined' )
+                                    {
+
+                                       $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "leadid", "Please Select the leadid");
+                                        valid_select_lead = 0;
+                                        break;   
+                                    }
+                                    else
+                                    {
+                                      valid_select_lead = 1;   
+                                    }  
+                                }
+                                
                                 var subact_value = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "Sub_Activity");
                               //  alert("subact_value" +subact_value);
-                                if (subact_value == null || subact_value == 'undefined')
+                                if (subact_value == null || typeof(subact_value) == 'undefined')
                                 {
                                     $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "Sub_Activity", "Please Select the Activity Type");
                                     valid_subact = 0;
@@ -2932,7 +3015,7 @@
                                 }
 
                                 var sub_grp = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "division");
-                                if (sub_grp == null || sub_grp == 'undefined')
+                                if (sub_grp == null || typeof(sub_grp) == 'undefined')
                                 {
                                     $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "division", "Please select the Sales Type");
                                     valid_subgrp = 0;
@@ -2945,32 +3028,52 @@
 
                                  var lead_status = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "statusid");
                                  var create_lead = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "create_lead");
-                               // alert("status in add "+lead_status);
+                                 var noofleads = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "noofleads");
+                           /*     alert("status in add "+lead_status);
+                                alert("create_lead in add "+create_lead);
+                                alert("noofleads in add "+noofleads);
+                                 alert("type of leadstatus in add "+typeof(lead_status));*/
+                                
+                               
                                 if (create_lead==1)
                                 {
-                                    if (lead_status == null || lead_status == 'undefined')
+                                    if (lead_status == null || typeof(lead_status) == 'undefined' || lead_status == 'No Status' )
                                         {
+                                           // alert("in undefined");
                                             $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "statusid", "Please select the Lead status");
                                             valid_lead_status = 0;
                                             break;
                                         }
                                         else
                                         {
+                                            //alert("in else of undefined");
                                             valid_lead_status = 1;
                                         }
                                 }
-                                else
+                                else 
                                 {
-                                    valid_lead_status = 1;
-                                }
+                                        if (create_lead==0 && noofleads >0 && typeof(lead_status)=='undefined')
+                                        {
+                                            alert("in status create_lead 0");
+                                             $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "statusid", "Please select the Lead status");
+                                            valid_lead_status = 0;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                           valid_lead_status = 1; 
+                                        }
+                                       
+                                } 
+                                    
                                 
-
+                               // alert("valid_lead_status "+valid_lead_status);
                                 var lead_substatus = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "leadsubstatusid");
                                 var create_lead = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "create_lead");
-                              //  alert("substatus in add "+lead_substatus);
+                               // alert("substatus in add "+lead_substatus);
                               if (create_lead==1)
                                 {
-                                    if (lead_substatus == null || lead_substatus == 'undefined' || lead_substatus == 'Select Substatus')
+                                    if (lead_substatus == null || typeof(lead_substatus) == 'undefined' || lead_substatus == 'Select Substatus' || lead_substatus == 'No Substatus')
                                     {
                                         $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead substatus");
                                         valid_lead_substatus = 0;
@@ -2983,16 +3086,28 @@
                                 }
                                 else
                                 {
-                                    valid_lead_substatus = 1;
+                                    if (create_lead==0 && noofleads >0  && (typeof(lead_status)=='undefined' || lead_substatus == 'Select Substatus') )
+                                    {
+                                       // alert("in substatus create_lead 0");
+                                         $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead Substatus");
+                                        valid_lead_substatus = 0;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                       valid_lead_substatus = 1; 
+                                    }
+
                                 }
-                                
+                               // alert("valid_lead_substatus  "+valid_lead_substatus);
+
 
                                 var crm_soc = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "crm_soc_number");
                                 // alert(" lead_status "+lead_status);
                                 //alert("crm_soc "+crm_soc);
                                 if(lead_status=='Expanding And Build Relationship')
                                 {
-                                   if (crm_soc == null || crm_soc == 'undefined' || crm_soc == '')
+                                   if (crm_soc == null || typeof(crm_soc) == 'undefined' || crm_soc == '')
                                     {
                                         $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "statusid", "without soc number you cannot convert this lead. Please revert back to old status");
                                         valid_crm_soc = 0;
@@ -3010,7 +3125,7 @@
                                 
                                 
                                 var hr_moc = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "Mode_Of_Contact");
-                                if (hr_moc == null || hr_moc == 'undefined') {
+                                if (hr_moc == null || typeof(hr_moc) == 'undefined') {
                                     $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "Mode_Of_Contact", "Please Select Mode of Contact");
                                     valid_moc = 0;
                                     break;
@@ -3022,7 +3137,7 @@
 
                                 
                                 var hr_value = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "hour");
-                                if (hr_value == null || hr_value == 'undefined') {
+                                if (hr_value == null || typeof(hr_value) == 'undefined') {
                                     $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "hour", "Please Select the Hours");
                                     valid_hrs = 0;
                                     break;
@@ -3032,7 +3147,7 @@
                                     valid_hrs = 1;
                                 }
                                 var mins_value = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "minute");
-                                if (mins_value == null || mins_value == 'undefined') {
+                                if (mins_value == null || typeof(mins_value) == 'undefined') {
                                     $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "minute", "Please Select the Minutes");
                                     valid_mins = 0;
 
@@ -3045,7 +3160,7 @@
                                 }
 
                                 var moc_value = $('#jqxgrid_add').jqxGrid('getcellvalue', k, "Mode_Of_Contact");
-                                if (moc_value == null || moc_value == 'undefined') {
+                                if (moc_value == null || typeof(moc_value) == 'undefined') {
                                     $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "Mode_Of_Contact", "Please Select the Minutes");
                                     valid_moc = 0;
                                     break;
@@ -3072,7 +3187,10 @@
                              return false;
                              }*/
                             
-
+                            if(valid_select_lead==0)
+                            {
+                               return false; 
+                            }
                             if (valid_hrs == 0)
                             {
                                 return false;
@@ -3094,6 +3212,14 @@
                                 return false;
                             }
                             if (valid_subgrp == 0)
+                            {
+                                return false;
+                            }
+                            if (valid_lead_status==0)
+                            {
+                                return false;
+                            }
+                            if (valid_lead_substatus==0)
                             {
                                 return false;
                             }
@@ -3121,9 +3247,13 @@
                                    
                                 }
                                
-                                /*alert("noofleads  "+griddata.noofleads);
+                            /*    alert("noofleads  "+griddata.noofleads);
+                                alert("create_lead  "+griddata.create_lead);
                                 alert("actualpotenqty  "+griddata.actualpotenqty);
                                 alert("prevstatusid  "+griddata.prevsubstatusid);
+                                alert("prevsubstatusid  "+griddata.prevsubstatusid);
+                                alert("statusid  "+griddata.statusid);
+                                alert("leadsubstatusid  "+griddata.leadsubstatusid);
                                 alert(" type noofleads "+typeof(griddata.noofleads));*/
                                 
                                  if (typeof(griddata.line_id)=='undefined')
@@ -3142,7 +3272,6 @@
                                 rowval["potentialqty"] = griddata.Potential_Quantity;
                                 rowval["actualpotenqty"] = griddata.actualpotenqty;
                                 rowval["subactivity"] = griddata.Sub_Activity;
-                                rowval["noofleads"] = griddata.noofleads;
                                 //alert("currentdate  "+currentdate);
                                 rowval["hour_s"] = griddata.hour;
                                 rowval["minit"] = griddata.minute;
@@ -3151,6 +3280,7 @@
                                 rowval["division"] = griddata.division;
                                 rowval["leadid"] = griddata.leadid;
                                 rowval["statusid"] = griddata.statusid;
+                                rowval["leadsubstatusid"] = griddata.leadsubstatusid;
                                 if (typeof(griddata.prevstatusid)=='undefined')
                                 {
                                     rowval["prevstatusid"] = 0;    
@@ -3167,13 +3297,14 @@
                                 {
                                     rowval["prevsubstatusid"] = griddata.prevsubstatusid;
                                 }
-                                rowval["leadsubstatusid"] = griddata.leadsubstatusid;
+                                
 
                                 rowval["lead_appointmentdt"] = lead_appointmentdt;
                                 rowval["not_able_to_get_appointment"] = griddata.not_able_to_get_appointment;
                                 rowval["sample_rejected_reason"] = griddata.sample_rejected_reason;
                                 rowval["order_cancelled_reason"] = griddata.order_cancelled_reason;
                                 rowval["crm_soc_number"] = griddata.crm_soc_number;
+                                rowval["noofleads"] = griddata.noofleads;
                                 
                                 if (griddata.create_lead==undefined)
                                 {
@@ -3187,8 +3318,16 @@
                                 rowval["Remarks"] = griddata.Notes_Remarks;
                                 data[i] = rowval;
                             }
-
+                                /*alert("noofleads  "+griddata.noofleads);
+                                alert("create_lead  "+griddata.create_lead);
+                                alert("actualpotenqty  "+griddata.actualpotenqty);
+                                alert("prevstatusid  "+griddata.prevsubstatusid);
+                                alert("prevsubstatusid  "+griddata.prevsubstatusid);
+                                alert("statusid  "+griddata.statusid);
+                                alert("leadsubstatusid  "+griddata.leadsubstatusid);
+                                alert(" type noofleads "+typeof(griddata.noofleads));*/
                             var data = "save=true&" + $.param(data);
+                           
                             $.ajax({
                                 dataType: 'json',
                                 type: "POST",
@@ -3236,7 +3375,7 @@
 
                                 var cg_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "custgroup");
 
-                                if (cg_value == null || cg_value == 'undefined')
+                                if (cg_value == null || typeof(cg_value) == 'undefined')
                                 {
                                     $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "custgroup", "Please Select the Customer Group");
                                     valid_custgrp = 0;
@@ -3249,7 +3388,7 @@
 
                                 var subact_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "subactivity");
 
-                                if (subact_value == null || subact_value == 'undefined')
+                                if (subact_value == null || typeof(subact_value) == 'undefined')
                                 {
                                     $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "subactivity", "Please Select the Activity Type");
                                     valid_subact = 0;
@@ -3261,7 +3400,7 @@
                                 }
 
                                 var sub_grp = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "division");
-                                if (sub_grp == null || sub_grp == 'undefined')
+                                if (sub_grp == null || typeof(sub_grp) == 'undefined')
                                 {
                                     $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "division", "Please select the Sale Type");
                                     valid_subgrp = 0;
@@ -3278,7 +3417,7 @@
                                 
                                 if (create_lead==1)
                                 {
-                                    if (lead_status == null || lead_status == 'undefined')
+                                    if (lead_status == null || typeof(lead_status) == 'undefined')
                                     {
                                         $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadstatusid", "Please select the Lead status");
                                         valid_lead_status = 0;
@@ -3300,7 +3439,7 @@
                                 var create_lead = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "create_lead");
                                 if (create_lead==1)
                                 {
-                                    if (lead_substatus == null || lead_substatus == 'undefined' || lead_substatus == 'Select Substatus')
+                                    if (lead_substatus == null || typeof(lead_substatus) == 'undefined' || lead_substatus == 'Select Substatus')
                                     {
                                         $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadsubstatusid", "Please select the Lead substatus");
                                         valid_lead_substatus = 0;
@@ -3322,7 +3461,7 @@
                                 //alert("crm_soc "+crm_soc);
                                 if(lead_status=='Expanding And Build Relationship')
                                 {
-                                   if (crm_soc == null || crm_soc == 'undefined' || crm_soc == '')
+                                   if (crm_soc == null || typeof(crm_soc) == 'undefined' || crm_soc == '')
                                     {
                                         $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadstatusid", "without soc number you cannot convert this lead. Please revert back to old status");
                                         valid_crm_soc = 0;
@@ -3340,7 +3479,7 @@
                                 
 
                                 var moc_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "modeofcontact");
-                                if (moc_value == null || moc_value == 'undefined') {
+                                if (moc_value == null || typeof(moc_value) == 'undefined') {
                                     $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "modeofcontact", "Please Select the Mode of contact");
                                     valid_moc = 0;
                                     break;
@@ -3351,7 +3490,7 @@
                                 }
                                 
                                 var hr_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "hour_s");
-                                if (hr_value == null || hr_value == 'undefined') {
+                                if (hr_value == null || typeof(hr_value) == 'undefined') {
                                     $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "hour_s", "Please Select the Hours");
                                     valid_hrs = 0;
                                     break;
@@ -3364,7 +3503,7 @@
                                 
 
                                 var mins_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "minit");
-                                if (mins_value == null || mins_value == 'undefined') {
+                                if (mins_value == null || typeof(mins_value) == 'undefined') {
                                     $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "minit", "Please Select the Minutes");
                                     valid_mins = 0;
 
@@ -4313,6 +4452,14 @@
                                 </div>
                                  
                                 <!-- add new product end -->
+
+                                 <!-- Select itemmaster popup start -->
+                                <div id="popupWindowPotential" style="position: fixed; left: 50%; top: 50%;">
+                                    <div style="margin: 10px">
+                                        <!-- <div id="jqxgrid_productpotential" style="width: 400px;"></div> -->
+                                    </div>
+                                </div>
+                                <!-- Select Itemmaster popup end -->
 
                             <!--  This part of div contain windows End      -->
                         </div>
