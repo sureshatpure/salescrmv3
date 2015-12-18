@@ -858,6 +858,40 @@
                            
                             if(cust_grp!="" && prod_grp!="")
                             {
+
+                                 /* check duplicate start*/
+                                    $.ajax({
+                                        type: "POST",
+                                        url: base_url + 'dailyactivity/checkduplicate_product/'+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp),
+                                        data: 'prodgroup=' + encodeURIComponent(prod_grp) + '&customergroup=' + encodeURIComponent(cust_grp),
+                                        dataType: 'json',
+                                        success: function (response)
+                                        {
+                                           // alert(response.msg);
+                                            if (response.ok == false) 
+                                            {
+                                                //  datevalidation=false;
+                                                //validateProductName.html(response.msg);
+                                                     //alert("This product group has been already billed for this customer")
+                                                    g_create_lead_add=0;
+                                                     validateProductName_add.html(response.msg);
+                                                    // editor.jqxCheckBox({ checked: false, hasThreeStates:false});
+                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead",0);
+                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "leadstatusid",'No Status');
+                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "leadsubstatusid",'No Substatus');
+
+                                            }
+                                            else
+                                            {
+                                                // datevalidation=true;
+                                                g_create_lead_add=1;
+                                                validateProductName_add.html(response.msg);
+                                                $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead",1);
+                                            }
+
+                                        }
+                                    })
+                                    /* check duplicate end */
                                 //return true;
                                     var url = "dailyactivity/get_potentialquantity/"+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp);
                                         $.ajax({
@@ -889,16 +923,12 @@
                                                      potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity);
                                                 }
-
-                                                
- 
-                                                
                                             }
                                         });
 
                                     
-                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "noofleads", noofleads);
-                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "result_type", resulttype);
+                                        $("#jqxgrid_n").jqxGrid('setcellvalue', row, "noofleads", noofleads);
+                                        $("#jqxgrid_n").jqxGrid('setcellvalue', row, "result_type", resulttype);
 
 
                                         var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
@@ -920,96 +950,8 @@
 
                         },
                                initResultsEditorat_update: function(row){
-                                 /* var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                   if(data.result_type === 'Value')
-                                    {
-                                        this.columntype = 'dropdownlist';
-                                    } 
-
-                                   else if(data.result_type === 'Select') 
-                                   {
-                                    this.columntype = 'dropdownlist';
-                                   }*/
-
-                                    var rowdata = $("#jqxgrid_n").jqxGrid('getrowdata', row);
-                                    var cust_grp = rowdata.custgroup;
-                                    var prod_grp = rowdata.itemgroup;
-                                    var curr_poten = rowdata.potentialqty;
-                                   
-                                    if(cust_grp!="" && prod_grp!="")
-                                    {
-                                        //return true;
-                                            var url = "dailyactivity/get_potentialquantity/"+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp);
-                                                $.ajax({
-                                                    dataType: "html",
-                                                    url: url,
-                                                    type: "POST",
-                                                    async: false,
-                                                    cache:false,
-                                                    error: function (xhr, status) {
-                                                        alert("check " + status + " test");
-                                                    },
-                                                    success: function (result) {
-                                                        var obj = jQuery.parseJSON(result);
-                                                        rows = obj.rows;
-
-                                                        potential_quantity = rows[0].potential;
-                                                        noofleads =rows[0].noofleads;
-                                                        resulttype =rows[0].result_type;
-
-                                                        if(noofleads>0)
-                                                        {
-                                                         g_create_lead=0;
-                                                         this.columntype = 'dropdownlist'; 
-                                                         $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity); 
-                                                         $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead); 
-                                                        }
-                                                        else
-                                                        {
-                                                             this.columntype = 'textbox';
-
-                                                             if(prod_grp==undefined)
-                                                             {
-                                                               g_create_lead=0; 
-                                                             }
-                                                             else
-                                                             {
-                                                                g_create_lead=1;
-                                                             }
-                                                             potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
-                                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity);
-                                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead);
-                                                        }
-
-                                                        
-         
-                                                        
-                                                    }
-                                                });
-
-                                            
-                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "noofleads", noofleads);
-                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "result_type", resulttype);
-                                            $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead", g_create_lead);
-
-
-                                                var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
-                                                  if(data.result_type === 'Value')
-                                                    {
-                                                        this.columntype = 'textbox';
-                                                    } 
-
-                                                   else if(data.result_type === 'Select') 
-                                                   {
-                                                    this.columntype = 'dropdownlist';
-                                                   }
-                                        
-                                    }
-                                    else
-                                    {
-                                        return false;
-                                    }
-                                    if(data.result_type === 'Value')
                                     {
                                         this.columntype = 'dropdownlist';
                                     } 
@@ -1019,6 +961,7 @@
                                     this.columntype = 'dropdownlist';
                                    }
 
+                                   
                         
                                },
                                initResultsEditorst: function(row){
@@ -1173,37 +1116,7 @@
                                 switch(data.result_type){
                                  case 'Value':
                                 editor.jqxInput({ placeHolder: "No Leads" });
-                                $.ajax({
-                                        type: "POST",
-                                        url: base_url + 'dailyactivity/checkduplicate_product_update/'+encodeURIComponent(cust_grp)+"/"+encodeURIComponent(prod_grp),
-                                        data: 'prodgroup=' + encodeURIComponent(prod_grp) + '&customergroup=' + encodeURIComponent(cust_grp),
-                                        dataType: 'json',
-                                        success: function (response)
-                                        {
-
-                                            if (response.ok == false) 
-                                            {
-                                                //  datevalidation=false;
-                                                //validateProductName.html(response.msg);
-                                                     //alert("This product group has been already billed for this customer")
-                                                     if(line_id===undefined)
-                                                     {
-                                                       response.msg="<font color=green>&nbsp;&nbsp;A Lead will be created </font>";
-                                                     }
-
-                                                     validateProductName.html(response.msg);
-                                                    // editor.jqxCheckBox({ checked: false, hasThreeStates:false});
-                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead",0);
-                                            }
-                                            else
-                                            {
-                                                // datevalidation=true;
-                                                validateProductName.html(response.msg);
-                                                $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead",1);
-                                            }
-
-                                        }
-                                    })
+                               
                                      break;
                                      case 'Select':
 
@@ -1425,18 +1338,21 @@
 
                                    var leadid =data.leadid;
                                   // alert("in initeditor for update substatus "+status_name);
-                                  // alert("in initeditor for update leadid "+leadid);
-                                    if (leadid!="" && leadid!='No Leads'|| typeof(data.leadid)==="undefined") 
+                                   alert("in initeditor for update leadid "+leadid);
+                                   alert("in initeditor for update typeof leadid "+typeof(leadid));
+                                   alert("in initeditor for update length leadid "+data.leadid.length);
+                                   
+                                   /* if (leadid!="" && leadid!='No Leads'|| typeof(data.leadid)==="undefined") 
                                     {
                                       geturl=base_url + "dailyactivity/getldsubstatusbyname/"+status_name;
                                       
-                                    }
-                                    else  if (typeof(data.leadid)==="string" && data.leadid.length >0)
+                                    }*/
+                                   if (typeof(data.leadid)==="string" && data.leadid.length >0)
                                     {
                                         geturl=base_url + "dailyactivity/getldsubstatusbynameid/"+status_name+"/"+leadid;
                                        
                                     }
-                                    else
+                                    else if (typeof(data.leadid)==="string" && data.leadid.length==0)
                                     {
                                         geturl=base_url + "dailyactivity/getldsubstatusbyname/"+status_name;
                                     }
@@ -1513,29 +1429,21 @@
                                  }           
                                },*/
                                resultsEditorat_update: function(row, cellvalue, editor){
-                                   var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                   
+                                  var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
                                    var leadid =data.leadid;
                                    var createLead =data.create_lead;
                                   // alert("createLead in resultsEditorat_update "+createLead);
                                    switch(data.result_type){
-                                         case 'Value':
-                                          if(createLead==0)
-                                          {
-                                            editor.jqxDropDownList(
-                                                {source: ["NEW CUSTOMER", "EXSISTING CUSTOMER", "ORDER FOLLOWUP", "ORDER AND PAYMENT", "TENDER", "PAYMENT FOLLOW UP", "BALANCE SHEET", "TANKER  DIVERTION", "INVOICE", "PROFORM INVOICE", "PAYMENT COLLECTION"]
-                                                });
-                                          
-                                          
-                                          }
-                                          else
-                                          {
-                                            editor.jqxDropDownList({source: ["LEADS"],autoDropDownHeight: true,selectedIndex:0});
-                                          }
-                                           
-                                         break;
-                                         case 'Select':
-                                            editor.jqxDropDownList({source: ["LEADS"],autoDropDownHeight: true,selectedIndex:0});
+                                     case 'Value':
+                                       editor.jqxDropDownList(
+                                        {source: ["NEW CUSTOMER", "EXSISTING CUSTOMER", "ORDER FOLLOWUP", "ORDER AND PAYMENT", "TENDER", "PAYMENT FOLLOW UP", "BALANCE SHEET", "TANKER  DIVERTION", "INVOICE", "PROFORM INVOICE", "PAYMENT COLLECTION"]
+                                        });
+                                     break;
+                                     case 'Select':
+                                         editor.jqxDropDownList({source: ["LEADS"],autoDropDownHeight: true,selectedIndex: 0});
                                         } // end of switch
+
 
                                  },
 
@@ -1736,7 +1644,7 @@
                                                             filterable: true,
                                                             columns: [
                                                                 {text: 'UID', datafield: 'id', width: 150, cellsalign: 'left', hidden: true},
-                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: true},
+                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: false},
                                                                 {text: 'Customer Group', datafield: 'custgroup', width: 150, editable: false},
                                                                 {text: 'Cust Id', datafield: 'custid', width: 100, editable: false,hidden: true},
                                                                 {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},
@@ -1749,9 +1657,9 @@
                                                                           }
                                                                         }
                                                                 },
-                                                                {text: 'noofleads', datafield: 'noofleads',hidden:true, width: 20, cellsalign: 'left', editable: false},
-                                                                {text: 'result_type', datafield: 'result_type',hidden:true, width: 75, cellsalign: 'left', editable: false},
-                                                                { text: 'Create Lead', datafield: 'create_lead', hidden:true, width: 20, cellsalign: 'left', editable: false},
+                                                                {text: 'noofleads', datafield: 'noofleads',hidden:false, width: 20, cellsalign: 'left', editable: false},
+                                                                {text: 'result_type', datafield: 'result_type',hidden:false, width: 75, cellsalign: 'left', editable: false},
+                                                                { text: 'Create Lead', datafield: 'create_lead', hidden:false, width: 20, cellsalign: 'left', editable: false},
                                                                 {text: 'Status', datafield: 'leadstatusid', width: 150, cellsalign: 'center', cellbeginedit:Resultsupdate.initResultsEditorldst_update, initeditor: Resultsupdate.resultsEditorldst_update, cellsrenderer: Resultsupdate.renderUnitsldst_update,promptText:'Select Status',
                                                                                     cellvaluechanging: function (row, datafield, columntype, oldvalue, newvalue) 
                                                                                     {
@@ -2061,7 +1969,7 @@
 
                                                                      {text: 'Order Cancel', datafield: 'order_cancelled_reason', width: 110, align: 'left', hidden:true, editable:false},
 
-                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:true},
+                                                                     {text: 'SOC No', datafield: 'crm_soc_number', width: 110, align: 'left', hidden:true, editable:false},
 
                                                                      
 
@@ -2233,7 +2141,7 @@
                                     columnsresize: true,
                                     columns: [
                                         {text: 'UID', datafield: 'uid', width: 150, cellsalign: 'left', hidden: true},
-                                        {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: false},
+                                        {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: true},
                                         {text: 'Customer Group', datafield: 'custgroup', width: 100, editable: false},
                                         {text: 'Cust Id', datafield: 'id', width: 100, editable: false,hidden: true},
                                         {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},   

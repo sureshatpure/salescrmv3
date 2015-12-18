@@ -2114,7 +2114,7 @@ class dailyactivity extends CI_Controller {
             }
             
         header('Content-Type: application/x-json; charset=utf-8');
-       // echo $message;
+        echo $message;
     }
 
     function getnullleadids()

@@ -366,11 +366,16 @@ class dailyactivity_model extends CI_Model
 					$row["leadid"] = "No Leads";
 					$row["leadstatusid"] = "No Status";	
 					$row["leadsubstatusid"] = "No Substatus";
+					$row["noofleads"] = 0;	
+					$row["result_type"] = 'Value';	
+					
 					}
 					else
 					{
 						$row["leadid"] = $activitydetails[$i]["leadid"];
 						$row["leadstatusid"] = $activitydetails[$i]["statusname"];	
+						$row["noofleads"] = 1;	
+						$row["result_type"] = 'Select';	
 						$row["leadsubstatusid"] = $activitydetails[$i]["substatusname"];
 					}
 					
