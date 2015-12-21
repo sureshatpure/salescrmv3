@@ -1244,6 +1244,103 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 	       return $this->db->insert_id();	
 			}
 
+			function get_customerpotential($customergroup)
+			{
+					$customergroup = urldecode($customergroup);
+						$sql="SELECT 
+								lead_customergroup as customergroup,
+								lead_product_group as item_group,
+								sum(lead_potential) as sum_of_potential,
+								'LMS' as source
+								 FROM 
+								(
+								SELECT 
+								 			a.product_group as lead_product_group,
+								 			b.lead_potential,
+								      		d.customergroup as lead_customergroup,
+											c.customer_id as lead_customer_id,
+											f.item_group_id as lead_item_grp_id
+								 FROM 
+											(
+													(
+													SELECT leadid as prod_leadid, product_group FROM leadproducts 
+													) a 
+													LEFT JOIN 
+													(
+													SELECT leadid as pot_leadid,productid,sum(potential) as lead_potential  FROM lead_prod_potential_types 
+													GROUP BY leadid,productid 
+													) b ON a.prod_leadid=b.pot_leadid 
+											LEFT JOIN 
+																		(
+																		SELECT
+																						leadid as leaddetails_leadid,company as customer_id
+																		FROM  leaddetails --WHERE leadstatus <8
+																		)c ON b.pot_leadid=c.leaddetails_leadid 
+												LEFT JOIN
+																	(
+																		SELECT id,customergroup from	 customermasterhdr 
+																	) d ON c.customer_id=d.id
+																	LEFT JOIN 
+																(
+																	SELECT header_id as item_group_id,item_group as business_item_group FROM business_plan_item_group_id 
+																) f ON f.business_item_group =a.product_group 
+											) 
+								) WHERE lead_customergroup='".$customergroup."'
+								GROUP BY 
+								customergroup,
+								item_group
+
+								UNION
+
+
+								SELECT 
+								d.customergroup ,
+								b.item_group,
+								sum(a.annual_potential_qty) as sum_of_potential,
+								'CRM' as source
+								FROM
+								(
+								SELECT 
+														id,
+												(
+													COALESCE (
+														customermasterhdr.cust_account_id,
+														(0) :: NUMERIC
+													)
+												) :: INTEGER AS cust_account_id
+								,customergroup FROM customermasterhdr
+								WHERE 
+									(
+													customermasterhdr.cust_account_id <> (0) :: NUMERIC
+								)
+								) d
+
+								LEFT JOIN  (
+												SELECT header_id, customer_group FROM business_plan_customer_group_id
+								) m ON  m.customer_group=d.customergroup
+								LEFT JOIN (
+															SELECT 
+															item_group_id,customer_group_id,sale_category_id,annual_potential_qty
+															FROM gc_business_monthly_plan
+								)a ON 
+								a.customer_group_id= m.header_id
+								LEFT JOIN 
+															(
+															SELECT
+																			header_id,item_group 
+															FROM  business_plan_item_group_id
+															)b ON a.item_group_id=b.header_id 
+								WHERE customergroup='".$customergroup."'
+								GROUP BY 
+								d.customergroup,
+								b.item_group";
+                //echo $sql; die;
+				$result = $this->db->query($sql);
+				$arr =  json_encode($result->result_array());
+				$arr =	 '{ "rows" :'.$arr.' }';
+				return $arr;
+			}
+
 }
 ?>
 

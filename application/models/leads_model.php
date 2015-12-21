@@ -2940,10 +2940,10 @@ SELECT
     }
     function check_prodgroup_dup_saleorder($prodgrp, $customerid,$customergroup) {
           //$sql = "select * from vw_lead_check_prod_duplicate WHERE  lead_customer_ref_id=".$customerid." AND product_group = '".$prodgrp."'";
-        $sql = "select * from vw_lead_check_prod_duplicate WHERE lead_customer_ref_id=".$customerid." or  customergroup ='".$customergroup."' AND product_group = '".$prodgrp."'";
+        $sql = "select * from vw_lead_check_prod_duplicate WHERE (lead_customer_ref_id=".$customerid." or  customergroup ='".$customergroup."' ) AND product_group = '".$prodgrp."'";
 
 
-      //   echo $sql;   die;                
+       //  echo $sql;   die;                
         $result = $this->db->query($sql);
         $rowcount = $result->num_rows();
         if ($rowcount == 0) {

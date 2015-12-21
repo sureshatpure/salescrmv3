@@ -1646,6 +1646,91 @@
                                                                 {text: 'UID', datafield: 'id', width: 150, cellsalign: 'left', hidden: true},
                                                                 {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: false},
                                                                 {text: 'Customer Group', datafield: 'custgroup', width: 150, editable: false},
+                                                                { text: 'Show products', datafield: 'Edit', columntype: 'button', cellsrenderer: function () {
+                                                                            return "Show Potentials";
+                                                                        }, buttonclick: function (row) {
+                                                                             var data = $('#jqxgrid_n').jqxGrid('getrowdata', row);
+                                                                             var cust_grp =data.custgroup;
+
+                                                                            // alert("cust_grp "+cust_grp);
+                                                                            // alert("type of cust_grp "+typeof(cust_grp));
+                                                                             if(typeof(cust_grp)=='undefined')
+                                                                             {
+                                                                                alert("Please select the customergroup")
+                                                                                return false;
+                                                                             }
+                                                                             else
+                                                                             {
+                                                                                editrow = row;
+                                                                                var x = $(window).width() / 2 - 125; 
+                                                                                var y = $(window).height() / 2 - 200;
+                                                                                var windowScrollLeft = $(window).scrollLeft();
+                                                                                var windowScrollTop = $(window).scrollTop();
+                                                                                $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 400, height: 500, resizable: true, title: 'Potential Details'});
+                                                                                $("#popupWindowPotential").jqxWindow({ position: { x: x + windowScrollLeft, y: y + windowScrollTop} });
+
+                                                                                // Source for Potential grid start
+                                                                                    var url = "dailyactivity/getcustomerpotential/"+cust_grp;
+                                                                                    var rows = {};
+                                                                                    jQuery.ajax({
+                                                                                        dataType: "html",
+                                                                                        url: url,
+                                                                                        type: "POST",
+                                                                                        async: false,
+                                                                                        error: function (xhr, status) {
+                                                                                            //  alert("check "+status+" test");
+                                                                                        },
+                                                                                        success: function (result) {
+                                                                                            var obj = jQuery.parseJSON(result);
+                                                                                            rows = obj.rows;
+                                                                                            //   rows = obj[1].rows;
+                                                                                            //  commonCols=obj[0].columns;
+                                                                                        }
+                                                                                    });
+                                                                                    var potential_source =
+                                                                                            {
+                                                                                                datatype: "json",
+                                                                                                datafields: [{name: 'customergroup', type: 'string'},
+                                                                                                             {name: 'item_group', type: 'string'},
+                                                                                                             {name: 'sum_of_potential', type: 'number'},
+                                                                                                             {name: 'source', type: 'string'},
+                                                                                                             {name: 'update_potential', type: 'number'}
+                                                                                                             ],
+                                                                                                localdata: rows
+                                                                                            };
+
+                                                                                    //  alert("columns "+columns.toSource());    
+                                                                                    var dataAdapterItemMaster = new $.jqx.dataAdapter(potential_source);
+                                                                                    $("#jqxgrid_productpotential").jqxGrid(
+                                                                                            {
+                                                                                                width: '100%',
+                                                                                                source: dataAdapterItemMaster,
+                                                                                                theme: theme,
+                                                                                                selectionmode: 'singlecell',
+                                                                                                sortable: true,
+                                                                                                pageable: true,
+                                                                                                editable: true,
+                                                                                                columnsresize: true,
+                                                                                                sortable: true,
+                                                                                                showfilterrow: true,
+                                                                                                filterable: true,
+                                                                                                columns: [
+                                                                                                    {text: 'customergroup', dataField: 'customergroup', width: 100, hidden:true,editable:false},
+                                                                                                    {text: 'Product Group', dataField: 'item_group',editable:false, width: 200},
+                                                                                                    {text: 'Potential', dataField: 'sum_of_potential',editable:false, width: 70},
+                                                                                                    {text: 'Source', dataField: 'source',editable:false, width: 70},
+                                                                                                    {text: 'New Poten', dataField: 'update_potential', editable:true, width: 50,hidden:true},
+                                                                                                    
+                                                                                                ]
+                                                                                            });
+                                                                                // Source for Potential grid END
+                                                                                
+                                                                                // show the popup window.
+                                                                                $("#popupWindowPotential").jqxWindow('open');
+                                                                             }
+                                                                            
+                                                                        }
+                                                                },
                                                                 {text: 'Cust Id', datafield: 'custid', width: 100, editable: false,hidden: true},
                                                                 {text: 'Product Group', datafield: 'itemgroup', width: 150, cellsalign: 'left', editable: false},
                                                                 {text: 'Prod Id', datafield: 'itemid', width: 100, editable: false,hidden: true},
@@ -2149,16 +2234,86 @@
                                         { text: 'Show products', datafield: 'Edit', columntype: 'button', cellsrenderer: function () {
                                                     return "Show Potentials";
                                                 }, buttonclick: function (row) {
-                                                    editrow = row;
-                                                    var x = $(window).width() / 2 - 125; 
-                                                    var y = $(window).height() / 2 - 110;
-                                                    var windowScrollLeft = $(window).scrollLeft();
-                                                    var windowScrollTop = $(window).scrollTop();
-                                                    $("#popupWindowPotential").jqxWindow({ position: { x: x + windowScrollLeft, y: y + windowScrollTop} });
+                                                     var data = $('#jqxgrid_add').jqxGrid('getrowdata', row);
+                                                     var cust_grp =data.custgroup;
 
-                                                  
-                                                    // show the popup window.
-                                                    $("#popupWindowPotential").jqxWindow('open');
+                                                    // alert("cust_grp "+cust_grp);
+                                                    // alert("type of cust_grp "+typeof(cust_grp));
+                                                     if(typeof(cust_grp)=='undefined')
+                                                     {
+                                                        alert("Please select the customergroup")
+                                                        return false;
+                                                     }
+                                                     else
+                                                     {
+                                                        editrow = row;
+                                                        var x = $(window).width() / 2 - 125; 
+                                                        var y = $(window).height() / 2 - 200;
+                                                        var windowScrollLeft = $(window).scrollLeft();
+                                                        var windowScrollTop = $(window).scrollTop();
+                                                        $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 400, height: 500, resizable: true, title: 'Potential Details'});
+                                                        $("#popupWindowPotential").jqxWindow({ position: { x: x + windowScrollLeft, y: y + windowScrollTop} });
+
+                                                        // Source for Potential grid start
+                                                            var url = "dailyactivity/getcustomerpotential/"+cust_grp;
+                                                            var rows = {};
+                                                            jQuery.ajax({
+                                                                dataType: "html",
+                                                                url: url,
+                                                                type: "POST",
+                                                                async: false,
+                                                                error: function (xhr, status) {
+                                                                    //  alert("check "+status+" test");
+                                                                },
+                                                                success: function (result) {
+                                                                    var obj = jQuery.parseJSON(result);
+                                                                    rows = obj.rows;
+                                                                    //   rows = obj[1].rows;
+                                                                    //  commonCols=obj[0].columns;
+                                                                }
+                                                            });
+                                                            var potential_source =
+                                                                    {
+                                                                        datatype: "json",
+                                                                        datafields: [{name: 'customergroup', type: 'string'},
+                                                                                     {name: 'item_group', type: 'string'},
+                                                                                     {name: 'sum_of_potential', type: 'number'},
+                                                                                     {name: 'source', type: 'string'},
+                                                                                     {name: 'update_potential', type: 'number'}
+                                                                                     ],
+                                                                        localdata: rows
+                                                                    };
+
+                                                            //  alert("columns "+columns.toSource());    
+                                                            var dataAdapterItemMaster = new $.jqx.dataAdapter(potential_source);
+                                                            $("#jqxgrid_productpotential").jqxGrid(
+                                                                    {
+                                                                        width: '100%',
+                                                                        source: dataAdapterItemMaster,
+                                                                        theme: theme,
+                                                                        selectionmode: 'singlecell',
+                                                                        sortable: true,
+                                                                        pageable: true,
+                                                                        editable: true,
+                                                                        columnsresize: true,
+                                                                        sortable: true,
+                                                                        showfilterrow: true,
+                                                                        filterable: true,
+                                                                        columns: [
+                                                                            {text: 'customergroup', dataField: 'customergroup', width: 100, hidden:true,editable:false},
+                                                                            {text: 'Product Group', dataField: 'item_group',editable:false, width: 200},
+                                                                            {text: 'Potential', dataField: 'sum_of_potential',editable:false, width: 70},
+                                                                            {text: 'Source', dataField: 'source',editable:false, width: 70},
+                                                                            {text: 'New Poten', dataField: 'update_potential', editable:true, width: 50,hidden:true},
+                                                                            
+                                                                        ]
+                                                                    });
+                                                        // Source for Potential grid END
+                                                        
+                                                        // show the popup window.
+                                                        $("#popupWindowPotential").jqxWindow('open');
+                                                     }
+                                                    
                                                 }
                                         },
                                         {text: 'Lead id', datafield: 'leadid', displayfield: 'leadid', width: 127, cellsalign: 'center', cellbeginedit:Results.initResultsEditor, initeditor: Results.resultsEditor, cellsrenderer: Results.renderUnits,promptText:'Select Leadid',
@@ -3275,6 +3430,7 @@
                             var valid_lead_status=0;
                             var valid_lead_substatus=0;
                             var valid_crm_soc=0;
+                            var valid_select_lead=0;
 
                             var hdr_id = $('#hdn_hdr_id').val();
 
@@ -3292,6 +3448,32 @@
                                 else
                                 {
                                     valid_custgrp = 1;
+                                }
+
+                                var noofleads = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "noofleads");
+                                var select_leadid = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "leadid");
+                                var prod_grp = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "itemgroup");
+                               /* alert("typeof prodgroup in update  "+typeof(prod_grp));
+                                alert(" prodgroup in update "+prod_grp);
+                                alert("noofleads in update "+noofleads);
+                                alert("select_leadid in update "+select_leadid);*/
+                                if (typeof(prod_grp)=='undefined')
+                                {
+                                    valid_select_lead = 1; 
+                                }
+                                else
+                                {
+                                  if(noofleads>0 && select_leadid==0 || typeof(select_leadid)=='undefined' )
+                                    {
+
+                                       $("#jqxgrid_n").jqxGrid('showvalidationpopup', k, "leadid", "Please Check for the leads ");
+                                        valid_select_lead = 0;
+                                        break;   
+                                    }
+                                    else
+                                    {
+                                      valid_select_lead = 1;   
+                                    }  
                                 }
 
                                 var subact_value = $('#jqxgrid_n').jqxGrid('getcellvalue', k, "subactivity");
@@ -3432,7 +3614,11 @@
                             {
                                 return false;
                             }
-                           
+                            if(valid_select_lead==0)
+                            {
+                               return false; 
+                            }
+                       
                             if (valid_moc == 0)
                             {
                                 return false;
@@ -4361,13 +4547,13 @@
                                  
                                 <!-- add new product end -->
 
-                                 <!-- Select itemmaster popup start -->
+                                 <!-- Select Potential popup start -->
                                 <div id="popupWindowPotential" style="position: fixed; left: 50%; top: 50%;">
                                     <div style="margin: 10px">
-                                        <!-- <div id="jqxgrid_productpotential" style="width: 400px;"></div> -->
+                                        <div id="jqxgrid_productpotential"></div>
                                     </div>
                                 </div>
-                                <!-- Select Itemmaster popup end -->
+                                <!-- Select Potential popup end -->
 
                             <!--  This part of div contain windows End      -->
                         </div>

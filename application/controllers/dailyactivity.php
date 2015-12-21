@@ -2456,6 +2456,15 @@ class dailyactivity extends CI_Controller {
         print_r($data);
     }
     
+    function getcustomerpotential($customergroup) {
+       
+        
+       // $sql = 'SELECT  min(id) as itemid, itemgroup FROM view_tempitemmaster_pg GROUP BY itemgroup ORDER BY itemgroup asc';
+        $activitydata['productpotential'] = $this->dailyactivity_model->get_customerpotential($customergroup);
+        $viewdata = $activitydata['productpotential'];
+        header('Content-Type: application/x-json; charset=utf-8');
+        echo $viewdata;
+    }
 
 
    
