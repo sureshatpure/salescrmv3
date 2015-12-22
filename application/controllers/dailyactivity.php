@@ -2466,6 +2466,68 @@ class dailyactivity extends CI_Controller {
         echo $viewdata;
     }
 
+     function updaterevised_potential($custgrp,$prodgrp,$old_poten,$src,$new_poten)
+     {
+
+        $login_username = $this->session->userdata['username'];
+        $login_user_id = $this->session->userdata['user_id'];
+
+        $custgrp=urldecode($custgrp);
+        $prodgrp=urldecode($prodgrp);
+
+        $custgrp_id = $this->dailyactivity_model->get_customergroup_id($custgrp);
+        $prodgrp_id = $this->dailyactivity_model->getproductgroup_id($prodgrp);
+        $dup_record = $this->dailyactivity_model->checkduplicate_record($custgrp,$prodgrp);
+        
+        
+        if($dup_record['0']['noofrows']>0)
+        {
+           //echo "update";
+            $potential_id =$dup_record['0']['id'];
+            $update_potential = array('dac_cust_groupid' => $custgrp_id,
+                'dac_custgroupname' => trim($custgrp),
+                'dac_prodgrp_id' => $prodgrp_id,
+                'dac_prodgroupname' => trim($prodgrp),
+                'dac_act_potential' => $old_poten,
+                'dac_rev_potential' => $new_poten,
+                'dac_source' => $src,
+                'dac_updated_date' => date('Y-m-d:H:i:s'),
+                'dac_updated_userid' => $login_user_id,
+                'dac_updated_username' =>$login_username
+            );
+            $update_status=$this->dailyactivity_model->update_newpotential($update_potential,$potential_id);
+
+        }
+        else
+        {
+              $insert_potential = array('dac_cust_groupid' => $custgrp_id,
+                'dac_custgroupname' => trim($custgrp),
+                'dac_prodgrp_id' => $prodgrp_id,
+                'dac_prodgroupname' => trim($prodgrp),
+                'dac_act_potential' => $old_poten,
+                'dac_rev_potential' => $new_poten,
+                'dac_source' => $src,
+                'dac_created_date' => date('Y-m-d:H:i:s'),
+                'dac_created_userid' => $login_user_id,
+                'dac_created_username' => $login_username
+            );
+            $update_status=$this->dailyactivity_model->save_newpotential($insert_potential);
+
+        }
+            if($update_status>0)
+            {
+                $this->session->set_flashdata('message', 'Potential Updated Sucessfully');
+                $message ='Potential Updated Sucessfully';
+          //  redirect('admin/manageusers', 'refresh');
+            echo $message;
+            }
+
+
+        die;
+     
+         
+     
+     }
 
    
 }

@@ -1656,17 +1656,17 @@
                                                                             // alert("type of cust_grp "+typeof(cust_grp));
                                                                              if(typeof(cust_grp)=='undefined')
                                                                              {
-                                                                                alert("Please select the customergroup")
+                                                                                alert("Please select the customergroup");
                                                                                 return false;
                                                                              }
                                                                              else
                                                                              {
                                                                                 editrow = row;
                                                                                 var x = $(window).width() / 2 - 125; 
-                                                                                var y = $(window).height() / 2 - 200;
+                                                                                var y = $(window).height() / 2 - 50;
                                                                                 var windowScrollLeft = $(window).scrollLeft();
                                                                                 var windowScrollTop = $(window).scrollTop();
-                                                                                $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 400, height: 500, resizable: true, title: 'Potential Details'});
+                                                                                $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'Potential Details'});
                                                                                 $("#popupWindowPotential").jqxWindow({ position: { x: x + windowScrollLeft, y: y + windowScrollTop} });
 
                                                                                 // Source for Potential grid start
@@ -1719,14 +1719,75 @@
                                                                                                     {text: 'Product Group', dataField: 'item_group',editable:false, width: 200},
                                                                                                     {text: 'Potential', dataField: 'sum_of_potential',editable:false, width: 70},
                                                                                                     {text: 'Source', dataField: 'source',editable:false, width: 70},
-                                                                                                    {text: 'New Poten', dataField: 'update_potential', editable:true, width: 50,hidden:true},
+                                                                                                    { text: 'Revised Poten', dataField: 'update_potential', editable:true, width: 50,hidden:false,
+                                                                                                     initeditor:function(row, cellvalue, editor){
+                                                                                                        pot_cust_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "customergroup");
+                                                                                                        pot_prod_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "item_group");
+                                                                                                        act_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "sum_of_potential");
+                                                                                                        revised_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "update_potential");
+                                                                                                        pot_src = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "source");
+                                 
+                                                                                                    }
+                                                                                                 }
                                                                                                     
                                                                                                 ]
+
                                                                                             });
                                                                                 // Source for Potential grid END
                                                                                 
                                                                                 // show the popup window.
                                                                                 $("#popupWindowPotential").jqxWindow('open');
+                                                                                // events for potential grid start
+                                                                                    $("#jqxgrid_productpotential").on('cellbeginedit', function (event) {
+                                                                                        var args = event.args;
+                                                                                        $("#cellbegineditevent").text("Event Type: cellbeginedit, Column: " + args.datafield + ", Row: " + (1 + args.rowindex) + ", Value: " + args.value);
+                                                                                        g_old_pot =args.value;
+                                                                                    });
+                                                                                    $("#jqxgrid_productpotential").on('cellendedit', function (event) {
+                                                                                        var args = event.args;
+                                                                                       
+                                                                                        $("#cellendeditevent").text("Event Type: cellendedit, Column: " + args.datafield + ",Row: " + (1 + args.rowindex) + ", Value: " + args.value);
+                                                                                         /* alert("value "+args.value);
+                                                                                          alert("pot_cust_group  "+pot_cust_group);
+                                                                                          alert("pot_prod_group  "+pot_prod_group);
+                                                                                          alert("act_pot  "+act_pot);*/
+                                                                                          g_new_pot =args.value;
+                                                                                          if(args.value!="" && g_old_pot!= g_new_pot)
+                                                                                          {
+                                                                                             if(g_new_pot<g_old_pot)
+                                                                                              {
+                                                                                               alert("Revised Potential should be greater than the old potential");
+                                                                                               return  false;
+                                                                                              }
+                                                                                              else
+                                                                                              {
+                                                                                                $.ajax({
+                                                                                                    dataType: 'json',
+                                                                                                    type: "POST",
+                                                                                                    url: 'dailyactivity/updaterevised_potential/'+pot_cust_group+'/'+pot_prod_group+'/'+act_pot+'/'+pot_src+'/'+args.value,
+                                                                                                    cache: true,
+                                                                                                    data: data,
+                                                                                                    success: function (response) {
+                                                                                                        // alert("Record Updated sucessfully ");
+                                                                                                         alert(result.responseText);
+                                                                                                        //$('#addWindow').hide();
+                                                                                                        //window.location.href = base_url + "dailyactivity";
+                                                                                                    },
+                                                                                                    error: function (result) {
+                                                                                                         alert(result.responseText);
+                                                                                                    }
+                                                                                                });
+                                                                                              }  
+                                                                                             
+                                                                                          }
+                                                                                          else
+                                                                                          {
+                                                                                             //alert("No value to update ");
+                                                                                          }
+                                                                                          
+                                                                                         
+                                                                                    });
+                                                                                // events for potential grid end
                                                                              }
                                                                             
                                                                         }
@@ -2251,7 +2312,7 @@
                                                         var y = $(window).height() / 2 - 200;
                                                         var windowScrollLeft = $(window).scrollLeft();
                                                         var windowScrollTop = $(window).scrollTop();
-                                                        $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 400, height: 500, resizable: true, title: 'Potential Details'});
+                                                        $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'Potential Details'});
                                                         $("#popupWindowPotential").jqxWindow({ position: { x: x + windowScrollLeft, y: y + windowScrollTop} });
 
                                                         // Source for Potential grid start
@@ -2304,7 +2365,19 @@
                                                                             {text: 'Product Group', dataField: 'item_group',editable:false, width: 200},
                                                                             {text: 'Potential', dataField: 'sum_of_potential',editable:false, width: 70},
                                                                             {text: 'Source', dataField: 'source',editable:false, width: 70},
-                                                                            {text: 'New Poten', dataField: 'update_potential', editable:true, width: 50,hidden:true},
+                                                                            {text: 'Revised Poten', dataField: 'update_potential', editable:true, width: 50,hidden:false,
+                                                                            initeditor:function(row, cellvalue, editor){
+                                                                                                        pot_cust_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "customergroup");
+                                                                                                        pot_prod_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "item_group");
+                                                                                                        act_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "sum_of_potential");
+                                                                                                        revised_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "update_potential");
+                                                                                                        pot_src = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "source");
+
+                                                                                                        
+                                 
+                                                                                                    }
+
+                                                                            },
                                                                             
                                                                         ]
                                                                     });
@@ -2312,6 +2385,59 @@
                                                         
                                                         // show the popup window.
                                                         $("#popupWindowPotential").jqxWindow('open');
+
+                                                        // events for potential grid start
+                                                                                    $("#jqxgrid_productpotential").on('cellbeginedit', function (event) {
+                                                                                        var args = event.args;
+                                                                                        $("#cellbegineditevent").text("Event Type: cellbeginedit, Column: " + args.datafield + ", Row: " + (1 + args.rowindex) + ", Value: " + args.value);
+                                                                                        g_old_pot =args.value;
+                                                                                    });
+                                                                                    $("#jqxgrid_productpotential").on('cellendedit', function (event) {
+                                                                                        var args = event.args;
+                                                                                       
+                                                                                        $("#cellendeditevent").text("Event Type: cellendedit, Column: " + args.datafield + ",Row: " + (1 + args.rowindex) + ", Value: " + args.value);
+                                                                                        /*  alert("value "+args.value);
+                                                                                          alert("pot_cust_group  "+pot_cust_group);
+                                                                                          alert("pot_prod_group  "+pot_prod_group);
+                                                                                          alert("act_pot  "+act_pot);
+                                                                                          alert("act_pot  "+pot_src);*/
+                                                                                          g_new_pot =args.value;
+                                                                                          if(args.value!="" && g_old_pot!= g_new_pot)
+                                                                                          {
+                                                                                             if(g_new_pot<g_old_pot)
+                                                                                              {
+                                                                                               alert("Revised Potential should be greater than the old potential");
+                                                                                               return  false;
+                                                                                              }
+                                                                                              else
+                                                                                              {
+                                                                                                $.ajax({
+                                                                                                    dataType: 'json',
+                                                                                                    type: "POST",
+                                                                                                    url: 'dailyactivity/updaterevised_potential/'+pot_cust_group+'/'+pot_prod_group+'/'+act_pot+'/'+pot_src+'/'+args.value,
+                                                                                                    cache: true,
+                                                                                                    data: data,
+                                                                                                    success: function (response) {
+                                                                                                        // alert("Record Updated sucessfully ");
+                                                                                                         alert(result.responseText);
+                                                                                                        //$('#addWindow').hide();
+                                                                                                        //window.location.href = base_url + "dailyactivity";
+                                                                                                    },
+                                                                                                    error: function (result) {
+                                                                                                         alert(result.responseText);
+                                                                                                    }
+                                                                                                });
+                                                                                              }  
+                                                                                             
+                                                                                          }
+                                                                                          else
+                                                                                          {
+                                                                                             //alert("No value to update ");
+                                                                                          }
+                                                                                          
+                                                                                         
+                                                                                    });
+                                                                                // events for potential grid end
                                                      }
                                                     
                                                 }

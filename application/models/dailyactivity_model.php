@@ -1330,16 +1330,101 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 																			header_id,item_group 
 															FROM  business_plan_item_group_id
 															)b ON a.item_group_id=b.header_id 
-								WHERE customergroup='".$customergroup."'
+								WHERE customergroup='".$customergroup."' AND item_group is NOT NULL 
 								GROUP BY 
 								d.customergroup,
 								b.item_group";
-                //echo $sql; die;
+               // echo $sql; die;
 				$result = $this->db->query($sql);
 				$arr =  json_encode($result->result_array());
 				$arr =	 '{ "rows" :'.$arr.' }';
 				return $arr;
 			}
+
+			function get_customergroup_id($custgrp)
+			{
+				$this->db->select('header_id');
+		        $this->db->from('business_plan_customer_group_id');
+		        $this->db->where('customer_group', $custgrp);
+		        $result = $this->db->get();
+		        $cust_grpid = $result->result_array();
+		        //print_r($ld_status); die;
+		        return @$cust_grpid[0]['header_id'];
+			}
+
+			function getproductgroup_id($prodgrp)
+			{
+				$this->db->select('header_id');
+		        $this->db->from('business_plan_item_group_id');
+		        $this->db->where('item_group', $prodgrp);
+		        $result = $this->db->get();
+		        $prod_grpid = $result->result_array();
+		        //print_r($ld_status); die;
+		        return @$prod_grpid[0]['header_id'];
+			}
+
+			function save_newpotential($dailyactivity_poten_insert) {
+		        $this->db->insert('dactivity_revised_pot', $dailyactivity_poten_insert);
+		        return $this->db->insert_id();
+		    }
+
+		    function update_newpotential($dailyactivity_poten_update, $potentialid) {
+
+		        $this->db->where('dac_poten_id', $potentialid);
+		        $this->db->update('dactivity_revised_pot', $dailyactivity_poten_update);
+		        return ($this->db->affected_rows() > 0);
+		    }
+
+			        
+        	function checkduplicate_record($custgroup,$prodgrp)
+			{
+				/*$sql ="SELECT dac_poten_id FROM dactivity_revised_pot  WHERE dac_custgroupname='".$custgroup."' AND dac_prodgroupname ='".$prodgrp."'";
+                echo $sql;
+                $result = $this->db->query($sql);
+                echo"<pre>";print_r($result);echo"</pre>";
+				$recordset = $result->result_array();
+                if($result->num_rows()>0)
+                {
+                	 return @$recordset[0]['dac_poten_id'];
+                	 return @$recordset[0]['dac_poten_id'];
+                }*/
+
+                $sql ="SELECT dac_poten_id FROM dactivity_revised_pot  WHERE  dac_custgroupname='".$custgroup."' AND dac_prodgroupname ='".$prodgrp."'";
+                $result = $this->db->query($sql);
+                $result->num_rows();
+                $daily_potenid = $result->result_array();
+              //  echo"<pre>";print_r($daily_potenid);echo"</pre>";
+             
+                if($result->num_rows()==0)
+                {
+                    $daily_potenid['0']['noofrows']=$result->num_rows();
+                    $daily_potenid['0']['exename']="";
+                    $daily_potenid['0']['id']=0; 
+                }
+                else
+                {
+                    $daily_potenid['0']['noofrows']=$result->num_rows();
+                    $daily_potenid['0']['id']=$daily_potenid['0']['dac_poten_id'];
+          
+                }
+                
+
+            //  echo"<pre>";print_r($daily_potenid['0']);echo"</pre>";
+                //echo"max id is ".$daily_hdr_id[0]['max'];
+               // return $daily_hdr_id[0]['id'];
+               return $daily_potenid;
+
+
+
+
+
+
+
+
+
+
+			}
+
 
 }
 ?>
