@@ -81,6 +81,7 @@ class Loginlogout extends CI_Controller {
             redirect('admin/login', 'refresh');
         } elseif (!$this->admin_auth->is_admin()) {
 
+            $this->update_null_logout();
             $branch = $this->uri->segment(3);
             $user_id = $this->uri->segment(4);
 
@@ -126,6 +127,20 @@ class Loginlogout extends CI_Controller {
             $this->load->view('loginlogout/usertimespent_with_griddata', $leaddata);
         }
     }
+
+        function update_null_logout()
+        {
+                $date = date ('Y-m-j G:i:s');
+                $format='Y-m-d';
+                $previous_day = date ( $format, strtotime ('-1 day'.$date));  
+                $sql="UPDATE lead_login_activity SET logout_time= login_time + (11 ||' minutes')::interval  WHERE login_time::DATE = '".$previous_day."'  AND logout_time is NULL";
+                $result = $this->db->query($sql);
+               
+                
+                     
+       
+
+        }
 
 }
 

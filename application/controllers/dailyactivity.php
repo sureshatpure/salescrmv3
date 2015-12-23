@@ -2168,6 +2168,10 @@ class dailyactivity extends CI_Controller {
         echo $message;
       }  
 
+      function lms_dailyactivtiy()
+      {
+        $this->load->view('dailyactivity/lms_dailyactivity_merge');
+      }
       function tutortial1()
       {
         $this->load->view('dailyactivity/tutorial1');
@@ -2516,7 +2520,7 @@ class dailyactivity extends CI_Controller {
         }
             if($update_status>0)
             {
-                $this->session->set_flashdata('message', 'Potential Updated Sucessfully');
+               // $this->session->set_flashdata('message', 'Potential Updated Sucessfully');
                 $message ='Potential Updated Sucessfully';
           //  redirect('admin/manageusers', 'refresh');
             echo $message;

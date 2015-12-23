@@ -524,6 +524,7 @@
                                                 async: false
                                                
                                             };
+                                            validateProductName_add.html('<font color="green"> Lead Already Exists </font>');
 
                                             listdataAdapter = new $.jqx.dataAdapter(list, {
                                                 autoBind: true,
@@ -874,7 +875,7 @@
                                                 //validateProductName.html(response.msg);
                                                      //alert("This product group has been already billed for this customer")
                                                     g_create_lead_add=0;
-                                                     validateProductName_add.html(response.msg);
+                                                     validateProductName.html(response.msg);
                                                     // editor.jqxCheckBox({ checked: false, hasThreeStates:false});
                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead",0);
                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "leadstatusid",'No Status');
@@ -885,7 +886,7 @@
                                             {
                                                 // datevalidation=true;
                                                 g_create_lead_add=1;
-                                                validateProductName_add.html(response.msg);
+                                                validateProductName.html(response.msg);
                                                 $("#jqxgrid_n").jqxGrid('setcellvalue', row, "create_lead",1);
                                             }
 
@@ -916,6 +917,7 @@
                                                 {
                                                  this.columntype = 'dropdownlist'; 
                                                  $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity); 
+                                                 
                                                 }
                                                 else
                                                 {
@@ -940,6 +942,7 @@
                                            else if(data.result_type === 'Select') 
                                            {
                                             this.columntype = 'dropdownlist';
+                                            validateProductName.html('<font color="green"> Lead Already Exists </font>');
                                            }
                                 
                             }
@@ -1135,7 +1138,7 @@
                                                 cache: false,
                                                 async: false
                                             };
-
+                                            validateProductName.html('<font color="green"> Lead Already Exists </font>');
                                             listdataAdapter = new $.jqx.dataAdapter(list, {
                                                 autoBind: true,
                                                 buildSelect: function (suboptions)
@@ -1338,9 +1341,9 @@
 
                                    var leadid =data.leadid;
                                   // alert("in initeditor for update substatus "+status_name);
-                                   alert("in initeditor for update leadid "+leadid);
+                                  /* alert("in initeditor for update leadid "+leadid);
                                    alert("in initeditor for update typeof leadid "+typeof(leadid));
-                                   alert("in initeditor for update length leadid "+data.leadid.length);
+                                   alert("in initeditor for update length leadid "+data.leadid.length);*/
                                    
                                    /* if (leadid!="" && leadid!='No Leads'|| typeof(data.leadid)==="undefined") 
                                     {
@@ -1644,7 +1647,7 @@
                                                             filterable: true,
                                                             columns: [
                                                                 {text: 'UID', datafield: 'id', width: 150, cellsalign: 'left', hidden: true},
-                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: false},
+                                                                {text: 'LineId', datafield: 'line_id', width: 150, cellsalign: 'left', hidden: true},
                                                                 {text: 'Customer Group', datafield: 'custgroup', width: 150, editable: false},
                                                                 { text: 'Show products', datafield: 'Edit', columntype: 'button', cellsrenderer: function () {
                                                                             return "Show Potentials";
@@ -1661,14 +1664,6 @@
                                                                              }
                                                                              else
                                                                              {
-                                                                                editrow = row;
-                                                                                var x = $(window).width() / 2 - 125; 
-                                                                                var y = $(window).height() / 2 - 50;
-                                                                                var windowScrollLeft = $(window).scrollLeft();
-                                                                                var windowScrollTop = $(window).scrollTop();
-                                                                                $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'Potential Details'});
-                                                                                $("#popupWindowPotential").jqxWindow({ position: { x: x + windowScrollLeft, y: y + windowScrollTop} });
-
                                                                                 // Source for Potential grid start
                                                                                     var url = "dailyactivity/getcustomerpotential/"+cust_grp;
                                                                                     var rows = {};
@@ -1734,6 +1729,34 @@
 
                                                                                             });
                                                                                 // Source for Potential grid END
+                                                                                editrow = row;
+                                                                                $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'Potential Details'});
+                                                                                  var x = ($(window).width() - $("#popupWindowPotential").jqxWindow('width')) / 2 + $(window).scrollLeft();
+                                                                                    var y = ($(window).height() - $("#popupWindowPotential").jqxWindow('height')) / 2 + $(window).scrollTop();
+                                                                                    $("#popupWindowPotential").jqxWindow({ position: { x: x, y: y} });
+                                                                                    $('#popupWindowPotential').jqxWindow('open');
+                                                                                    $('#popupWindowPotential').jqxWindow({ zIndex: 99999}); 
+                                                                                    $('#popupWindowPotential').jqxWindow('bringToFront');
+                                                                                    $('#addWindow').mouseup(function () 
+                                                                                    {
+                                                                                       // alert("columnname item "+columnname);
+                                                                                        if ($('#popupWindowPotential').jqxWindow('isOpen')) 
+                                                                                        {
+                                                                                           // alert("item true");
+                                                                                            $('#popupWindowPotential').jqxWindow('bringToFront');
+                                                                                        }
+                                                                                        else
+                                                                                        {
+
+                                                                                           // alert("item false");
+                                                                                            $('#popupWindowPotential').jqxWindow('bringToFront');
+                                                                                        }
+                                                                                    
+
+                                                                                    });
+                                                                                
+
+                                                                                
                                                                                 
                                                                                 // show the popup window.
                                                                                 $("#popupWindowPotential").jqxWindow('open');
@@ -1747,16 +1770,20 @@
                                                                                         var args = event.args;
                                                                                        
                                                                                         $("#cellendeditevent").text("Event Type: cellendedit, Column: " + args.datafield + ",Row: " + (1 + args.rowindex) + ", Value: " + args.value);
-                                                                                         /* alert("value "+args.value);
+                                                                                    /*  alert("value "+args.value);
                                                                                           alert("pot_cust_group  "+pot_cust_group);
                                                                                           alert("pot_prod_group  "+pot_prod_group);
-                                                                                          alert("act_pot  "+act_pot);*/
+                                                                                          alert("act_pot  "+act_pot);
+                                                                                          alert("revised_pot  "+g_new_pot);
+                                                                                          alert("g_new_pot  "+g_new_pot);
+                                                                                       */
                                                                                           g_new_pot =args.value;
-                                                                                          if(args.value!="" && g_old_pot!= g_new_pot)
+                                                                                          
+                                                                                          if(args.value!="" && act_pot!= g_new_pot)
                                                                                           {
-                                                                                             if(g_new_pot<g_old_pot)
+                                                                                             if(g_new_pot<act_pot)
                                                                                               {
-                                                                                               alert("Revised Potential should be greater than the old potential");
+                                                                                               alert("Revised Potential should be greater than the actual potential");
                                                                                                return  false;
                                                                                               }
                                                                                               else
@@ -1777,6 +1804,7 @@
                                                                                                          alert(result.responseText);
                                                                                                     }
                                                                                                 });
+                                                                                               //$('#popupWindowPotential').jqxWindow('close');
                                                                                               }  
                                                                                              
                                                                                           }
@@ -2307,13 +2335,7 @@
                                                      }
                                                      else
                                                      {
-                                                        editrow = row;
-                                                        var x = $(window).width() / 2 - 125; 
-                                                        var y = $(window).height() / 2 - 200;
-                                                        var windowScrollLeft = $(window).scrollLeft();
-                                                        var windowScrollTop = $(window).scrollTop();
-                                                        $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'Potential Details'});
-                                                        $("#popupWindowPotential").jqxWindow({ position: { x: x + windowScrollLeft, y: y + windowScrollTop} });
+                                                        
 
                                                         // Source for Potential grid start
                                                             var url = "dailyactivity/getcustomerpotential/"+cust_grp;
@@ -2382,6 +2404,31 @@
                                                                         ]
                                                                     });
                                                         // Source for Potential grid END
+                                                            editrow = row;
+                                                            $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'Potential Details'});
+                                                              var x = ($(window).width() - $("#popupWindowPotential").jqxWindow('width')) / 2 + $(window).scrollLeft();
+                                                                var y = ($(window).height() - $("#popupWindowPotential").jqxWindow('height')) / 2 + $(window).scrollTop();
+                                                                $("#popupWindowPotential").jqxWindow({ position: { x: x, y: y} });
+                                                                $('#popupWindowPotential').jqxWindow('open');
+                                                                $('#popupWindowPotential').jqxWindow({ zIndex: 99999}); 
+                                                                $('#popupWindowPotential').jqxWindow('bringToFront');
+                                                                $('#customWindow').mouseup(function () 
+                                                                {
+                                                                   // alert("columnname item "+columnname);
+                                                                    if ($('#popupWindowPotential').jqxWindow('isOpen')) 
+                                                                    {
+                                                                       // alert("item true");
+                                                                        $('#popupWindowPotential').jqxWindow('bringToFront');
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                       // alert("item false");
+                                                                        $('#popupWindowPotential').jqxWindow('bringToFront');
+                                                                    }
+                                                                
+
+                                                                });
                                                         
                                                         // show the popup window.
                                                         $("#popupWindowPotential").jqxWindow('open');
@@ -2400,13 +2447,17 @@
                                                                                           alert("pot_cust_group  "+pot_cust_group);
                                                                                           alert("pot_prod_group  "+pot_prod_group);
                                                                                           alert("act_pot  "+act_pot);
-                                                                                          alert("act_pot  "+pot_src);*/
-                                                                                          g_new_pot =args.value;
-                                                                                          if(args.value!="" && g_old_pot!= g_new_pot)
+                                                                                          alert("revised_pot  "+g_new_pot);
+                                                                                          alert("g_new_pot  "+g_new_pot);
+                                                                                       */
+                                                                                       g_new_pot =args.value;
+                   
+                                                                                          
+                                                                                          if(args.value!="" && act_pot!= g_new_pot)
                                                                                           {
-                                                                                             if(g_new_pot<g_old_pot)
+                                                                                             if(g_new_pot<act_pot)
                                                                                               {
-                                                                                               alert("Revised Potential should be greater than the old potential");
+                                                                                               alert("Revised Potential should be greater than the actual potential");
                                                                                                return  false;
                                                                                               }
                                                                                               else
@@ -2427,6 +2478,7 @@
                                                                                                          alert(result.responseText);
                                                                                                     }
                                                                                                 });
+                                                                                               //$('#popupWindowPotential').jqxWindow('close');
                                                                                               }  
                                                                                              
                                                                                           }
@@ -3243,7 +3295,7 @@
                                 {
                                         if (create_lead==0 && noofleads >0 && typeof(lead_status)=='undefined')
                                         {
-                                            alert("in status create_lead 0");
+                                           // alert("in status create_lead 0");
                                              $("#jqxgrid_add").jqxGrid('showvalidationpopup', k, "statusid", "Please select the Lead status");
                                             valid_lead_status = 0;
                                             break;
@@ -4234,7 +4286,7 @@
                                          $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "prevsubstatusid", lead_curr_substsid);
                                          $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "leadstatusid", lead_status_name);
                                          $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "leadsubstatusid", lead_substatus_name);
-                                        
+                                        validateProductName.html('<font color="green"> Lead Already Exists </font>');
                                          
                                          
 

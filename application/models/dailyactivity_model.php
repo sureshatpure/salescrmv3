@@ -1274,7 +1274,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 																		(
 																		SELECT
 																						leadid as leaddetails_leadid,company as customer_id
-																		FROM  leaddetails --WHERE leadstatus <8
+																		FROM  leaddetails WHERE leadstatus <8
 																		)c ON b.pot_leadid=c.leaddetails_leadid 
 												LEFT JOIN
 																	(
@@ -1334,7 +1334,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 								GROUP BY 
 								d.customergroup,
 								b.item_group";
-               // echo $sql; die;
+                //echo $sql; die;
 				$result = $this->db->query($sql);
 				$arr =  json_encode($result->result_array());
 				$arr =	 '{ "rows" :'.$arr.' }';

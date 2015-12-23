@@ -68,12 +68,18 @@
                             </li>
                              <li>Video Tutorials
                                 <ul style='width: 150px;'>
-                                    <li>DailyActivity
-                                        <ul style='width: 200px;'>
+                                    <li>LMS-Dailyactivty
+                                       <!--  <ul style='width: 200px;'>
                                             <li><a href="<?= base_url() ?>dailyactivity/tutortial1">UserManual</a></li>
                                             
+                                        </ul> -->
+                                        <ul style='width: 200px;'>
+                                            <li><a href="<?= base_url() ?>dailyactivity/tutortial1">Old Version</a></li>
+                                            <li><a href="<?= base_url() ?>dailyactivity/lms_dailyactivtiy">Merged Version</a></li>
                                         </ul>
 
+                                    </li>
+                                    
                                     </li>
                                     <li>New Version
                                         <ul style='width: 200px;'>
