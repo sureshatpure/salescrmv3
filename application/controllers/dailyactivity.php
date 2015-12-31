@@ -220,9 +220,10 @@ class dailyactivity extends CI_Controller {
          $sales_type_flag="R";
        
         //echo "current_date ".$_POST[0]['currentdate'];
+        //echo"<pre> _POST data";print_r($_POST);echo"</pre>";
         $hrd_currentdate = $_POST[0]['currentdate'];
         $grid_data = array_slice($_POST, 1, null, true);
-        //echo"<pre> grid data";print_r($grid_data);echo"</pre>"; 
+       // echo"<pre> grid data";print_r($grid_data);echo"</pre>"; 
         $check_duplicates = $this->dailyactivity_model->check_dailyhdr_duplicates($hrd_currentdate, $user1);
         //  echo $check_duplicates; die;
         $today_date = date('Y-m-d:H:i:s');
@@ -526,7 +527,7 @@ class dailyactivity extends CI_Controller {
                                 $lead_prod_poten_type[$k]['product_type_id'] =$product_sale_type[$k]['n_value_id'];
 
                                  if ($product_sale_type[$k]['n_value_id'] == $sales_type_id) {
-                                    $lead_prod_poten_type[$k]['potential'] = $val['potentialqty'];
+                                    $lead_prod_poten_type[$k]['potential'] = $val['actualpotenqty'];
                                 } else {
                                     $lead_prod_poten_type[$k]['potential'] = 0;
                                 }
@@ -1658,9 +1659,20 @@ class dailyactivity extends CI_Controller {
                                 'last_modified' => date('Y-m-d:H:i:s'),
                                 'last_updated_user' => $login_user_id
                             );
+
+
+                             $sales_type_id = $this->dailyactivity_model->get_salestypeid_byname($val['division']);  
+                                                    
+
+                             $lead_prod_poten_type = array(
+                                'potential' => $val['actualpotenqty']
+                            );
                                 
                             $id = $this->Leads_model->update_lead($leaddetails, $lead_id);
                             $id = $this->Leads_model->update_leadproducts($leadproducts, $lead_id);
+                            $lead_pord_poten_id = $this->Leads_model->dcupdate_leadprodpotentypes($lead_prod_poten_type, $lead_id,$sales_type_id);
+
+      
 
 
                              /* Start for Managing and implementation*/
@@ -2527,10 +2539,14 @@ class dailyactivity extends CI_Controller {
             }
 
 
-        die;
+
      
          
      
+     }
+     function test()
+     {
+        $sales_type_id = $this->dailyactivity_model->get_salestypeid_byname('Part Tanker');
      }
 
    

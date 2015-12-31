@@ -1048,6 +1048,8 @@ class Leads_model extends CI_Model {
         return ($this->db->affected_rows() > 0);
     }
 
+    
+
     function update_customer_potential($customer_poten, $leadid) {
         $data = array(
             'customergroup' => $customer_poten[0]['customergroup'],
@@ -3265,6 +3267,16 @@ SELECT
         $this->db->update('leadproducts', $leadprod);
         return ($this->db->affected_rows() > 0);
     }
+
+      function dcupdate_leadprodpotentypes($leadprod_poten_type, $leadid,$prod_type_id) {
+
+        $this->db->where('leadid', $leadid);
+        $this->db->where('product_type_id', $prod_type_id);
+        $this->db->update('lead_prod_potential_types', $leadprod_poten_type);
+        return ($this->db->affected_rows() > 0);
+    }
+
+    
 
 
 

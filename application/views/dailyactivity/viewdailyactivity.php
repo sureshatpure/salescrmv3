@@ -1190,7 +1190,7 @@
                                       var createLead =data.create_lead;
                                       switch(data.result_type){
                                          case 'Value':
-                                          if(createLead==1)
+                                          if(createLead==1 || createLead==0)
                                           {
                                               geturl=base_url + "dailyactivity/getleadsalestype";
                                                var sale_tye_list = {
@@ -2107,8 +2107,8 @@
                                                                 {text: 'Activity Type', datafield: 'subactivity', width: 110, cellsalign: 'left', cellbeginedit:Resultsupdate.initResultsEditorat_update, initeditor: Resultsupdate.resultsEditorat_update, cellsrenderer: Resultsupdate.renderUnitsat
                                                                 },
                                                                 
-                                                                {text: 'Potential', datafield: 'potentialqty', width: 75, cellsalign: 'left', editable: false},
-                                                                {text: 'ActualPotential', datafield: 'actualpotenqty', width: 75, cellsalign:'left', editable: true},
+                                                                {text: 'BP Potential', datafield: 'potentialqty', width: 75, cellsalign: 'left', editable: false},
+                                                                {text: 'LMS Potential', datafield: 'actualpotenqty', width: 75, cellsalign:'left', editable: true,hidden:false},
 
                                                                 {text: 'Required Quantity',datafield: 'quantity', width: 75, cellsalign: 'left',
                                                                         cellbeginedit: function (row, datafield, columntype) {
@@ -2443,14 +2443,16 @@
                                                                                         var args = event.args;
                                                                                        
                                                                                         $("#cellendeditevent").text("Event Type: cellendedit, Column: " + args.datafield + ",Row: " + (1 + args.rowindex) + ", Value: " + args.value);
-                                                                                        /*  alert("value "+args.value);
+                                                                                               g_new_pot =args.value;
+                                                                                          alert("args.rowindex "+args.rowindex);
+                                                                                          alert("args value "+args.value);
                                                                                           alert("pot_cust_group  "+pot_cust_group);
                                                                                           alert("pot_prod_group  "+pot_prod_group);
                                                                                           alert("act_pot  "+act_pot);
                                                                                           alert("revised_pot  "+g_new_pot);
                                                                                           alert("g_new_pot  "+g_new_pot);
-                                                                                       */
-                                                                                       g_new_pot =args.value;
+                                                                                       
+                                                                                   
                    
                                                                                           
                                                                                           if(args.value!="" && act_pot!= g_new_pot)
@@ -2803,8 +2805,8 @@
                                         },
                                         {text: 'Activity Type', datafield: 'Sub_Activity', width: 110, cellsalign: 'left', cellbeginedit:Results.initResultsEditorat, initeditor: Results.resultsEditorat, cellsrenderer: Results.renderUnitsat
                                         },
-                                        {text: 'Potential', datafield: 'Potential_Quantity', width: 75, cellsalign: 'left', editable: false},
-                                        {text: 'ActualPotential', datafield: 'actualpotenqty', width: 75, cellsalign: 'left', editable: true},
+                                        {text: 'BP Potential', datafield: 'Potential_Quantity', width: 75, cellsalign: 'left', editable: false},
+                                        {text: 'LMS Potential', datafield: 'actualpotenqty', width: 75, cellsalign: 'left', editable: true,hidden:false},
                                         {text: 'Required Quantity', datafield: 'Quantity_Requirement', width: 75, cellsalign: 'left',
                                             cellbeginedit: function (row, datafield, columntype) {
                                                         var rowdata = $("#jqxgrid_add").jqxGrid('getrowdata', row);

@@ -1247,7 +1247,7 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 			function get_customerpotential($customergroup)
 			{
 					$customergroup = urldecode($customergroup);
-						$sql="SELECT 
+						/*$sql="SELECT 
 								lead_customergroup as customergroup,
 								lead_product_group as item_group,
 								sum(lead_potential) as sum_of_potential,
@@ -1333,8 +1333,9 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 								WHERE customergroup='".$customergroup."' AND item_group is NOT NULL 
 								GROUP BY 
 								d.customergroup,
-								b.item_group";
-                //echo $sql; die;
+								b.item_group";*/
+								$sql="SELECT M .lead_customergroup AS customergroup, M .lead_product_group AS item_group, SUM (M .lead_potential) AS sum_of_potential, update_potential, 'LMS' AS SOURCE FROM ( SELECT K .product_group AS lead_product_group, K .lead_potential, K .customergroup AS lead_customergroup, K .customer_id AS lead_customer_id, K .item_group_id AS lead_item_grp_id, COALESCE (K .dac_rev_potential, 0) AS update_potential FROM (( SELECT leadid AS prod_leadid, product_group FROM leadproducts ) A LEFT JOIN ( SELECT leadid AS pot_leadid, productid, SUM (potential) AS lead_potential FROM lead_prod_potential_types GROUP BY leadid, productid ) b ON A .prod_leadid = b.pot_leadid LEFT JOIN ( SELECT leadid AS leaddetails_leadid, company AS customer_id FROM leaddetails ) C ON b.pot_leadid = C .leaddetails_leadid LEFT JOIN ( SELECT ID, customergroup FROM customermasterhdr ) d ON C .customer_id = d. ID LEFT JOIN ( SELECT header_id AS item_group_id, item_group AS business_item_group FROM business_plan_item_group_id ) f ON f.business_item_group = A .product_group LEFT JOIN ( SELECT dac_custgroupname, dac_rev_potential, dac_source FROM dactivity_revised_pot WHERE dac_source = 'LMS' ) L ON D.customergroup = L.dac_custgroupname ) K ) M WHERE lead_customergroup = '".$customergroup."' GROUP BY customergroup, item_group, update_potential UNION SELECT d.customergroup, b.item_group, SUM (A .annual_potential_qty) AS sum_of_potential, COALESCE (l.dac_rev_potential, 0) AS dac_rev_potential, 'CRM' AS SOURCE FROM ( SELECT ID, ( COALESCE ( customermasterhdr.cust_account_id, (0) :: NUMERIC )) :: INTEGER AS cust_account_id, customergroup FROM customermasterhdr WHERE ( customermasterhdr.cust_account_id <> (0) :: NUMERIC )) d LEFT JOIN ( SELECT header_id, customer_group FROM business_plan_customer_group_id ) M ON M .customer_group = d.customergroup LEFT JOIN ( SELECT item_group_id, customer_group_id, sale_category_id, annual_potential_qty FROM gc_business_monthly_plan ) A ON A .customer_group_id = M .header_id LEFT JOIN ( SELECT header_id, item_group FROM business_plan_item_group_id ) b ON A .item_group_id = b.header_id LEFT JOIN ( SELECT dac_custgroupname, dac_rev_potential, dac_source FROM dactivity_revised_pot WHERE dac_source = 'CRM' ) L ON D.customergroup = L.dac_custgroupname WHERE customergroup = '".$customergroup."' AND item_group IS NOT NULL GROUP BY d.customergroup, b.item_group, l.dac_rev_potential";			
+              //  echo $sql; die;
 				$result = $this->db->query($sql);
 				$arr =  json_encode($result->result_array());
 				$arr =	 '{ "rows" :'.$arr.' }';
