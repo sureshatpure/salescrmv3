@@ -2482,7 +2482,7 @@ class dailyactivity extends CI_Controller {
         echo $viewdata;
     }
 
-     function updaterevised_potential($custgrp,$prodgrp,$old_poten,$src,$new_poten)
+     function updaterevised_potential($custgrp,$prodgrp,$old_poten,$src,$sal_cat_type,$new_poten)
      {
 
         $login_username = $this->session->userdata['username'];
@@ -2490,11 +2490,15 @@ class dailyactivity extends CI_Controller {
 
         $custgrp=urldecode($custgrp);
         $prodgrp=urldecode($prodgrp);
+        $sal_cat_type=urldecode($sal_cat_type);
+        $prev_poten =$old_poten; 
+        $mailflag="No";
 
         $custgrp_id = $this->dailyactivity_model->get_customergroup_id($custgrp);
         $prodgrp_id = $this->dailyactivity_model->getproductgroup_id($prodgrp);
+        $salecat_id = $this->dailyactivity_model->get_bpsalecatid($sal_cat_type);
         $dup_record = $this->dailyactivity_model->checkduplicate_record($custgrp,$prodgrp);
-        
+        //$salecat_id =$sal_cat_id['0']['header_id'];
         
         if($dup_record['0']['noofrows']>0)
         {
@@ -2504,14 +2508,52 @@ class dailyactivity extends CI_Controller {
                 'dac_custgroupname' => trim($custgrp),
                 'dac_prodgrp_id' => $prodgrp_id,
                 'dac_prodgroupname' => trim($prodgrp),
-                'dac_act_potential' => $old_poten,
-                'dac_rev_potential' => $new_poten,
                 'dac_source' => $src,
                 'dac_updated_date' => date('Y-m-d:H:i:s'),
                 'dac_updated_userid' => $login_user_id,
                 'dac_updated_username' =>$login_username
             );
-            $update_status=$this->dailyactivity_model->update_newpotential($update_potential,$potential_id);
+               $rev_potential_data  = array('dactivity_revised_potid' => $potential_id,
+                'rpsc_salecate_id' => trim($salecat_id),
+                'rpsc_salecat_name' => trim($sal_cat_type),
+                'rpsc_act_potential' => $old_poten,
+                'rpsc_rev_potential' => $new_poten,
+                'rpsc_prev_potential' => $prev_poten,
+                'rpsc_mail_status' => $mailflag,
+                'rpsc_source' => $src,
+                'rpsc_updated_date' => date('Y-m-d:H:i:s'),
+                'rpsc_updated_userid' => $login_user_id,
+                'rpsc_updated_username' =>$login_username
+            );
+            /* check for duplicate in detail table start*/
+            $dup_record_detail = $this->dailyactivity_model->check_salecat_duplicate_record($potential_id,$salecat_id);
+            if($dup_record_detail['0']['noofrows']>0)
+            {
+                // update detail table
+              
+             //echo"update"; print_r($rev_potential_data);
+                $update_status=$this->dailyactivity_model->update_revisedpotential($rev_potential_data,$potential_id,$salecat_id);
+            }
+            else
+            {
+                // insert detail table 
+                $rev_potential_data  = array('dactivity_revised_potid' => $potential_id,
+                'rpsc_salecate_id' => $salecat_id,
+                'rpsc_salecat_name' => trim($sal_cat_type),
+                'rpsc_act_potential' => $old_poten,
+                'rpsc_rev_potential' => $new_poten,
+                'rpsc_prev_potential' => $prev_poten,
+                'rpsc_mail_status' => $mailflag,
+                'rpsc_source' => $src,
+                'rpsc_created_date' => date('Y-m-d:H:i:s'),
+                'rpsc_created_userid' => $login_user_id,
+                'rpsc_created_username' =>$login_username
+            );
+             //echo"insert";print_r($rev_potential_data);
+            $update_status=$this->dailyactivity_model->save_revisedpotential($rev_potential_data);
+            }
+            /*check for duplicate in detail table end*/
+           
 
         }
         else
@@ -2520,14 +2562,26 @@ class dailyactivity extends CI_Controller {
                 'dac_custgroupname' => trim($custgrp),
                 'dac_prodgrp_id' => $prodgrp_id,
                 'dac_prodgroupname' => trim($prodgrp),
-                'dac_act_potential' => $old_poten,
-                'dac_rev_potential' => $new_poten,
                 'dac_source' => $src,
                 'dac_created_date' => date('Y-m-d:H:i:s'),
                 'dac_created_userid' => $login_user_id,
                 'dac_created_username' => $login_username
             );
-            $update_status=$this->dailyactivity_model->save_newpotential($insert_potential);
+              $last_insert_id  =$this->dailyactivity_model->save_newpotential($insert_potential);
+             $rev_potential_data_insert  = array('dactivity_revised_potid' => $last_insert_id,
+                'rpsc_salecate_id' => $salecat_id,
+                'rpsc_salecat_name' => trim($sal_cat_type),
+                'rpsc_act_potential' => $old_poten,
+                'rpsc_rev_potential' => $new_poten,
+                'rpsc_prev_potential' => $prev_poten,
+                'rpsc_mail_status' => $mailflag,
+                'rpsc_source' => $src,
+                'rpsc_created_date' => date('Y-m-d:H:i:s'),
+                'rpsc_created_userid' => $login_user_id,
+                'rpsc_created_username' =>$login_username
+            );
+             //echo"insert";print_r($rev_potential_data);
+            $update_status=$this->dailyactivity_model->save_revisedpotential($rev_potential_data_insert);
 
         }
             if($update_status>0)

@@ -1685,11 +1685,13 @@
                                                                                     var potential_source =
                                                                                             {
                                                                                                 datatype: "json",
-                                                                                                datafields: [{name: 'customergroup', type: 'string'},
+                                                                                                datafields: [{name: 'customer_group', type: 'string'},
                                                                                                              {name: 'item_group', type: 'string'},
-                                                                                                             {name: 'sum_of_potential', type: 'number'},
-                                                                                                             {name: 'source', type: 'string'},
-                                                                                                             {name: 'update_potential', type: 'number'}
+                                                                                                             {name: 'BULK', type: 'number'},
+                                                                                                             {name: 'RETAIL', type: 'number'},
+                                                                                                             {name: 'SMALL PACKING', type: 'number'},
+                                                                                                             {name: 'SINGLE - TANKER', type: 'number'},
+                                                                                                             {name: 'PART TANKER', type: 'number'}
                                                                                                              ],
                                                                                                 localdata: rows
                                                                                             };
@@ -1710,61 +1712,22 @@
                                                                                                 showfilterrow: true,
                                                                                                 filterable: true,
                                                                                                 columns: [
-                                                                                                    {text: 'customergroup', dataField: 'customergroup', width: 100, hidden:true,editable:false},
-                                                                                                    {text: 'Product Group', dataField: 'item_group',editable:false, width: 200},
-                                                                                                    {text: 'Source', dataField: 'source',editable:false, width: 70},
-                                                                                                    {text: 'Potential', dataField: 'sum_of_potential',editable:false, width: 70},
-                                                                                                    { text: 'Bulk Poten', dataField: 'update_potential', editable:true, width: 50,hidden:false,
-                                                                                                     initeditor:function(row, cellvalue, editor){
-                                                                                                        pot_cust_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "customergroup");
-                                                                                                        pot_prod_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "item_group");
-                                                                                                        act_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "sum_of_potential");
-                                                                                                        revised_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "update_potential");
-                                                                                                        pot_src = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "source");
-                                 
-                                                                                                        }
-                                                                                                    },
-                                                                                                     { text: 'Small Pack', dataField: '', editable:true, width: 75,hidden:false,
-                                                                                                     initeditor:function(row, cellvalue, editor){
-                                                                                                        pot_cust_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "customergroup");
-                                                                                                        pot_prod_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "item_group");
-                                                                                                        act_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "sum_of_potential");
-                                                                                                        revised_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "update_potential");
-                                                                                                        pot_src = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "source");
-                                 
-                                                                                                        }
-                                                                                                    },
-                                                                                                    { text: 'Single Tanker', dataField: '', editable:true, width: 75,hidden:false,
-                                                                                                     initeditor:function(row, cellvalue, editor){
-                                                                                                        pot_cust_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "customergroup");
-                                                                                                        pot_prod_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "item_group");
-                                                                                                        act_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "sum_of_potential");
-                                                                                                        revised_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "update_potential");
-                                                                                                        pot_src = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "source");
-                                 
-                                                                                                        }
-                                                                                                    },
+                                                                                                    {text: 'customergroup', dataField: 'customer_group', width: 100, hidden:true,editable:false},
+                                                                                                    {text: 'Product Group', dataField:'item_group',editable:false, width: 200},
+                                                                                                       {text: 'BULK', dataField: 'BULK',editable:true, width: 70
+                                                                                                       },
+                                                                                                    {text: 'RETAIL', dataField: 'RETAIL',editable:true, width: 70},
+                                                                                                    {text: 'SMALL PACKING', dataField: 'SMALL PACKING',editable:true, width: 110},
+                                                                                                    {text: 'SINGLE - TANKER', dataField: 'SINGLE - TANKER',editable:true, width: 110},
+                                                                                                    {text: 'Part Tanker', dataField: 'PART TANKER',editable:true, width: 110},
                                                                                                     
                                                                                                 ]
 
                                                                                             });
-                                                                                  /* Mater start*/
-                                                                                  $("#jqxgrid_productpotential").on('rowselect', function (event) {
-                                                                                        var customergroup = event.args.row.customergroup;
-                                                                                        var itemgroup =event.args.row.item_group;
-                                                                                        var records = new Array();
-                                                                                      //  alert("customergroup "+customergroup);
-                                                                                      //  alert("itemgroup "+itemgroup);
-                                                                                
-                                                                                        // update data source.
-
-                                                                                        $("#salestype").jqxGrid({ source: adapter });
-
-                                                                                    });
-                                                                                  /* Master end*/      
+                                                                                 
                                                                                 // Source for Potential grid END
                                                                                 editrow = row;
-                                                                                $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 800, height: 400, resizable: true, title: 'Potential Details'});
+                                                                                $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 700, height: 400, resizable: true, title: 'BP Potential Details'});
                                                                                   var x = ($(window).width() - $("#popupWindowPotential").jqxWindow('width')) / 2 + $(window).scrollLeft();
                                                                                     var y = ($(window).height() - $("#popupWindowPotential").jqxWindow('height')) / 2 + $(window).scrollTop();
                                                                                     $("#popupWindowPotential").jqxWindow({ position: { x: x, y: y} });
@@ -1799,25 +1762,43 @@
                                                                                         var args = event.args;
                                                                                         $("#cellbegineditevent").text("Event Type: cellbeginedit, Column: " + args.datafield + ", Row: " + (1 + args.rowindex) + ", Value: " + args.value);
                                                                                         g_old_pot =args.value;
+                                                                                        act_pot=g_old_pot;
+                                                                                        pot_src="CRM";
+                                                                                         pot_cust_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', event.args.rowindex, "customer_group");
+                                                                                        pot_prod_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', event.args.rowindex, "item_group");
+                                                                                        
                                                                                     });
                                                                                     $("#jqxgrid_productpotential").on('cellendedit', function (event) {
                                                                                         var args = event.args;
-                                                                                       
+                                                                                       salecat_type=event.args.datafield;
+
                                                                                         $("#cellendeditevent").text("Event Type: cellendedit, Column: " + args.datafield + ",Row: " + (1 + args.rowindex) + ", Value: " + args.value);
-                                                                                    /*  alert("value "+args.value);
+                                                                                         /*alert("new value "+args.value);
                                                                                           alert("pot_cust_group  "+pot_cust_group);
                                                                                           alert("pot_prod_group  "+pot_prod_group);
-                                                                                          alert("act_pot  "+act_pot);
-                                                                                          alert("revised_pot  "+g_new_pot);
-                                                                                          alert("g_new_pot  "+g_new_pot);
-                                                                                       */
+                                                                                          alert("act_pot  "+act_pot);*/
+                                                                                          var args = event.args;
+                                                                                          var columnDataField = args.datafield;
+                                                                                          var rowIndex =  args.rowindex;
+                                                                                          var cellValue = args.value;
+                                                                                          var oldValue = args.oldvalue;
+
+                                                                                        /*  alert("new value "+cellValue);
+                                                                                          alert("oldValue  "+oldValue);
+                                                                                          alert("rowIndex  "+rowIndex);
+                                                                                          alert("columnDataField  "+columnDataField);*/
+
                                                                                           g_new_pot =args.value;
                                                                                           
                                                                                           if(args.value!="" && act_pot!= g_new_pot)
                                                                                           {
                                                                                              if(g_new_pot<act_pot)
                                                                                               {
+                                                                                                
                                                                                                alert("Revised Potential should be greater than the actual potential");
+                                                                                               //alert("oldValue after alert "+oldValue+rowIndex+columnDataField);
+                                                                    $("#jqxgrid_productpotential").jqxGrid('setcellvalue', rowIndex, columnDataField, oldValue);
+                                                                    //$('#jqxgrid_productpotential').jqxGrid('render');  
                                                                                                return  false;
                                                                                               }
                                                                                               else
@@ -1825,8 +1806,9 @@
                                                                                                 $.ajax({
                                                                                                     dataType: 'json',
                                                                                                     type: "POST",
-                                                                                                    url: 'dailyactivity/updaterevised_potential/'+pot_cust_group+'/'+pot_prod_group+'/'+act_pot+'/'+pot_src+'/'+args.value,
+                                                                                                    url: 'dailyactivity/updaterevised_potential/'+pot_cust_group+'/'+pot_prod_group+'/'+act_pot+'/'+pot_src+'/'+salecat_type+'/'+args.value,
                                                                                                     cache: true,
+                                                                                                    async: false,
                                                                                                     data: data,
                                                                                                     success: function (response) {
                                                                                                         // alert("Record Updated sucessfully ");
@@ -2142,7 +2124,7 @@
                                                                 },
                                                                 
                                                                 {text: 'BP Potential', datafield: 'potentialqty', width: 75, cellsalign: 'left', editable: false},
-                                                                {text: 'LMS Potential', datafield: 'actualpotenqty', width: 75, cellsalign:'left', editable: true,hidden:true},
+                                                                {text: 'LMS Potential', datafield: 'actualpotenqty', width: 75, cellsalign:'left', editable: true,hidden:false},
 
                                                                 {text: 'Required Quantity',datafield: 'quantity', width: 75, cellsalign: 'left',
                                                                         cellbeginedit: function (row, datafield, columntype) {
@@ -2160,7 +2142,7 @@
 
                                                                                 },editable: true
                                                                     },
-                                                                    {text: 'Sales Type', datafield: 'division', width: 110,hidden:true, cellsalign: 'left',readonly:true,cellbeginedit:Resultsupdate.initResultsEditorst, initeditor: Resultsupdate.resultsEditorst_update, cellsrenderer: Resultsupdate.renderUnitsst
+                                                                    {text: 'Sales Type', datafield: 'division', width: 110,hidden:false, cellsalign: 'left',readonly:true,cellbeginedit:Resultsupdate.initResultsEditorst, initeditor: Resultsupdate.resultsEditorst_update, cellsrenderer: Resultsupdate.renderUnitsst
 
                                                                     },
                                                                     
@@ -2369,9 +2351,8 @@
                                                      }
                                                      else
                                                      {
-                                                        
-
                                                         // Source for Potential grid start
+
                                                             var url = "dailyactivity/getcustomerpotential/"+cust_grp;
                                                             var rows = {};
                                                             jQuery.ajax({
@@ -2392,11 +2373,13 @@
                                                             var potential_source =
                                                                     {
                                                                         datatype: "json",
-                                                                        datafields: [{name: 'customergroup', type: 'string'},
+                                                                        datafields: [{name: 'customer_group', type: 'string'},
                                                                                      {name: 'item_group', type: 'string'},
-                                                                                     {name: 'sum_of_potential', type: 'number'},
-                                                                                     {name: 'source', type: 'string'},
-                                                                                     {name: 'update_potential', type: 'number'}
+                                                                                     {name: 'BULK', type: 'number'},
+                                                                                     {name: 'RETAIL', type: 'number'},
+                                                                                     {name: 'SMALL PACKING', type: 'number'},
+                                                                                     {name: 'SINGLE - TANKER', type: 'number'},
+                                                                                     {name: 'PART TANKER', type: 'number'}
                                                                                      ],
                                                                         localdata: rows
                                                                     };
@@ -2407,8 +2390,8 @@
                                                                     {
                                                                         width: '100%',
                                                                         source: dataAdapterItemMaster,
+                                                                        selectionmode:'singlecell',
                                                                         theme: theme,
-                                                                        selectionmode: 'singlecell',
                                                                         sortable: true,
                                                                         pageable: true,
                                                                         editable: true,
@@ -2417,29 +2400,22 @@
                                                                         showfilterrow: true,
                                                                         filterable: true,
                                                                         columns: [
-                                                                            {text: 'customergroup', dataField: 'customergroup', width: 100, hidden:true,editable:false},
-                                                                            {text: 'Product Group', dataField: 'item_group',editable:false, width: 200},
-                                                                            {text: 'Potential', dataField: 'sum_of_potential',editable:false, width: 70},
-                                                                            {text: 'Source', dataField: 'source',editable:false, width: 70},
-                                                                            {text: 'Revised Poten', dataField: 'update_potential', editable:true, width: 50,hidden:false,
-                                                                            initeditor:function(row, cellvalue, editor){
-                                                                                                        pot_cust_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "customergroup");
-                                                                                                        pot_prod_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "item_group");
-                                                                                                        act_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "sum_of_potential");
-                                                                                                        revised_pot = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "update_potential");
-                                                                                                        pot_src = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', row, "source");
-
-                                                                                                        
-                                 
-                                                                                                    }
-
-                                                                            },
+                                                                            {text: 'customergroup', dataField: 'customer_group', width: 100, hidden:true,editable:false},
+                                                                            {text: 'Product Group', dataField:'item_group',editable:false, width: 200},
+                                                                               {text: 'BULK', dataField: 'BULK',editable:true, width: 70
+                                                                               },
+                                                                            {text: 'RETAIL', dataField: 'RETAIL',editable:true, width: 70},
+                                                                            {text: 'SMALL PACKING', dataField: 'SMALL PACKING',editable:true, width: 110},
+                                                                            {text: 'SINGLE - TANKER', dataField: 'SINGLE - TANKER',editable:true, width: 110},
+                                                                            {text: 'Part Tanker', dataField: 'PART TANKER',editable:true, width: 110},
                                                                             
                                                                         ]
+
                                                                     });
+                                                             
                                                         // Source for Potential grid END
                                                             editrow = row;
-                                                            $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'Potential Details'});
+                                                            $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'BP Potential Details'});
                                                               var x = ($(window).width() - $("#popupWindowPotential").jqxWindow('width')) / 2 + $(window).scrollLeft();
                                                                 var y = ($(window).height() - $("#popupWindowPotential").jqxWindow('height')) / 2 + $(window).scrollTop();
                                                                 $("#popupWindowPotential").jqxWindow({ position: { x: x, y: y} });
@@ -2472,21 +2448,20 @@
                                                                                         var args = event.args;
                                                                                         $("#cellbegineditevent").text("Event Type: cellbeginedit, Column: " + args.datafield + ", Row: " + (1 + args.rowindex) + ", Value: " + args.value);
                                                                                         g_old_pot =args.value;
+                                                                                        act_pot=g_old_pot;
+                                                                                        pot_src="CRM";
+                                                                                        pot_cust_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', event.args.rowindex, "customer_group");
+                                                                                        pot_prod_group = $('#jqxgrid_productpotential').jqxGrid('getcellvalue', event.args.rowindex, "item_group");
+
+                                                                                        
                                                                                     });
                                                                                     $("#jqxgrid_productpotential").on('cellendedit', function (event) {
                                                                                         var args = event.args;
+
+                                                                                       salecat_type=event.args.datafield;
                                                                                        
                                                                                         $("#cellendeditevent").text("Event Type: cellendedit, Column: " + args.datafield + ",Row: " + (1 + args.rowindex) + ", Value: " + args.value);
                                                                                                g_new_pot =args.value;
-                                                                                          alert("args.rowindex "+args.rowindex);
-                                                                                          alert("args value "+args.value);
-                                                                                          alert("pot_cust_group  "+pot_cust_group);
-                                                                                          alert("pot_prod_group  "+pot_prod_group);
-                                                                                          alert("act_pot  "+act_pot);
-                                                                                          alert("revised_pot  "+g_new_pot);
-                                                                                          alert("g_new_pot  "+g_new_pot);
-                                                                                       
-                                                                                   
                    
                                                                                           
                                                                                           if(args.value!="" && act_pot!= g_new_pot)
@@ -2501,9 +2476,11 @@
                                                                                                 $.ajax({
                                                                                                     dataType: 'json',
                                                                                                     type: "POST",
-                                                                                                    url: 'dailyactivity/updaterevised_potential/'+pot_cust_group+'/'+pot_prod_group+'/'+act_pot+'/'+pot_src+'/'+args.value,
+                                                                                                    url: 'dailyactivity/updaterevised_potential/'+pot_cust_group+'/'+pot_prod_group+'/'+act_pot+'/'+pot_src+'/'+salecat_type+'/'+args.value,
                                                                                                     cache: true,
+                                                                                                    async: false,
                                                                                                     data: data,
+
                                                                                                     success: function (response) {
                                                                                                         // alert("Record Updated sucessfully ");
                                                                                                          alert(result.responseText);
@@ -4765,10 +4742,7 @@
                                 <div id="popupWindowPotential" style="position: fixed; left: 50%; top: 50%;">
                                     <div style="margin: 10px">
                                         <div id="jqxgrid_productpotential"></div>
-                                        <div id="salestype"></div>
-
                                     </div>
-
                                 </div>
                                 <!-- Select Potential popup end -->
 
