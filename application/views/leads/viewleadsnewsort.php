@@ -91,8 +91,8 @@
                 source: branch_dataAdapter,
                 displayMember: "branch",
                 valueMember: "branch",
-
                 height: 25,
+                autoDropDownHeight:true,
                 theme: theme,
                 placeHolder: '– Select Branch –'
             });
@@ -131,6 +131,7 @@
                 displayMember: "displayname",
                 valueMember: "header_user_id",
                 height: 25,
+                autoDropDownHeight:true,
                 width:262,
                 theme: theme,
                 placeHolder: '– Created By –'
@@ -169,6 +170,7 @@
                 valueMember: "header_user_id",
                 width: 200,
                 height: 25,
+                autoDropDownHeight:true,
                 theme: theme,
                 placeHolder: '– Created By –'
             });
@@ -179,6 +181,7 @@
                 valueMember: "header_user_id",
                 height: 25,
                 width:262,
+                autoDropDownHeight:true,
                 theme: theme,
                 placeHolder: '– Assigned To –'
             });
@@ -305,6 +308,7 @@
                 displayMember: "displayname",
                 valueMember: "header_user_id",
                 height: 25,
+                autoDropDownHeight:true,
                 width:262,
                 theme: theme,
                 placeHolder: '– Assigned To –'

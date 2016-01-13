@@ -1119,18 +1119,17 @@ class dailyactivity extends CI_Controller {
 
                
             }  // end of $_POST=save is true
-            //	$message = "Daily Activity Created Successfully";
+            
             $message = "true";
         } else {
-            // echo "duplicate exists";	
+            
             $message = "Entry already exists for the date " . $hrd_currentdate;
 
         }
         header('Content-Type: application/x-json; charset=utf-8');
         echo $message;
 
-        //$this->session->set_flashdata('message', "Daily Activity Created Successfully");
-        //redirect('dailyactivity');
+
     }
 
     function updateitemmaster() {
@@ -1151,7 +1150,7 @@ class dailyactivity extends CI_Controller {
         $lead_assign_name = $assign_to_array['0']['location_user'] . "-" . $assign_to_array['0']['aliasloginname'];
         //echo"<pre> post array";print_r($_POST);echo"</pre>";
         $grid_data = array_slice($_POST, 1, null, true);
-        //echo"<pre>";print_r($grid_data);echo"</pre>"; 
+       // echo"<pre>";print_r($grid_data);echo"</pre>"; 
         $get_update_id = $hdn_hdr_id;
 
             if ($_POST['update'] == 'true') {
@@ -1296,14 +1295,20 @@ class dailyactivity extends CI_Controller {
  
                             for ($k = 0; $k < count($product_sale_type); $k++) 
                             {
+/*                                echo"salecat_id ".$product_sale_type[$k]['n_value_id']."<br>";
+                                echo"sales_type_id ".$sales_type_id."<br>";
+                                echo"<pre>";print_r($val);echo"</pre>";*/
+
                                 $lead_prod_poten_type[$k]['leadid'] = $lead_id;
                                 $lead_prod_poten_type[$k]['productid'] = $val['hdn_prod_id'];
                                 $lead_prod_poten_type[$k]['product_type_id'] =$product_sale_type[$k]['n_value_id'];
 
                                  if ($product_sale_type[$k]['n_value_id'] == $sales_type_id) {
-                                    $lead_prod_poten_type[$k]['potential'] = $val['potentialqty'];
+                                    $lead_prod_poten_type[$k]['potential'] = $val['actualpotenqty'];
+                                   // echo"in matched <br>";
                                 } else {
                                     $lead_prod_poten_type[$k]['potential'] = 0;
+                                   // echo"in not matched <br>";
                                 }
 
                              $proddata[$k]['leadid'] = $lead_id;
@@ -1664,13 +1669,13 @@ class dailyactivity extends CI_Controller {
                              $sales_type_id = $this->dailyactivity_model->get_salestypeid_byname($val['division']);  
                                                     
 
-                             $lead_prod_poten_type = array(
+                             $lead_prod_poten_type_update = array(
                                 'potential' => $val['actualpotenqty']
                             );
                                 
                             $id = $this->Leads_model->update_lead($leaddetails, $lead_id);
                             $id = $this->Leads_model->update_leadproducts($leadproducts, $lead_id);
-                            $lead_pord_poten_id = $this->Leads_model->dcupdate_leadprodpotentypes($lead_prod_poten_type, $lead_id,$sales_type_id);
+                            $lead_pord_poten_id = $this->Leads_model->dcupdate_leadprodpotentypes($lead_prod_poten_type_update, $lead_id,$sales_type_id);
 
       
 

@@ -355,7 +355,6 @@ class dailyactivity_model extends CI_Model
 					$row["hour_s"] = $activitydetails[$i]["hour_s"];
 					$row["minit"] = $activitydetails[$i]["minit"];
 					$row["quantity"] = $activitydetails[$i]["quantity"];
-					$row["actualpotenqty"] = $activitydetails[$i]["actualpotenqty"];
 					$row["create_lead"]= $activitydetails[$i]["create_lead"];
 					$row["division"] = $activitydetails[$i]["division"];
 					$row["date"] = $activitydetails[$i]["date"];
@@ -367,6 +366,7 @@ class dailyactivity_model extends CI_Model
 					$row["leadstatusid"] = "No Status";	
 					$row["leadsubstatusid"] = "No Substatus";
 					$row["noofleads"] = 0;	
+					$row["actualpotenqty"] = $activitydetails[$i]["actualpotenqty"];
 					$row["result_type"] = 'Value';	
 					
 					}
@@ -375,6 +375,7 @@ class dailyactivity_model extends CI_Model
 						$row["leadid"] = $activitydetails[$i]["leadid"];
 						$row["leadstatusid"] = $activitydetails[$i]["statusname"];	
 						$row["noofleads"] = 1;	
+						$row["actualpotenqty"] = $this->getlms_potential($activitydetails[$i]["leadid"]);
 						$row["result_type"] = 'Select';	
 						$row["leadsubstatusid"] = $activitydetails[$i]["substatusname"];
 					}
@@ -393,6 +394,16 @@ class dailyactivity_model extends CI_Model
    //    echo $arr; die;
 		 	return $arr;
 	}
+			function getlms_potential($leadid)
+			{
+				$sql ="select max(potential)  FROM lead_prod_potential_types WHERE leadid=".$leadid;
+				$result = $this->db->query($sql);
+				//print_r($result->result_array());
+				$lms_poten = $result->result_array();
+			//	print_r($daily_hdr_id);
+				//echo"max id is ".$daily_hdr_id[0]['max'];
+				return $lms_poten[0]['max'];
+			}
 			function get_products($sql)
 			{
 				//$sql='SELECT  DISTINCT  itemgroup FROM itemmaster ORDER BY description asc';
@@ -694,6 +705,17 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 		function get_lead_potential_update($leaid)
 		{
 
+				/*$sql="SELECT lead_prod_potential_types.potential,leadproducts.quantity as requirement,leaddetails.leadid,leaddetails.leadstatus as curr_stats_id, leaddetails.ldsubstatus as curr_substats_id,lead_prod_potential_types.product_type_id as id,lead_sale_type.n_value_displayname as lead_sale_type, leadsource.leadsource as lead_source_name,leaddetails.email_id,  leadstatus.leadstatus as leadstatusname,leadsubstatus.lst_name as leadsubstatusname
+							FROM leaddetails 
+							INNER JOIN leadproducts ON leaddetails.leadid = leadproducts.leadid 
+							INNER JOIN leadsource ON leaddetails.leadsource = leadsource.leadsourceid
+							INNER JOIN leadstatus ON leadstatus.leadstatusid =leaddetails.leadstatus
+							INNER JOIN leadsubstatus ON leadsubstatus.lst_sub_id =leaddetails.ldsubstatus
+							INNER JOIN customermasterhdr ON leaddetails.company = customermasterhdr.id 
+							INNER JOIN view_tempitemmaster_grp ON view_tempitemmaster_grp.id=leadproducts.productid 
+							INNER JOIN lead_prod_potential_types ON lead_prod_potential_types.leadid=leaddetails.leadid 
+							INNER JOIN lead_sale_type ON lead_sale_type.n_value_id = lead_prod_potential_types.product_type_id
+							WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".$leaid." ORDER BY lead_prod_potential_types.potential,lead_prod_potential_types.product_type_id  LIMIT 1";*/
 				$sql="SELECT lead_prod_potential_types.potential,leadproducts.quantity as requirement,leaddetails.leadid,leaddetails.leadstatus as curr_stats_id, leaddetails.ldsubstatus as curr_substats_id,lead_prod_potential_types.product_type_id as id,lead_sale_type.n_value_displayname as lead_sale_type, leadsource.leadsource as lead_source_name,leaddetails.email_id,  leadstatus.leadstatus as leadstatusname,leadsubstatus.lst_name as leadsubstatusname
 							FROM leaddetails 
 							INNER JOIN leadproducts ON leaddetails.leadid = leadproducts.leadid 
@@ -704,8 +726,10 @@ WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".
 							INNER JOIN view_tempitemmaster_grp ON view_tempitemmaster_grp.id=leadproducts.productid 
 							INNER JOIN lead_prod_potential_types ON lead_prod_potential_types.leadid=leaddetails.leadid 
 							INNER JOIN lead_sale_type ON lead_sale_type.n_value_id = lead_prod_potential_types.product_type_id
-							WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".$leaid." ORDER BY lead_prod_potential_types.potential,lead_prod_potential_types.product_type_id  LIMIT 1";
-				//echo $sql;							
+							WHERE  leaddetails.lead_close_status=0 and converted=0 AND leaddetails.leadid=".$leaid." AND
+							 	 lead_prod_potential_types.potential =(SELECT max(potential) FROM lead_prod_potential_types WHERE leadid=
+							 	 	".$leaid.") ORDER BY lead_prod_potential_types.potential,lead_prod_potential_types.product_type_id";	
+				//echo $sql;	die;						
 				
 				$result = $this->db->query($sql);
 				

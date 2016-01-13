@@ -128,6 +128,7 @@
                         {name: 'substatusname'},
                         {name: 'leadsource'},
                         {name: 'productname', type: 'string'},
+                        {name: 'product_group', type: 'string'},
                         /*{ name: 'salestype',type:'string'},*/
                         {name: 'assign_from_name'},
                         {name: 'empname'},
@@ -171,7 +172,7 @@
                         {text: 'Lead SubStatus', dataField: 'substatusname', width: 120},
                         {text: 'Lead Source', dataField: 'leadsource', width: 85, cellsalign: 'left'},
                         {text: 'Product Name', dataField: 'productname', width: 100, cellsalign: 'left'},
-                        /*{ text: 'Sales Type', dataField: 'salestype', width: 100, cellsalign: 'left'},*/
+                        {text: 'Item Group', dataField: 'product_group', width: 100, cellsalign: 'left'},
                         {text: 'Assigned From', dataField: 'assign_from_name', width: 120, cellsalign: 'left'},
                         {text: 'Assigned To', dataField: 'empname', width: 125, cellsalign: 'left'},
                         {text: 'Customer Name', dataField: 'tempcustname', cellsalign: 'left', minwidth: 150},

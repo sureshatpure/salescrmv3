@@ -1314,6 +1314,7 @@ class Leads_model extends CI_Model {
             leaddetails.sent_mail_alert,
             leaddetails.industry_id,
             leadproducts.productid,
+            leadproducts.product_group,
             view_tempitemmaster.description AS productname,
             vw_web_user_login.empname as assign_from_name,
             assignedfrom.empname,
@@ -1365,6 +1366,7 @@ class Leads_model extends CI_Model {
             $row["lead_close_option"] = $jTableResult['leaddetails'][$i]["lead_close_option"];
             $row["lead_close_comments"] = $jTableResult['leaddetails'][$i]["lead_close_comments"];
             $row["productname"] = $jTableResult['leaddetails'][$i]["productname"];
+            $row["product_group"] = $jTableResult['leaddetails'][$i]["product_group"];
             $row["productid"] = $jTableResult['leaddetails'][$i]["productid"];
             $row["branch"] = $jTableResult['leaddetails'][$i]["user_branch"];
             $row["leadsource"] = $jTableResult['leaddetails'][$i]["leadsource"];
@@ -1782,6 +1784,7 @@ class Leads_model extends CI_Model {
             leaddetails.sent_mail_alert,
             leaddetails.industry_id,
             leadproducts.productid,
+            leadproducts.product_group,
             view_tempitemmaster.description AS productname,
             vw_web_user_login.empname as assign_from_name,
             assignedfrom.empname,
@@ -1838,6 +1841,7 @@ class Leads_model extends CI_Model {
             $row["lead_close_comments"] = $jTableResult['leaddetails'][$i]["lead_close_comments"];
             $row["productname"] = $jTableResult['leaddetails'][$i]["productname"];
             $row["productid"] = $jTableResult['leaddetails'][$i]["productid"];
+            $row["product_group"] = $jTableResult['leaddetails'][$i]["product_group"];
             $row["branch"] = $jTableResult['leaddetails'][$i]["user_branch"];
             $row["leadsource"] = $jTableResult['leaddetails'][$i]["leadsource"];
             $row["assign_from_name"] = $jTableResult['leaddetails'][$i]["assign_from_name"];
@@ -2742,12 +2746,30 @@ class Leads_model extends CI_Model {
 
     function insertlead_deletelog($created_date, $created_userid, $created_user_name, $leadid) {
         //return $this->db->insert_batch('leadproducts', $leadprods);
-        $sql = "INSERT INTO 
+       /* $sql = "INSERT INTO 
 			web_lead_deletedlog 
 (leadid,lead_no,email_id,firstname,lastname,created_user,asignedto_userid,street,endproducttype,productsaletype,presentsource,suppliername,decisionmaker,branchname,comments,uploadeddate,description,secondaryemail,assignedtouser,createddate,createdby,last_modified,updatedby,sent_mail_alert,leadsource,primarystatus,substatusname,loginname,prodqnty,productupdatedate,created_date,prod_type_id,leadpoten,industrysegment,productname,itemgroup,uom,customername,customertype,deleteddate,deleted_userid,deleted_username)
 SELECT 
-     leadid,lead_no,email_id,firstname,lastname,created_user,asignedto_userid,street,endproducttype,productsaletype,presentsource,suppliername,decisionmaker,branchname,comments,uploadeddate,description,secondaryemail,assignedtouser,createddate,createdby,last_modified,updatedby,sent_mail_alert,leadsource,primarystatus,substatusname,loginname,prodqnty,productupdatedate,created_date,prod_type_id,leadpoten,industrysegment,productname,itemgroup,uom,customername,customertype,'" . $created_date . "'," . $created_userid . ",'" . $created_user_name . "' FROM vw_lead_export_excel where leadid=" . $leadid;
-        //echo $sql; 
+     leadid,lead_no,email_id,firstname,lastname,created_user,asignedto_userid,street,endproducttype,productsaletype,presentsource,suppliername,decisionmaker,branchname,comments,uploadeddate,description,secondaryemail,assignedtouser,createddate,createdby,last_modified,updatedby,sent_mail_alert,leadsource,primarystatus,substatusname,loginname,prodqnty,productupdatedate,created_date,prod_type_id,leadpoten,industrysegment,productname,itemgroup,uom,customername,customertype,'" . $created_date . "'," . $created_userid . ",'" . $created_user_name . "' FROM vw_lead_export_to_exceljcwise where leadid=" . $leadid;*/
+
+     $sql = "INSERT INTO web_lead_deletedlog (leadid,lead_no,email_id,firstname,lastname,created_user,asignedto_userid,street,endproducttype,productsaletype,
+presentsource,suppliername,decisionmaker,branchname,comments,uploadeddate,description,secondaryemail,assignedtouser,createddate,createdby,last_modified,updatedby,sent_mail_alert,leadsource,primarystatus,substatusname,loginname,prodqnty,productupdatedate,created_date,prod_type_id,leadpoten,industrysegment,productname,itemgroup,uom,customername,customertype,deleteddate,deleted_userid,deleted_username) 
+    (
+    SELECT leadid,lead_no,email_id,firstname,lastname,created_user,asignedto_userid,address,industrysegment,
+        ( 
+            SELECT s.n_value_displayname from lead_prod_potential_types l,lead_sale_type s WHERE l.product_type_id = s.n_value_id AND leadid=".$leadid." AND l.potential >0
+        ) as productsaletype,
+        presentsource,suppliername,decisionmaker,branchname,comments,uploadeddate,description,secondaryemail,assignedtouser,createddate,createdby,lastupdatedate,updatedby,sent_mail_alert,leadsource,primarystatus,substatusname,createdby,immediate_requirement,productupdatedate,createddate,
+        ( 
+            SELECT s.n_value_id
+            from lead_prod_potential_types l,lead_sale_type s WHERE l.product_type_id = s.n_value_id AND leadid=".$leadid." AND l.potential >0
+        ) as prod_type_id,
+        ( 
+            SELECT l.potential from  lead_prod_potential_types l,lead_sale_type s WHERE l.product_type_id = s.n_value_id AND leadid=39649 AND l.potential >0
+        )leadpoten,
+        industrysegment,productname,itemgroup,uom,customername,customertype,'" . $created_date . "'," . $created_userid . ",'" . $created_user_name . "' FROM vw_lead_export_to_exceljcwise_fordeletelog where leadid=".$leadid.")";
+
+        //echo $sql; die;
         $result = $this->db->query($sql);
         // echo $this->db->affected_rows();
 
@@ -2914,6 +2936,7 @@ SELECT
     function save_leadprodpotentypes($lead_potential_types) {
 
         return $this->db->insert_batch('lead_prod_potential_types', $lead_potential_types);
+
     }
 
     function save_leadcustomer_potential_update($lead_customer_pontential) {

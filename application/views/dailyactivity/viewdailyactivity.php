@@ -352,16 +352,14 @@
                                                         }
                                                         else
                                                         {
-                                                           // alert("prod_grp "+prod_grp);
-                                                            //alert(" in false noofleads "+noofleads);
+
                                                              if(typeof(prod_grp)==undefined) 
                                                              {
                                                                g_create_lead_add=0; 
                                                                noofleads=0;
                                                              }
-                                                             //alert("in false noofleads "+noofleads);
-                                                             //alert(" in false g_create_lead_add "+g_create_lead_add);
-                                                             potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
+
+                                                             //potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
                                                             $("#jqxgrid_add").jqxGrid('setcellvalue', row, "Potential_Quantity", potential_quantity);
                                                             $("#jqxgrid_add").jqxGrid('setcellvalue', row, "create_lead", g_create_lead_add);
                                                         }
@@ -916,14 +914,16 @@
                                                 if(noofleads>0)
                                                 {
                                                  this.columntype = 'dropdownlist'; 
-                                                 $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity); 
+                                                 $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", curr_poten); 
+                                                 $("#jqxgrid_n").jqxGrid('setcellvalue', row, "actualpotenqty", potential_quantity); 
                                                  
                                                 }
                                                 else
                                                 {
                                                      this.columntype = 'textbox';
-                                                     potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
-                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity);
+                                                  //   potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
+                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", curr_poten);
+                                                    $("#jqxgrid_n").jqxGrid('setcellvalue', row, "actualpotenqty", potential_quantity); 
                                                 }
                                             }
                                         });
@@ -1025,7 +1025,7 @@
                                                                 else
                                                                 {
                                                                      this.columntype = 'textbox';
-                                                                     potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
+                                                                 //    potential_quantity =(potential_quantity >0) ? potential_quantity :curr_poten;
                                                                     $("#jqxgrid_n").jqxGrid('setcellvalue', row, "potentialqty", potential_quantity);
                                                                 }
 
@@ -1687,7 +1687,7 @@
                                                                                                 datatype: "json",
                                                                                                 datafields: [{name: 'customer_group', type: 'string'},
                                                                                                              {name: 'item_group', type: 'string'},
-                                                                                                             {name: 'BULK', type: 'number'},
+                                                                                                             {name: 'BULK', type: 'decimal'},
                                                                                                              {name: 'RETAIL', type: 'number'},
                                                                                                              {name: 'SMALL PACKING', type: 'number'},
                                                                                                              {name: 'SINGLE - TANKER', type: 'number'},
@@ -1698,6 +1698,13 @@
 
                                                                                     //  alert("columns "+columns.toSource());    
                                                                                     var dataAdapterItemMaster = new $.jqx.dataAdapter(potential_source);
+
+                                                                                    var cellvaluechanging = function (row, datafield, columntype, oldvalue, newvalue) {
+                                                                                                    if (newvalue < oldvalue)
+                                                                                                        { alert("Revised Potential should be greater than the actual potential");
+                                                                                                            return oldvalue;
+                                                                                                        }
+                                                                                                    }
                                                                                     $("#jqxgrid_productpotential").jqxGrid(
                                                                                             {
                                                                                                 width: '100%',
@@ -1714,12 +1721,12 @@
                                                                                                 columns: [
                                                                                                     {text: 'customergroup', dataField: 'customer_group', width: 100, hidden:true,editable:false},
                                                                                                     {text: 'Product Group', dataField:'item_group',editable:false, width: 200},
-                                                                                                       {text: 'BULK', dataField: 'BULK',editable:true, width: 70
-                                                                                                       },
-                                                                                                    {text: 'RETAIL', dataField: 'RETAIL',editable:true, width: 70},
-                                                                                                    {text: 'SMALL PACKING', dataField: 'SMALL PACKING',editable:true, width: 110},
-                                                                                                    {text: 'SINGLE - TANKER', dataField: 'SINGLE - TANKER',editable:true, width: 110},
-                                                                                                    {text: 'Part Tanker', dataField: 'PART TANKER',editable:true, width: 110},
+                                                                                                    {text: 'BULK', dataField: 'BULK',editable:true, width: 70,
+                                                                                                    cellvaluechanging:cellvaluechanging},
+                                                                                                    {text: 'RETAIL', dataField: 'RETAIL',editable:true, width: 70,cellvaluechanging:cellvaluechanging},
+                                                                                                    {text: 'SMALL PACKING', dataField: 'SMALL PACKING',editable:true, width: 110,cellvaluechanging:cellvaluechanging},
+                                                                                                    {text: 'SINGLE - TANKER', dataField: 'SINGLE - TANKER',editable:true, width: 110,cellvaluechanging:cellvaluechanging},
+                                                                                                    {text: 'Part Tanker', dataField: 'PART TANKER',editable:true, width: 110,cellvaluechanging:cellvaluechanging},
                                                                                                     
                                                                                                 ]
 
@@ -1730,7 +1737,9 @@
                                                                                 $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 700, height: 400, resizable: true, title: 'BP Potential Details'});
                                                                                   var x = ($(window).width() - $("#popupWindowPotential").jqxWindow('width')) / 2 + $(window).scrollLeft();
                                                                                     var y = ($(window).height() - $("#popupWindowPotential").jqxWindow('height')) / 2 + $(window).scrollTop();
-                                                                                    $("#popupWindowPotential").jqxWindow({ position: { x: x, y: y} });
+
+                                                                                    //$("#popupWindowPotential").jqxWindow({ position: { x: x, y: y} });
+                                                                                    $("#popupWindowPotential").jqxWindow({ position: { x: 420, y: 72} });
                                                                                     $('#popupWindowPotential').jqxWindow('open');
                                                                                     $('#popupWindowPotential').jqxWindow({ zIndex: 99999}); 
                                                                                     $('#popupWindowPotential').jqxWindow('bringToFront');
@@ -1797,7 +1806,7 @@
                                                                                                 
                                                                                                alert("Revised Potential should be greater than the actual potential");
                                                                                                //alert("oldValue after alert "+oldValue+rowIndex+columnDataField);
-                                                                    $("#jqxgrid_productpotential").jqxGrid('setcellvalue', rowIndex, columnDataField, oldValue);
+                                                                    
                                                                     //$('#jqxgrid_productpotential').jqxGrid('render');  
                                                                                                return  false;
                                                                                               }
@@ -2384,7 +2393,13 @@
                                                                         localdata: rows
                                                                     };
 
-                                                            //  alert("columns "+columns.toSource());    
+                                                            //  alert("columns "+columns.toSource());   
+                                                              var cellvaluechanging = function (row, datafield, columntype, oldvalue, newvalue) {
+                                                                    if (newvalue < oldvalue)
+                                                                        { alert("Revised Potential should be greater than the actual potential");
+                                                                            return oldvalue;
+                                                                        }
+                                                                    } 
                                                             var dataAdapterItemMaster = new $.jqx.dataAdapter(potential_source);
                                                             $("#jqxgrid_productpotential").jqxGrid(
                                                                     {
@@ -2402,20 +2417,20 @@
                                                                         columns: [
                                                                             {text: 'customergroup', dataField: 'customer_group', width: 100, hidden:true,editable:false},
                                                                             {text: 'Product Group', dataField:'item_group',editable:false, width: 200},
-                                                                               {text: 'BULK', dataField: 'BULK',editable:true, width: 70
-                                                                               },
-                                                                            {text: 'RETAIL', dataField: 'RETAIL',editable:true, width: 70},
-                                                                            {text: 'SMALL PACKING', dataField: 'SMALL PACKING',editable:true, width: 110},
-                                                                            {text: 'SINGLE - TANKER', dataField: 'SINGLE - TANKER',editable:true, width: 110},
-                                                                            {text: 'Part Tanker', dataField: 'PART TANKER',editable:true, width: 110},
+                                                                               {text: 'BULK', dataField: 'BULK',editable:true, width: 70,cellvaluechanging:cellvaluechanging},
+                                                                            {text: 'RETAIL', dataField: 'RETAIL',editable:true, width: 70,cellvaluechanging:cellvaluechanging},
+                                                                            {text: 'SMALL PACKING', dataField: 'SMALL PACKING',editable:true, width: 110,cellvaluechanging:cellvaluechanging},
+                                                                            {text: 'SINGLE - TANKER', dataField: 'SINGLE - TANKER',editable:true, width: 110,cellvaluechanging:cellvaluechanging},
+                                                                            {text: 'Part Tanker', dataField: 'PART TANKER',editable:true, width: 110,cellvaluechanging:cellvaluechanging},
                                                                             
                                                                         ]
 
                                                                     });
+                                                                  
                                                              
                                                         // Source for Potential grid END
                                                             editrow = row;
-                                                            $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 450, height: 500, resizable: true, title: 'BP Potential Details'});
+                                                            $('#popupWindowPotential').jqxWindow({theme: 'energyblue', autoOpen: false, width: 700, height: 500, resizable: true, title: 'BP Potential Details'});
                                                               var x = ($(window).width() - $("#popupWindowPotential").jqxWindow('width')) / 2 + $(window).scrollLeft();
                                                                 var y = ($(window).height() - $("#popupWindowPotential").jqxWindow('height')) / 2 + $(window).scrollTop();
                                                                 $("#popupWindowPotential").jqxWindow({ position: { x: x, y: y} });
@@ -4289,7 +4304,7 @@
 
                                             }
                                         });
-                                         $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "potentialqty", lead_poten);
+                                         $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "actualpotenqty", lead_poten);
                                          $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "quantity", lead_req);
                                          $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "division", lead_salestype);
                                          $("#jqxgrid_n").jqxGrid('setcellvalue', rowindex, "modeofcontact", lead_email_id);

@@ -432,7 +432,7 @@
                                 }
                             },
                             columns: [
-                                {text: 'Product Name', datafield: 'product_name', width: 300, editable: false},
+                                {text: 'Product Group', datafield: 'product_name', width: 300, editable: false},
                                 {text: 'Product id', datafield: 'product_id', width: 50, editable: false, hidden:true},
                                 {text: 'Bulk', datafield: 'bulk', width: 50,hidden:false},
                                 {text: 'Repack', datafield: 'repack', width: 65,hidden:false},
@@ -474,7 +474,7 @@
                         {
 
                             loadproducts();
-                            $('#win_selectItemMaster').jqxWindow({theme: 'darkblue', autoOpen: false, isModal: true, width: 400, height: 500, resizable: true, modalOpacity: 0.01, title: 'select product'});
+                            $('#win_selectItemMaster').jqxWindow({theme: 'darkblue', autoOpen: false, isModal: true, width: 400, height: 500, resizable: true, modalOpacity: 0.01, title: 'Select the Product Group'});
                             $('#win_selectItemMaster').jqxWindow({position: {x: 500, y: 100}});
                             $('#win_selectItemMaster').jqxWindow('open');
 
@@ -1704,7 +1704,7 @@
                                 columns:
                                         [
                                             {text: 'Id', dataField: 'id', width: 100},
-                                            {text: 'Product Name', dataField: 'description', width: 500, height: 600},
+                                            {text: 'Product Group', dataField: 'description', width: 500, height: 600},
                                         ]
                             });
 

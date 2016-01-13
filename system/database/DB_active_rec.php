@@ -61,7 +61,7 @@ class CI_DB_active_record extends CI_DB_driver {
 	
 	var $ar_no_escape 			= array();
 	var $ar_cache_no_escape     = array();
-  	var $unions					=array();
+  	var $unions					="";
 
 	// --------------------------------------------------------------------
 
@@ -1112,6 +1112,7 @@ class CI_DB_active_record extends CI_DB_driver {
 		}
 
 		$keys = array_keys(current($key));
+		
 		sort($keys);
 
 		foreach ($key as $row)

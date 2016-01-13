@@ -43,7 +43,7 @@ class Leads extends CI_Controller {
                 
             if($this->session->userdata['reportingto']!="" && count($out_array)==1 )
             {
-              $leaddata['selectedIndex_val']=0;
+              $leaddata['selectedIndex_val']=-1;
             }
             else
             {
@@ -1361,9 +1361,9 @@ class Leads extends CI_Controller {
                 redirect($url . 'dailycall');
             } else {
 
-               //redirect('leads/add',$leaddata);
+               
                redirect('leads/add');
-              //  echo"<pre>";print_r($leaddata);echo"</pre>";
+              
 
 
             }
